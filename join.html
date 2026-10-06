@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Join Server</title>
+<style>
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+         background:#1e1f22; color:#f2f3f5; font-family:system-ui,Segoe UI,Arial,sans-serif; }
+  .card { background:#2b2d31; padding:28px 32px; border-radius:12px; max-width:440px; width:90%; text-align:center; }
+  h1 { margin:0 0 8px; font-size:22px; }
+  p { margin:6px 0 18px; color:#b5bac1; font-size:14px; }
+  .btn { display:inline-block; background:#3498db; color:#fff; text-decoration:none; font-weight:700;
+         padding:12px 22px; border-radius:8px; }
+  code { display:block; margin-top:18px; padding:10px; background:#1e1f22; border-radius:8px;
+         font-size:12px; word-break:break-all; color:#b5bac1; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1 id="title">Joining server...</h1>
+  <p id="msg">Your browser may ask to open Roblox. Click Open / Allow.</p>
+  <a id="btn" class="btn" href="#">Open Roblox</a>
+  <code id="raw"></code>
+</div>
+<script>
+  var q = new URLSearchParams(location.search);
+  var placeId = q.get("placeId") || "";
+  var jobId = q.get("jobId") || "";
+
+  // only digits for placeId and a UUID for jobId, so nothing else can be injected into the link
+  var valid = /^\d{1,20}$/.test(placeId) && /^[0-9a-fA-F-]{36}$/.test(jobId);
+
+  if (!valid) {
+    document.getElementById("title").textContent = "Invalid link";
+    document.getElementById("msg").textContent = "The place ID or server ID is missing or malformed.";
+    document.getElementById("btn").style.display = "none";
+  } else {
+    var url = "roblox://experiences/start?placeId=" + placeId + "&gameInstanceId=" + jobId;
+    document.getElementById("btn").href = url;
+    document.getElementById("raw").textContent = url;
+    setTimeout(function () { location.href = url; }, 400);
+  }
+</script>
+</body>
+</html>
