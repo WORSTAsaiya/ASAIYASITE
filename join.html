@@ -136,7 +136,18 @@
   }, 1000);
 
   poll();
-  setInterval(poll, 3000);
+
+  // Check every 2s. A tiny background worker keeps the timer running even when this tab is hidden,
+  // because browsers slow down normal timers in background tabs.
+  try {
+    var ticker = new Worker(URL.createObjectURL(new Blob(
+      ["setInterval(function(){postMessage(1)},2000)"], { type: "text/javascript" })));
+    ticker.onmessage = poll;
+  } catch (e) {
+    setInterval(poll, 2000);
+  }
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) poll(); });
+  window.addEventListener("focus", poll);
 </script>
 </body>
 </html>
