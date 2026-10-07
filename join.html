@@ -5,36 +5,74 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Join Server</title>
 <style>
-  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+  body { margin:0; min-height:100vh; padding:20px; box-sizing:border-box;
+         display:grid; grid-template-columns:minmax(0,300px) minmax(0,440px) minmax(0,300px);
+         justify-content:space-between; align-items:center; gap:20px;
          background-color:#1e1f22;
          background-image:url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true");
          background-size:cover; background-position:center; background-repeat:no-repeat;
          color:#f2f3f5; font-family:system-ui,Segoe UI,Arial,sans-serif; }
-  .card { background:#2b2d31; padding:28px 32px; border-radius:12px; max-width:440px; width:90%; text-align:center; }
+  .card { background:#2b2d31; padding:28px 32px; border-radius:12px; text-align:center; }
   h1 { margin:0 0 8px; font-size:22px; }
   p { margin:6px 0 18px; color:#b5bac1; font-size:14px; }
   .btn { display:inline-block; background:#3498db; color:#fff; text-decoration:none; font-weight:700;
          padding:12px 22px; border-radius:8px; }
   code { display:block; margin-top:18px; padding:10px; background:#1e1f22; border-radius:8px;
          font-size:12px; word-break:break-all; color:#b5bac1; }
+
+  .panel { background:rgba(30,31,34,.88); border-radius:12px; padding:16px; align-self:start; margin-top:8px; }
+  .panel h2 { margin:0 0 12px; font-size:16px; }
+  #feed { display:flex; flex-direction:column; gap:8px; max-height:70vh; overflow-y:auto; }
+  .item { display:block; padding:10px 12px; background:#2b2d31; border-radius:8px; color:inherit;
+          text-decoration:none; border-left:3px solid #3498db; }
+  .item:hover { background:#34363c; }
+  .item.new { animation:flash 1.6s ease-out; }
+  .item b { display:block; font-size:14px; }
+  .item span { display:block; font-size:12px; color:#b5bac1; margin-top:2px; }
+  .empty { font-size:13px; color:#b5bac1; }
+  .Secret { border-color:#E74C3C; } .Eternal { border-color:#9B59B6; } .Divine { border-color:#F1C40F; }
+  #joined { font-size:14px; }
+  @keyframes flash { from { background:#3d5a80; } to { background:#2b2d31; } }
+  @media (max-width:980px) {
+    body { grid-template-columns:minmax(0,1fr); justify-content:center; }
+    .card { order:1; } #left { order:2; } #right { order:3; }
+    #feed { max-height:40vh; }
+  }
 </style>
 </head>
 <body>
+
+<aside class="panel" id="left">
+  <h2>New Webhooks</h2>
+  <div id="feed"><div class="empty">Waiting for the first alert...</div></div>
+</aside>
+
 <div class="card">
   <h1 id="title">Joining server...</h1>
   <p id="msg">Your browser may ask to open Roblox. Click Open / Allow.</p>
   <a id="btn" class="btn" href="#">Open Roblox</a>
   <code id="raw"></code>
 </div>
+
+<aside class="panel" id="right">
+  <div id="joined">User 1 Joined - Server 1</div>
+</aside>
+
 <script>
+  // Paste your Cloudflare Worker feed address here, for example https://eggfeed.yourname.workers.dev/feed
+  var FEED_URL = "https://eggfeed.asaiyamain.workers.dev/feed";
+
+  // ---------- join logic (unchanged) ----------
   var q = new URLSearchParams(location.search);
   var placeId = q.get("placeId") || "";
   var jobId = q.get("jobId") || "";
-
-  // only digits for placeId and a UUID for jobId, so nothing else can be injected into the link
   var valid = /^\d{1,20}$/.test(placeId) && /^[0-9a-fA-F-]{36}$/.test(jobId);
 
-  if (!valid) {
+  if (!placeId && !jobId) {
+    document.getElementById("title").textContent = "No server selected";
+    document.getElementById("msg").textContent = "Pick one from New Webhooks.";
+    document.getElementById("btn").style.display = "none";
+  } else if (!valid) {
     document.getElementById("title").textContent = "Invalid link";
     document.getElementById("msg").textContent = "The place ID or server ID is missing or malformed.";
     document.getElementById("btn").style.display = "none";
@@ -44,6 +82,61 @@
     document.getElementById("raw").textContent = url;
     setTimeout(function () { location.href = url; }, 400);
   }
+
+  // ---------- live feed ----------
+  var feedEl = document.getElementById("feed");
+  var known = {};
+  var firstLoad = true;
+
+  function ago(t) {
+    var s = Math.max(0, Math.floor((Date.now() - t) / 1000));
+    if (s < 60) return s + "s ago";
+    if (s < 3600) return Math.floor(s / 60) + "m ago";
+    return Math.floor(s / 3600) + "h ago";
+  }
+
+  function line(tag, text, cls) {
+    var el = document.createElement(tag);
+    el.textContent = text;
+    if (cls) el.className = cls;
+    return el;
+  }
+
+  function render(items) {
+    if (!items.length) return;
+    feedEl.textContent = "";
+    items.forEach(function (it) {
+      if (!/^\d{1,20}$/.test(it.placeId) || !/^[0-9a-fA-F-]{36}$/.test(it.jobId)) return;
+      var key = it.jobId + it.t;
+      var a = document.createElement("a");
+      a.className = "item " + String(it.rarity).replace(/[^A-Za-z]/g, "");
+      if (!firstLoad && !known[key]) a.className += " new";
+      known[key] = true;
+      a.href = "?placeId=" + it.placeId + "&jobId=" + it.jobId;
+      a.appendChild(line("b", it.egg));
+      a.appendChild(line("span", [it.rarity, it.kg, it.mutation && it.mutation !== "NONE" ? it.mutation : ""].filter(Boolean).join(" • ")));
+      var t = line("span", ago(it.t));
+      t.dataset.t = it.t;
+      a.appendChild(t);
+      feedEl.appendChild(a);
+    });
+    firstLoad = false;
+  }
+
+  function poll() {
+    if (!FEED_URL) { feedEl.firstChild.textContent = "Feed not set up yet."; return; }
+    fetch(FEED_URL, { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { if (Array.isArray(d)) render(d); })
+      .catch(function () {});
+  }
+
+  setInterval(function () {
+    feedEl.querySelectorAll("span[data-t]").forEach(function (s) { s.textContent = ago(+s.dataset.t); });
+  }, 1000);
+
+  poll();
+  setInterval(poll, 3000);
 </script>
 </body>
 </html>
