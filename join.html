@@ -32,6 +32,21 @@
   .empty { font-size:13px; color:#b5bac1; }
   .Secret { border-color:#E74C3C; } .Eternal { border-color:#9B59B6; } .Divine { border-color:#F1C40F; }
   #joined { font-size:14px; }
+  .item { display:grid; grid-template-columns:56px minmax(0,1fr); gap:10px; align-items:center; }
+  .item span { word-break:break-word; }
+  .item .time { opacity:.7; }
+  .pic { width:56px; height:56px; border-radius:8px; background:#1e1f22; overflow:hidden; }
+  .pic img { width:100%; height:100%; object-fit:contain; display:block; }
+  .info { min-width:0; }
+  dialog { background:#2b2d31; color:#f2f3f5; border:0; border-radius:12px; padding:24px; max-width:340px; width:88%;
+           font-family:system-ui,Segoe UI,Arial,sans-serif; text-align:center; }
+  dialog::backdrop { background:rgba(0,0,0,.65); }
+  dialog h3 { margin:0 0 6px; font-size:18px; }
+  dialog p { margin:0 0 18px; font-size:14px; }
+  .dlgbtns { display:flex; gap:10px; }
+  .dlgbtns button { flex:1; padding:11px; border:0; border-radius:8px; font-weight:700; font-size:15px; cursor:pointer; color:#fff; }
+  .dlgbtns .yes { background:#3498db; } .dlgbtns .no { background:#4e5058; }
+  .never { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:14px; font-size:12px; color:#b5bac1; cursor:pointer; }
   @keyframes flash { from { background:#3d5a80; } to { background:#2b2d31; } }
   @media (max-width:980px) {
     body { grid-template-columns:minmax(0,1fr); justify-content:center; }
@@ -57,6 +72,13 @@
 <aside class="panel" id="right">
   <div id="joined">User 1 Joined - Server 1</div>
 </aside>
+
+<dialog id="dlg">
+  <h3>Do you want to join this server?</h3>
+  <p id="dlgEgg"></p>
+  <div class="dlgbtns"><button id="dlgNo" class="no" type="button">Cancel</button><button id="dlgYes" class="yes" type="button">Join</button></div>
+  <label class="never"><input type="checkbox" id="never"> Never remind again</label>
+</dialog>
 
 <script>
   // Paste your Cloudflare Worker feed address here, for example https://eggfeed.yourname.workers.dev/feed
@@ -102,8 +124,16 @@
     return el;
   }
 
+  var lastSig = "";
+
+  function safeImg(u) { return typeof u === "string" && /^https:\/\//i.test(u) ? u : ""; }
+
   function render(items) {
     if (!items.length) return;
+    var sig = items.map(function (it) { return it.jobId + it.t; }).join(",");
+    if (sig === lastSig) return;   // nothing new, keep the list as it is
+    lastSig = sig;
+
     feedEl.textContent = "";
     items.forEach(function (it) {
       if (!/^\d{1,20}$/.test(it.placeId) || !/^[0-9a-fA-F-]{36}$/.test(it.jobId)) return;
@@ -113,15 +143,66 @@
       if (!firstLoad && !known[key]) a.className += " new";
       known[key] = true;
       a.href = "?placeId=" + it.placeId + "&jobId=" + it.jobId;
-      a.appendChild(line("b", it.egg));
-      a.appendChild(line("span", [it.rarity, it.kg, it.mutation && it.mutation !== "NONE" ? it.mutation : ""].filter(Boolean).join(" • ")));
-      var t = line("span", ago(it.t));
+      a.dataset.egg = it.egg;
+
+      var pic = document.createElement("div");
+      pic.className = "pic";
+      var src = safeImg(it.image);
+      if (src) {
+        var img = document.createElement("img");
+        img.alt = "";
+        img.referrerPolicy = "no-referrer";
+        img.onerror = function () { img.remove(); };
+        img.src = src;
+        pic.appendChild(img);
+      }
+
+      var info = document.createElement("div");
+      info.className = "info";
+      info.appendChild(line("b", it.egg));
+      info.appendChild(line("span", "Kg: " + it.kg));
+      info.appendChild(line("span", "Mutation: " + (it.mutation && it.mutation !== "NONE" ? it.mutation : "None")));
+      info.appendChild(line("span", "Value: " + (it.value || "Unknown")));
+      var t = line("span", ago(it.t), "time");
       t.dataset.t = it.t;
-      a.appendChild(t);
+      info.appendChild(t);
+
+      a.appendChild(pic);
+      a.appendChild(info);
       feedEl.appendChild(a);
     });
     firstLoad = false;
   }
+
+  // ---------- join confirmation ----------
+  var dlg = document.getElementById("dlg");
+  var pendingHref = "";
+
+  function skipConfirm() {
+    try { return localStorage.getItem("skipJoinConfirm") === "1"; } catch (e) { return false; }
+  }
+
+  feedEl.addEventListener("click", function (e) {
+    var a = e.target.closest("a.item");
+    if (!a) return;
+    e.preventDefault();
+    var href = a.getAttribute("href");
+    if (skipConfirm()) { location.href = href; return; }
+    pendingHref = href;
+    document.getElementById("dlgEgg").textContent = a.dataset.egg || "";
+    document.getElementById("never").checked = false;
+    dlg.showModal();
+  });
+
+  document.getElementById("dlgNo").addEventListener("click", function () { dlg.close(); });
+  document.getElementById("dlgYes").addEventListener("click", function () {
+    if (document.getElementById("never").checked) {
+      try { localStorage.setItem("skipJoinConfirm", "1"); } catch (e) {}
+    }
+    dlg.close();
+    location.href = pendingHref;
+  });
+  dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
 
   function poll() {
     if (!FEED_URL) { feedEl.firstChild.textContent = "Feed not set up yet."; return; }
