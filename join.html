@@ -4,41 +4,143 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Join Server</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
-  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-         background:#1e1f22; color:#f2f3f5; font-family:system-ui,Segoe UI,Arial,sans-serif; }
-  .card { background:#2b2d31; padding:28px 32px; border-radius:12px; max-width:440px; width:90%; text-align:center; }
-  h1 { margin:0 0 8px; font-size:22px; }
-  p { margin:6px 0 18px; color:#b5bac1; font-size:14px; }
-  .btn { display:inline-block; background:#3498db; color:#fff; text-decoration:none; font-weight:700;
-         padding:12px 22px; border-radius:8px; }
-  code { display:block; margin-top:18px; padding:10px; background:#1e1f22; border-radius:8px;
-         font-size:12px; word-break:break-all; color:#b5bac1; }
+  :root {
+    --ink: #f5f1ea;
+    --muted: #c9c2b6;
+    --panel: rgba(10, 8, 8, .62);
+    --line: rgba(245, 241, 234, .18);
+    --accent: #ff3b30;
+    --accent-ink: #fff;
+    --font: "Archivo", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    font-family: var(--font);
+    color: var(--ink);
+    background-color: #120c0c;
+    background-image:
+      linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.65)),
+      url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .card {
+    width: 100%;
+    max-width: 440px;
+    padding: 32px 28px 26px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 24px 60px rgba(0,0,0,.55);
+    animation: rise .5s ease-out both;
+  }
+  h1 {
+    margin: 0 0 6px;
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: -.02em;
+    line-height: 1.05;
+  }
+  .sub { margin: 0 0 22px; color: var(--muted); font-size: 15px; line-height: 1.5; }
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 14px 20px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font: 700 16px var(--font);
+    text-align: center;
+    text-decoration: none;
+    border: 0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform .12s ease, filter .12s ease;
+  }
+  .btn:hover { filter: brightness(1.1); }
+  .btn:active { transform: scale(.98); }
+  .row { display: flex; gap: 10px; margin-top: 10px; }
+  .ghost {
+    flex: 1;
+    padding: 11px 12px;
+    background: transparent;
+    color: var(--ink);
+    font: 500 14px var(--font);
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background .12s ease;
+  }
+  .ghost:hover { background: rgba(245,241,234,.08); }
+  .hint { margin: 18px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .card { animation: none; } .btn, .ghost { transition: none; } }
 </style>
 </head>
 <body>
-<div class="card">
-  <h1 id="title">Joining server...</h1>
-  <p id="msg">Your browser may ask to open Roblox. Click Open / Allow.</p>
-  <a id="btn" class="btn" href="#">Open Roblox</a>
-  <code id="raw"></code>
-</div>
+<main class="card">
+  <h1 id="title">Joining server</h1>
+  <p class="sub" id="msg">Roblox should open in a moment. If your browser asks, choose Open.</p>
+
+  <div id="actions">
+    <a id="btn" class="btn" href="#">Open Roblox</a>
+    <div class="row">
+      <a id="alt" class="ghost" href="#">Try alternate link</a>
+      <button id="copy" class="ghost" type="button">Copy join script</button>
+    </div>
+    <p class="hint">Nothing happens? Open this page in Chrome or Safari. In-app browsers like Discord's often block Roblox links.</p>
+  </div>
+</main>
+
 <script>
   var q = new URLSearchParams(location.search);
   var placeId = q.get("placeId") || "";
   var jobId = q.get("jobId") || "";
 
-  // only digits for placeId and a UUID for jobId, so nothing else can be injected into the link
+  // digits only for placeId and a UUID for jobId, so nothing else can be injected into the link
   var valid = /^\d{1,20}$/.test(placeId) && /^[0-9a-fA-F-]{36}$/.test(jobId);
 
   if (!valid) {
     document.getElementById("title").textContent = "Invalid link";
-    document.getElementById("msg").textContent = "The place ID or server ID is missing or malformed.";
-    document.getElementById("btn").style.display = "none";
+    document.getElementById("msg").textContent = "The place ID or server ID is missing or malformed. Open the link again from the Discord message.";
+    document.getElementById("actions").hidden = true;
   } else {
-    var url = "roblox://experiences/start?placeId=" + placeId + "&gameInstanceId=" + jobId;
+    var url  = "roblox://experiences/start?placeId=" + placeId + "&gameInstanceId=" + jobId;
+    var url2 = "roblox://placeId=" + placeId + "&gameId=" + jobId;
+    var lua  = 'game:GetService("TeleportService"):TeleportToPlaceInstance(' + placeId + ',"' + jobId + '",game.Players.LocalPlayer)';
+
     document.getElementById("btn").href = url;
-    document.getElementById("raw").textContent = url;
+    document.getElementById("alt").href = url2;
+
+    var copyBtn = document.getElementById("copy");
+    copyBtn.addEventListener("click", function () {
+      var done = function () {
+        copyBtn.textContent = "Copied";
+        setTimeout(function () { copyBtn.textContent = "Copy join script"; }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(lua).then(done, function () { window.prompt("Copy this script:", lua); });
+      } else {
+        window.prompt("Copy this script:", lua);
+      }
+    });
+
     setTimeout(function () { location.href = url; }, 400);
   }
 </script>
