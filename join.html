@@ -9,8 +9,8 @@
          display:grid; grid-template-columns:minmax(0,1fr) minmax(0,440px) minmax(0,1fr);
          align-items:center; gap:20px;
          background-color:#1e1f22;
-         background-image:url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true");
-         background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed;
+         background-image:url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WWORST.png?raw=true");
+         background-size:cover; background-position:center; background-repeat:no-repeat;
          color:#f2f3f5; font-family:system-ui,Segoe UI,Arial,sans-serif; }
   .card { background:#2b2d31; padding:28px 32px; border-radius:12px; text-align:center; }
   h1 { margin:0 0 8px; font-size:22px; }
@@ -21,7 +21,6 @@
          font-size:12px; word-break:break-all; color:#b5bac1; }
 
   [hidden] { display:none !important; }
-  code:empty { display:none; }
   #eggbox { display:flex; flex-direction:column; align-items:center; gap:4px; margin-bottom:14px; }
   #eggbox img { width:110px; height:110px; object-fit:contain; background:#1e1f22; border-radius:12px; margin-bottom:8px; }
   .eggname { font-size:22px; font-weight:700; }
@@ -128,13 +127,9 @@
 
   @keyframes flash { from { background:#3d5a80; } to { background:#2b2d31; } }
   @media (max-width:1200px) {
-    body { grid-template-columns:minmax(0,1fr); justify-content:center; align-items:start; background-image:none; }
-    body::before { content:""; order:0; aspect-ratio:1983 / 793; border-radius:12px;
-                   background:url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true") center / cover no-repeat; }
-    .card { order:1; padding:22px 18px; } #left { order:2; } #right { order:3; }
+    body { grid-template-columns:minmax(0,1fr); justify-content:center; }
+    .card { order:1; } #left { order:2; } #right { order:3; }
     #left, #right { max-width:none; justify-self:stretch; }
-    #opts, #vals, #eggs { flex:1 1 100%; }
-    #feedPanel { width:100%; }
     #feed { max-height:40vh; }
   }
 </style>
@@ -395,7 +390,7 @@
     ["Celestial Sunlion", "Eternal", "https://asaiya2.github.io/steal-an-egg/sunlion.png"],
     ["World Burner", "Divine", "https://asaiya2.github.io/steal-an-egg/World_Burner.png"],
     ["ArchAngel", "Divine", "https://asaiya2.github.io/steal-an-egg/ArchAngel.png"],
-    ["Nightflame", "Divine", "https://asaiya2.github.io/steal-an-egg/Nightflame.png"],
+    ["Nightflame", "Divine", "https://github.com/Asaiya2/steal-an-egg/blob/main/NIghtflame.png?raw=true"],
     ["Kitsune", "Divine", "https://asaiya2.github.io/steal-an-egg/Kitsune.png"],
     ["Unicorn", "Divine", "https://asaiya2.github.io/steal-an-egg/Unicorn.png"],
     ["Royal Skywhale", "Divine", "https://github.com/Asaiya2/steal-an-egg/blob/main/skywhale.png?raw=true"]
