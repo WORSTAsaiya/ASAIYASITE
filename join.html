@@ -7,10 +7,10 @@
 <style>
   body { margin:0; min-height:100vh; padding:20px; box-sizing:border-box;
          display:grid; grid-template-columns:minmax(0,1fr) minmax(0,440px) minmax(0,1fr);
-         align-items:center; gap:20px;
+         grid-template-rows:auto 1fr; align-items:center; gap:20px;
          background-color:#1e1f22;
-         background-image:url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WWORST.png?raw=true");
-         background-size:cover; background-position:center; background-repeat:no-repeat;
+         background-image:url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true");
+         background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed;
          color:#f2f3f5; font-family:system-ui,Segoe UI,Arial,sans-serif; }
   .card { background:#2b2d31; padding:28px 32px; border-radius:12px; text-align:center; }
   h1 { margin:0 0 8px; font-size:22px; }
@@ -21,6 +21,7 @@
          font-size:12px; word-break:break-all; color:#b5bac1; }
 
   [hidden] { display:none !important; }
+  code:empty { display:none; }
   #eggbox { display:flex; flex-direction:column; align-items:center; gap:4px; margin-bottom:14px; }
   #eggbox img { width:110px; height:110px; object-fit:contain; background:#1e1f22; border-radius:12px; margin-bottom:8px; }
   .eggname { font-size:22px; font-weight:700; }
@@ -94,6 +95,18 @@
   .pic img { width:100%; height:100%; object-fit:contain; display:block; }
   .info { min-width:0; }
 
+  .discord { background:#5865F2; color:#fff; text-decoration:none; font-size:12px; font-weight:700; padding:7px 10px; border-radius:8px; white-space:nowrap; }
+  .discord:hover { filter:brightness(1.1); }
+  .feedhead { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
+  .feedhead #count { margin:0; }
+  #cycle { font-size:12px; font-weight:700; color:#f2f3f5; text-align:right; }
+  #cycle.done { color:#b5bac1; font-weight:400; }
+  .pages { grid-column:1 / -1; justify-self:center; order:-1; display:flex; align-items:center; gap:6px; background:rgba(30,31,34,.88); padding:6px 8px; border-radius:12px; }
+  .pages span { font-size:12px; color:#b5bac1; margin:0 4px; }
+  .pg { padding:8px 14px; background:#2b2d31; color:#b5bac1; border:1px solid #4e5058; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; }
+  .pg.sel { background:#3498db; border-color:#3498db; color:#fff; }
+  #blank { grid-column:2; }
+
   /* ---- webhook input ---- */
   #hook { width:100%; box-sizing:border-box; padding:10px 12px; background:#1e1f22; color:#f2f3f5;
           border:1px solid #4e5058; border-radius:8px; font-size:13px; }
@@ -127,14 +140,26 @@
 
   @keyframes flash { from { background:#3d5a80; } to { background:#2b2d31; } }
   @media (max-width:1200px) {
-    body { grid-template-columns:minmax(0,1fr); justify-content:center; }
-    .card { order:1; } #left { order:2; } #right { order:3; }
+    body { grid-template-columns:minmax(0,1fr); justify-content:center; align-items:start; background-image:none; }
+    body::before { content:""; order:0; aspect-ratio:1983 / 793; border-radius:12px;
+                   background:url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true") center / cover no-repeat; }
+    #blank { grid-column:1; }
+    .card { order:1; padding:22px 18px; } #left { order:2; } #right { order:3; }
     #left, #right { max-width:none; justify-self:stretch; }
+    #opts, #vals, #eggs { flex:1 1 100%; }
+    #feedPanel { width:100%; }
     #feed { max-height:40vh; }
   }
 </style>
 </head>
 <body>
+
+<nav class="pages" id="pages">
+  <span>Pages</span>
+  <button class="pg sel" type="button" data-pg="1">STEAL AN EGG</button>
+  <button class="pg" type="button" data-pg="2">Inexistent</button>
+  <button class="pg" type="button" data-pg="3">Inexistent</button>
+</nav>
 
 <section id="left">
   <div class="filters">
@@ -177,12 +202,12 @@
   </div>
 
   <aside class="panel" id="feedPanel">
-    <div id="count"></div>
+    <div class="feedhead"><div id="count"></div><div id="cycle"></div></div>
     <div id="feed"><div class="empty">Waiting for the first alert...</div></div>
   </aside>
 </section>
 
-<div class="card">
+<div class="card" id="joinCard">
   <div id="eggbox" hidden></div>
   <h1 id="title">Joining server...</h1>
   <p id="msg">Your browser may ask to open Roblox. Click Open / Allow.</p>
@@ -190,8 +215,13 @@
   <code id="raw"></code>
 </div>
 
+<div class="card" id="blank" hidden>
+  <h1>Inexistent</h1>
+  <p>This page doesn't exist yet.</p>
+</div>
+
 <aside class="panel" id="right">
-  <h2>Webhook</h2>
+  <h2>Webhook <a class="discord" href="https://discord.gg/W0RST" target="_blank" rel="noopener noreferrer">Join Our Discord Server</a></h2>
   <div class="slots" id="slots">
     <button class="slot sel" type="button" data-slot="1">Webhook 1</button>
     <button class="slot" type="button" data-slot="2">Webhook 2</button>
@@ -390,7 +420,7 @@
     ["Celestial Sunlion", "Eternal", "https://asaiya2.github.io/steal-an-egg/sunlion.png"],
     ["World Burner", "Divine", "https://asaiya2.github.io/steal-an-egg/World_Burner.png"],
     ["ArchAngel", "Divine", "https://asaiya2.github.io/steal-an-egg/ArchAngel.png"],
-    ["Nightflame", "Divine", "https://github.com/Asaiya2/steal-an-egg/blob/main/NIghtflame.png?raw=true"],
+    ["Nightflame", "Divine", "https://asaiya2.github.io/steal-an-egg/Nightflame.png"],
     ["Kitsune", "Divine", "https://asaiya2.github.io/steal-an-egg/Kitsune.png"],
     ["Unicorn", "Divine", "https://asaiya2.github.io/steal-an-egg/Unicorn.png"],
     ["Royal Skywhale", "Divine", "https://github.com/Asaiya2/steal-an-egg/blob/main/skywhale.png?raw=true"]
@@ -697,17 +727,52 @@
     if (first) selectSlot(first, true); else selectSlot(1, false);
   });
 
+  // ---------- pages ----------
+  $("pages").addEventListener("click", function (e) {
+    var b = e.target.closest(".pg");
+    if (!b) return;
+    var n = +b.dataset.pg;
+    document.querySelectorAll(".pg").forEach(function (x) { x.classList.toggle("sel", x === b); });
+    ["left", "joinCard", "right"].forEach(function (id) { $(id).hidden = n !== 1; });
+    $("blank").hidden = n === 1;
+  });
+
   // ---------- polling ----------
+  // ---------- egg countdown (4:50 from the first alert of a round) ----------
+  var cycleStart = null, cycleWin = 290000, clockOffset = 0;
+
+  function fmt(ms) {
+    var t = Math.max(0, Math.ceil(ms / 1000));
+    return Math.floor(t / 60) + ":" + ("0" + (t % 60)).slice(-2);
+  }
+  function paintCycle() {
+    var el = $("cycle");
+    if (!cycleStart) { el.textContent = ""; el.className = ""; return; }
+    var left = cycleStart + cycleWin - (Date.now() + clockOffset);
+    if (left > 0) { el.textContent = "Eggs end in " + fmt(left); el.className = ""; }
+    else { el.textContent = "Ended. Next alert = new spawn"; el.className = "done"; }
+  }
+
   function poll() {
     if (!FEED_URL) { feedEl.textContent = "Feed not set up yet."; return; }
     fetch(FEED_URL, { cache: "no-store" })
       .then(function (r) { return r.json(); })
-      .then(function (d) { if (Array.isArray(d)) setItems(d); })
+      .then(function (d) {
+        var items = Array.isArray(d) ? d : (d && d.items);
+        if (d && d.cycle) {
+          cycleStart = d.cycle.start;
+          cycleWin = d.cycle.windowMs || 290000;
+          clockOffset = d.cycle.now - Date.now();
+        }
+        if (Array.isArray(items)) setItems(items);
+        paintCycle();
+      })
       .catch(function () {});
   }
 
   setInterval(function () {
     feedEl.querySelectorAll("span[data-t]").forEach(function (s) { s.textContent = ago(+s.dataset.t); });
+    paintCycle();
   }, 1000);
 
   loadF();
