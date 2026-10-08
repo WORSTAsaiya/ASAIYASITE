@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Join Server</title>
 <style>
-  body { margin:0; min-height:100vh; padding:20px; box-sizing:border-box;
+  body { --wall:url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true"); margin:0; min-height:100vh; padding:20px; box-sizing:border-box;
          display:grid; grid-template-columns:minmax(0,1fr) minmax(0,440px) minmax(0,1fr);
          grid-template-rows:auto 1fr; align-items:center; gap:20px;
          background-color:#1e1f22;
-         background-image:url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true");
+         background-image:var(--wall);
          background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed;
          color:#f2f3f5; font-family:system-ui,Segoe UI,Arial,sans-serif; }
   .card { background:#2b2d31; padding:28px 32px; border-radius:12px; text-align:center; }
@@ -95,6 +95,7 @@
   .pic img { width:100%; height:100%; object-fit:contain; display:block; }
   .info { min-width:0; }
 
+  #wallLabel { position:fixed; left:50%; bottom:10px; transform:translateX(-50%); font-size:13px; color:#8a8f98; pointer-events:none; }
   .discord { background:#5865F2; color:#fff; text-decoration:none; font-size:12px; font-weight:700; padding:7px 10px; border-radius:8px; white-space:nowrap; }
   .discord:hover { filter:brightness(1.1); }
   .feedhead { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
@@ -142,7 +143,8 @@
   @media (max-width:1200px) {
     body { grid-template-columns:minmax(0,1fr); justify-content:center; align-items:start; background-image:none; }
     body::before { content:""; order:0; aspect-ratio:1983 / 793; border-radius:12px;
-                   background:url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true") center / cover no-repeat; }
+                   background:var(--wall) center / cover no-repeat; }
+    body.nowall::before { display:none; }
     #blank { grid-column:1; }
     .card { order:1; padding:22px 18px; } #left { order:2; } #right { order:3; }
     #left, #right { max-width:none; justify-self:stretch; }
@@ -157,8 +159,8 @@
 <nav class="pages" id="pages">
   <span>Channels</span>
   <button class="pg sel" type="button" data-pg="1">STEAL AN EGG</button>
-  <button class="pg" type="button" data-pg="2">GENSHIN IMPACT</button>
-  <button class="pg" type="button" data-pg="3">Shit idk</button>
+  <button class="pg" type="button" data-pg="2">Inexistent</button>
+  <button class="pg" type="button" data-pg="3">Inexistent</button>
 </nav>
 
 <section id="left">
@@ -242,6 +244,8 @@
   <small class="note">You can save up to 3 webhooks, each with its own Egg Options and Egg Values. Pick a webhook, set your options, then press Save. Webhooks are stored on our server so alerts reach you while this page is closed. Remove deletes the selected one.</small>
 </aside>
 
+<div id="wallLabel"></div>
+
 <dialog id="dlg">
   <h3>Do you want to join this server?</h3>
   <p id="dlgEgg"></p>
@@ -251,6 +255,14 @@
 
 <script>
   var FEED_URL = "https://eggfeed.asaiyamain.workers.dev/feed";
+
+  // Wallpaper for each channel. Replace the placeholder text with an image link,
+  // or with the file name of an image you uploaded next to join.html (for example "bg2.png").
+  var WALLPAPERS = {
+    1: "https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true",
+    2: "https://media1.tenor.com/m/7zgRvAcRNv0AAAAd/mihoyo-genshin.gif",
+    3: "Channel 3 image"
+  };
   function $(id) { return document.getElementById(id); }
 
   // ---------- join logic ----------
@@ -727,6 +739,16 @@
     if (first) selectSlot(first, true); else selectSlot(1, false);
   });
 
+  // ---------- channel wallpapers ----------
+  function isImage(v) { return /^https?:\/\//i.test(v) || /\.(png|jpe?g|gif|webp|avif|svg)$/i.test(v); }
+  function setWallpaper(n) {
+    var v = WALLPAPERS[n] || "";
+    var ok = isImage(v);
+    document.body.style.setProperty("--wall", ok ? 'url("' + v.replace(/"/g, "%22") + '")' : "none");
+    document.body.classList.toggle("nowall", !ok);
+    $("wallLabel").textContent = ok ? "" : v;
+  }
+
   // ---------- pages ----------
   $("pages").addEventListener("click", function (e) {
     var b = e.target.closest(".pg");
@@ -735,7 +757,9 @@
     document.querySelectorAll(".pg").forEach(function (x) { x.classList.toggle("sel", x === b); });
     ["left", "joinCard", "right"].forEach(function (id) { $(id).hidden = n !== 1; });
     $("blank").hidden = n === 1;
+    setWallpaper(n);
   });
+  setWallpaper(1);
 
   // ---------- polling ----------
   // ---------- egg countdown (4:50 from the first alert of a round) ----------
