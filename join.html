@@ -50,7 +50,10 @@
   details.panel > summary::-webkit-details-marker { display:none; }
   details.panel > summary::after { content:"\25BE"; color:#b5bac1; transition:transform .15s; }
   details.panel[open] > summary::after { transform:rotate(180deg); }
-  details.panel[open] > summary { margin-bottom:12px; }
+  details.panel { position:relative; }
+  details.panel > .drop { position:absolute; top:100%; left:0; right:0; margin-top:6px; z-index:20; box-sizing:border-box;
+                          background:#1e1f22; border-radius:12px; padding:16px; box-shadow:0 12px 28px rgba(0,0,0,.55); }
+  #left { position:relative; z-index:5; }
   .resetrow { margin-top:14px; text-align:right; }
 
   /* ---- egg options (switches) ---- */
@@ -137,14 +140,17 @@
   <div class="filters">
     <details class="panel" id="opts">
       <summary>Egg Options</summary>
+      <div class="drop">
       <div class="opt"><div><b>Secrets</b><small>Only Secret rarities</small></div><button class="sw" type="button" role="switch" aria-checked="false" data-tier="Secret"></button></div>
       <div class="opt"><div><b>Eternals</b><small>Only Eternal rarities</small></div><button class="sw" type="button" role="switch" aria-checked="false" data-tier="Eternal"></button></div>
       <div class="opt"><div><b>Divine</b><small>Only Divine rarities</small></div><button class="sw" type="button" role="switch" aria-checked="false" data-tier="Divine"></button></div>
       <div class="opt"><div><b>All</b><small>Every new webhook</small></div><button class="sw" type="button" role="switch" aria-checked="true" data-tier="All"></button></div>
+    </div>
     </details>
 
     <details class="panel" id="vals">
       <summary>Egg Values</summary>
+      <div class="drop">
       <p class="sub">Mutation</p>
       <div class="chips" id="chips">
         <button class="chip" type="button" data-key="golden">Golden</button>
@@ -159,11 +165,14 @@
       <div class="srow"><label for="vMin">Minimum Value <output id="vMinOut"></output></label><input type="range" id="vMin" min="0" max="199" step="1" value="0"></div>
       <div class="srow"><label for="vMax">Maximum Value <output id="vMaxOut"></output></label><input type="range" id="vMax" min="1" max="200" step="1" value="200"></div>
     <div class="resetrow"><button class="reset" id="reset" type="button">Reset filters</button></div>
+    </div>
     </details>
 
     <details class="panel" id="eggs">
       <summary><span>Notifying Eggs <span id="eggCount"></span></span></summary>
+      <div class="drop">
       <div id="eggList"></div>
+    </div>
     </details>
   </div>
 
