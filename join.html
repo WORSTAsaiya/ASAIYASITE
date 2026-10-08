@@ -6,7 +6,7 @@
 <title>Join Server</title>
 <style>
   body { margin:0; min-height:100vh; padding:20px; box-sizing:border-box;
-         display:grid; grid-template-columns:minmax(0,300px) minmax(0,440px) minmax(0,300px);
+         display:grid; grid-template-columns:minmax(0,580px) minmax(0,440px) minmax(0,300px);
          justify-content:space-between; align-items:center; gap:20px;
          background-color:#1e1f22;
          background-image:url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true");
@@ -20,24 +20,59 @@
   code { display:block; margin-top:18px; padding:10px; background:#1e1f22; border-radius:8px;
          font-size:12px; word-break:break-all; color:#b5bac1; }
 
+  /* ---- panels ---- */
   .panel { background:rgba(30,31,34,.88); border-radius:12px; padding:16px; align-self:start; margin-top:8px; }
-  .panel h2 { margin:0 0 12px; font-size:16px; }
-  #feed { display:flex; flex-direction:column; gap:8px; max-height:70vh; overflow-y:auto; }
-  .item { display:block; padding:10px 12px; background:#2b2d31; border-radius:8px; color:inherit;
+  .panel h2 { margin:0 0 12px; font-size:16px; display:flex; justify-content:space-between; align-items:center; }
+  #left { display:flex; flex-direction:column; gap:12px; align-self:start; margin-top:8px; min-width:0; }
+  #left .panel { margin-top:0; }
+  .filters { display:flex; flex-wrap:wrap; gap:12px; }
+  #opts { flex:1 1 200px; }
+  #vals { flex:2 1 290px; }
+
+  /* ---- egg options (switches) ---- */
+  .opt { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
+  .opt:last-child { margin-bottom:0; }
+  .opt b { display:block; font-size:14px; }
+  .opt small { font-size:11px; color:#b5bac1; }
+  .sw { width:40px; height:22px; border-radius:11px; border:0; background:#4e5058; position:relative; cursor:pointer; flex:none; transition:background .15s; }
+  .sw::after { content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; transition:transform .15s; }
+  .sw.on { background:#3498db; }
+  .sw.on::after { transform:translateX(18px); }
+
+  /* ---- egg values ---- */
+  .sub { font-size:12px; color:#b5bac1; margin:0 0 6px; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
+  .chip { border:1px solid #4e5058; background:transparent; color:#f2f3f5; border-radius:999px; padding:4px 10px; font-size:12px; cursor:pointer; }
+  .chip.on { background:#3498db; border-color:#3498db; }
+  .srow { margin-top:10px; }
+  .srow label { display:flex; justify-content:space-between; font-size:12px; color:#b5bac1; }
+  .srow output { color:#f2f3f5; }
+  .srow input { width:100%; margin:4px 0 0; accent-color:#3498db; }
+  .reset { background:none; border:0; color:#b5bac1; font-size:12px; cursor:pointer; text-decoration:underline; padding:0; }
+
+  /* ---- feed ---- */
+  #count { font-size:12px; color:#b5bac1; margin-bottom:8px; }
+  #feed { display:flex; flex-direction:column; gap:8px; max-height:45vh; overflow-y:auto; }
+  .item { display:grid; grid-template-columns:56px minmax(0,1fr); gap:10px; align-items:center;
+          padding:10px 12px; background:#2b2d31; border-radius:8px; color:inherit;
           text-decoration:none; border-left:3px solid #3498db; }
   .item:hover { background:#34363c; }
   .item.new { animation:flash 1.6s ease-out; }
   .item b { display:block; font-size:14px; }
-  .item span { display:block; font-size:12px; color:#b5bac1; margin-top:2px; }
+  .item span { display:block; font-size:12px; color:#b5bac1; margin-top:2px; word-break:break-word; }
+  .item .time { opacity:.7; }
   .empty { font-size:13px; color:#b5bac1; }
   .Secret { border-color:#E74C3C; } .Eternal { border-color:#9B59B6; } .Divine { border-color:#F1C40F; }
-  #joined { font-size:14px; }
-  .item { display:grid; grid-template-columns:56px minmax(0,1fr); gap:10px; align-items:center; }
-  .item span { word-break:break-word; }
-  .item .time { opacity:.7; }
   .pic { width:56px; height:56px; border-radius:8px; background:#1e1f22; overflow:hidden; }
   .pic img { width:100%; height:100%; object-fit:contain; display:block; }
   .info { min-width:0; }
+
+  /* ---- webhook input ---- */
+  #hook { width:100%; box-sizing:border-box; padding:10px 12px; background:#1e1f22; color:#f2f3f5;
+          border:1px solid #4e5058; border-radius:8px; font-size:13px; }
+  #hook:focus { outline:2px solid #3498db; border-color:transparent; }
+
+  /* ---- join confirmation ---- */
   dialog { background:#2b2d31; color:#f2f3f5; border:0; border-radius:12px; padding:24px; max-width:340px; width:88%;
            font-family:system-ui,Segoe UI,Arial,sans-serif; text-align:center; }
   dialog::backdrop { background:rgba(0,0,0,.65); }
@@ -47,8 +82,9 @@
   .dlgbtns button { flex:1; padding:11px; border:0; border-radius:8px; font-weight:700; font-size:15px; cursor:pointer; color:#fff; }
   .dlgbtns .yes { background:#3498db; } .dlgbtns .no { background:#4e5058; }
   .never { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:14px; font-size:12px; color:#b5bac1; cursor:pointer; }
+
   @keyframes flash { from { background:#3d5a80; } to { background:#2b2d31; } }
-  @media (max-width:980px) {
+  @media (max-width:1100px) {
     body { grid-template-columns:minmax(0,1fr); justify-content:center; }
     .card { order:1; } #left { order:2; } #right { order:3; }
     #feed { max-height:40vh; }
@@ -57,10 +93,39 @@
 </head>
 <body>
 
-<aside class="panel" id="left">
-  <h2>New Webhooks</h2>
-  <div id="feed"><div class="empty">Waiting for the first alert...</div></div>
-</aside>
+<section id="left">
+  <div class="filters">
+    <aside class="panel" id="opts">
+      <h2>Egg Options</h2>
+      <div class="opt"><div><b>Secrets</b><small>Only Secret rarities</small></div><button class="sw" type="button" role="switch" aria-checked="false" data-tier="Secret"></button></div>
+      <div class="opt"><div><b>Eternals</b><small>Only Eternal rarities</small></div><button class="sw" type="button" role="switch" aria-checked="false" data-tier="Eternal"></button></div>
+      <div class="opt"><div><b>Divine</b><small>Only Divine rarities</small></div><button class="sw" type="button" role="switch" aria-checked="false" data-tier="Divine"></button></div>
+      <div class="opt"><div><b>All</b><small>Every new webhook</small></div><button class="sw" type="button" role="switch" aria-checked="true" data-tier="All"></button></div>
+    </aside>
+
+    <aside class="panel" id="vals">
+      <h2>Egg Values <button class="reset" id="reset" type="button">Reset</button></h2>
+      <p class="sub">Mutation</p>
+      <div class="chips" id="chips">
+        <button class="chip" type="button" data-key="golden">Golden</button>
+        <button class="chip" type="button" data-key="silver">Silver</button>
+        <button class="chip" type="button" data-key="parasite">Parasite</button>
+        <button class="chip" type="button" data-key="rainbow">Rainbow</button>
+        <button class="chip" type="button" data-key="bloom">Bloom</button>
+        <button class="chip" type="button" data-key="spiritbloom">Spirit Bloom</button>
+      </div>
+      <div class="srow"><label for="kgMin">Minimum Kg <output id="kgMinOut"></output></label><input type="range" id="kgMin" min="0" max="199" step="1" value="0"></div>
+      <div class="srow"><label for="kgMax">Maximum Kg <output id="kgMaxOut"></output></label><input type="range" id="kgMax" min="1" max="200" step="1" value="200"></div>
+      <div class="srow"><label for="vMin">Minimum Value <output id="vMinOut"></output></label><input type="range" id="vMin" min="0" max="199" step="1" value="0"></div>
+      <div class="srow"><label for="vMax">Maximum Value <output id="vMaxOut"></output></label><input type="range" id="vMax" min="1" max="200" step="1" value="200"></div>
+    </aside>
+  </div>
+
+  <aside class="panel" id="feedPanel">
+    <div id="count"></div>
+    <div id="feed"><div class="empty">Waiting for the first alert...</div></div>
+  </aside>
+</section>
 
 <div class="card">
   <h1 id="title">Joining server...</h1>
@@ -70,7 +135,8 @@
 </div>
 
 <aside class="panel" id="right">
-  <div id="joined">User 1 Joined - Server 1</div>
+  <h2>Webhook</h2>
+  <input id="hook" type="text" placeholder="Webhook" autocomplete="off" spellcheck="false">
 </aside>
 
 <dialog id="dlg">
@@ -81,34 +147,163 @@
 </dialog>
 
 <script>
-  // Paste your Cloudflare Worker feed address here, for example https://eggfeed.yourname.workers.dev/feed
   var FEED_URL = "https://eggfeed.asaiyamain.workers.dev/feed";
+  function $(id) { return document.getElementById(id); }
 
-  // ---------- join logic (unchanged) ----------
+  // ---------- join logic ----------
   var q = new URLSearchParams(location.search);
   var placeId = q.get("placeId") || "";
   var jobId = q.get("jobId") || "";
   var valid = /^\d{1,20}$/.test(placeId) && /^[0-9a-fA-F-]{36}$/.test(jobId);
 
   if (!placeId && !jobId) {
-    document.getElementById("title").textContent = "No server selected";
-    document.getElementById("msg").textContent = "Pick one from New Webhooks.";
-    document.getElementById("btn").style.display = "none";
+    $("title").textContent = "No server selected";
+    $("msg").textContent = "Pick one from the list.";
+    $("btn").style.display = "none";
   } else if (!valid) {
-    document.getElementById("title").textContent = "Invalid link";
-    document.getElementById("msg").textContent = "The place ID or server ID is missing or malformed.";
-    document.getElementById("btn").style.display = "none";
+    $("title").textContent = "Invalid link";
+    $("msg").textContent = "The place ID or server ID is missing or malformed.";
+    $("btn").style.display = "none";
   } else {
     var url = "roblox://experiences/start?placeId=" + placeId + "&gameInstanceId=" + jobId;
-    document.getElementById("btn").href = url;
-    document.getElementById("raw").textContent = url;
+    $("btn").href = url;
+    $("raw").textContent = url;
     setTimeout(function () { location.href = url; }, 400);
   }
 
+  // ---------- filters ----------
+  var TIERS = ["Secret", "Eternal", "Divine"];
+  var MUTS = ["golden", "silver", "parasite", "rainbow", "bloom", "spiritbloom"];
+
+  function defaults() { return { all: true, tiers: {}, mut: {}, kgMin: 0, kgMax: 200, vMin: 0, vMax: 200 }; }
+  var F = defaults();
+
+  function clampInt(v, lo, hi, d) { v = parseInt(v, 10); return isNaN(v) ? d : Math.min(hi, Math.max(lo, v)); }
+
+  function loadF() {
+    try {
+      var o = JSON.parse(localStorage.getItem("eggFilters") || "null");
+      if (!o) return;
+      var f = defaults();
+      f.all = o.all !== false;
+      TIERS.forEach(function (t) { if (o.tiers && o.tiers[t]) f.tiers[t] = true; });
+      MUTS.forEach(function (m) { if (o.mut && o.mut[m]) f.mut[m] = true; });
+      f.kgMin = clampInt(o.kgMin, 0, 199, 0);   f.kgMax = clampInt(o.kgMax, 1, 200, 200);
+      f.vMin = clampInt(o.vMin, 0, 199, 0);     f.vMax = clampInt(o.vMax, 1, 200, 200);
+      if (f.kgMax < f.kgMin) f.kgMax = f.kgMin;
+      if (f.vMax < f.vMin) f.vMax = f.vMin;
+      var n = Object.keys(f.tiers).length;
+      if (n === 0 || n === 3) { f.all = true; f.tiers = {}; }
+      if (f.all) f.tiers = {};
+      F = f;
+    } catch (e) {}
+  }
+  function saveF() { try { localStorage.setItem("eggFilters", JSON.stringify(F)); } catch (e) {} }
+
+  // slider position -> real number (log scale, last position = no limit)
+  function sig2(v) { var m = Math.pow(10, Math.floor(Math.log10(v)) - 1); return Math.round(v / m) * m; }
+  function kgAt(p) { return p >= 200 ? Infinity : sig2(Math.pow(10, p / 200 * 12)); }                       // 1 Kg ... ~870B Kg
+  function valAt(p) { return p <= 0 ? 0 : p >= 200 ? Infinity : sig2(Math.pow(10, 5 + (p - 1) / 198 * 10)); } // $100K/s ... $1Qa/s
+
+  function compact(n) {
+    var u = ["", "K", "M", "B", "T", "Qa", "Qi"], i = 0;
+    while (n >= 1000 && i < u.length - 1) { n /= 1000; i++; }
+    var s = n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2);
+    if (s.indexOf(".") >= 0) s = s.replace(/\.?0+$/, "");
+    return s + u[i];
+  }
+  function kgLabel(p) { var v = kgAt(p); return v === Infinity ? "No limit" : compact(v) + " Kg"; }
+  function valLabel(p, isMin) {
+    var v = valAt(p);
+    if (v === Infinity) return "No limit";
+    if (v === 0) return isMin ? "No minimum" : "$0/s";
+    return "$" + compact(v) + "/s";
+  }
+
+  function norm(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]/g, ""); }
+  var SUF = { "": 1, K: 1e3, M: 1e6, B: 1e9, T: 1e12, Qa: 1e15, Qi: 1e18 };
+  function parseKg(s) { var n = parseFloat(String(s || "").replace(/,/g, "")); return isNaN(n) ? NaN : n; }
+  function parseValue(s) {   // takes the last amount, so "A -> B" uses B (with mutation bonus)
+    var re = /\$([\d.]+)([A-Za-z]*)\/s/g, m, last = NaN;
+    while ((m = re.exec(String(s || "")))) { if (SUF[m[2]]) last = parseFloat(m[1]) * SUF[m[2]]; }
+    return last;
+  }
+
+  function passes(it) {
+    if (!F.all && !F.tiers[it.rarity]) return false;
+
+    var wanted = Object.keys(F.mut);
+    if (wanted.length) {
+      var have = String(it.mutation || "").split(",").map(norm);
+      if (!wanted.some(function (m) { return have.indexOf(m) > -1; })) return false;
+    }
+    if (F.kgMin > 0 || F.kgMax < 200) {
+      var kg = parseKg(it.kg);
+      if (isNaN(kg) || kg < kgAt(F.kgMin) || kg > kgAt(F.kgMax)) return false;
+    }
+    if (F.vMin > 0 || F.vMax < 200) {
+      var v = parseValue(it.value);
+      if (isNaN(v) || v < valAt(F.vMin) || v > valAt(F.vMax)) return false;
+    }
+    return true;
+  }
+
+  function syncUI() {
+    document.querySelectorAll(".sw").forEach(function (b) {
+      var t = b.dataset.tier;
+      var on = t === "All" ? F.all : (!F.all && !!F.tiers[t]);
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-checked", on ? "true" : "false");
+    });
+    document.querySelectorAll(".chip").forEach(function (c) { c.classList.toggle("on", !!F.mut[c.dataset.key]); });
+    $("kgMin").value = F.kgMin; $("kgMax").value = F.kgMax;
+    $("vMin").value = F.vMin;   $("vMax").value = F.vMax;
+    $("kgMinOut").textContent = kgLabel(F.kgMin);
+    $("kgMaxOut").textContent = kgLabel(F.kgMax);
+    $("vMinOut").textContent = valLabel(F.vMin, true);
+    $("vMaxOut").textContent = valLabel(F.vMax, false);
+  }
+
+  function changed() { syncUI(); saveF(); render(); }
+
+  // rarity switches: pick one or two; picking all three (or none) becomes "All"
+  $("opts").addEventListener("click", function (e) {
+    var b = e.target.closest(".sw");
+    if (!b) return;
+    var t = b.dataset.tier;
+    if (t === "All") {
+      F.all = true; F.tiers = {};
+    } else if (F.all) {
+      F.all = false; F.tiers = {}; F.tiers[t] = true;
+    } else {
+      if (F.tiers[t]) delete F.tiers[t]; else F.tiers[t] = true;
+      var n = Object.keys(F.tiers).length;
+      if (n === 0 || n === TIERS.length) { F.all = true; F.tiers = {}; }
+    }
+    changed();
+  });
+
+  $("chips").addEventListener("click", function (e) {
+    var c = e.target.closest(".chip");
+    if (!c) return;
+    var k = c.dataset.key;
+    if (F.mut[k]) delete F.mut[k]; else F.mut[k] = true;
+    changed();
+  });
+
+  $("kgMin").addEventListener("input", function () { F.kgMin = +this.value; if (F.kgMax < F.kgMin) F.kgMax = F.kgMin; changed(); });
+  $("kgMax").addEventListener("input", function () { F.kgMax = +this.value; if (F.kgMin > F.kgMax) F.kgMin = F.kgMax; changed(); });
+  $("vMin").addEventListener("input", function () { F.vMin = +this.value; if (F.vMax < F.vMin) F.vMax = F.vMin; changed(); });
+  $("vMax").addEventListener("input", function () { F.vMax = +this.value; if (F.vMin > F.vMax) F.vMin = F.vMax; changed(); });
+  $("reset").addEventListener("click", function () { F = defaults(); changed(); });
+
   // ---------- live feed ----------
-  var feedEl = document.getElementById("feed");
-  var known = {};
+  var feedEl = $("feed");
+  var allItems = [];
+  var seenKeys = {};
+  var newKeys = {};
   var firstLoad = true;
+  var lastSig = "";
 
   function ago(t) {
     var s = Math.max(0, Math.floor((Date.now() - t) / 1000));
@@ -124,24 +319,39 @@
     return el;
   }
 
-  var lastSig = "";
-
   function safeImg(u) { return typeof u === "string" && /^https:\/\//i.test(u) ? u : ""; }
 
-  function render(items) {
+  function setItems(items) {
     if (!items.length) return;
     var sig = items.map(function (it) { return it.jobId + it.t; }).join(",");
-    if (sig === lastSig) return;   // nothing new, keep the list as it is
+    if (sig === lastSig) return;   // nothing new
     lastSig = sig;
-
-    feedEl.textContent = "";
+    newKeys = {};
     items.forEach(function (it) {
+      var k = it.jobId + it.t;
+      if (!firstLoad && !seenKeys[k]) newKeys[k] = true;
+      seenKeys[k] = true;
+    });
+    firstLoad = false;
+    allItems = items;
+    render();
+  }
+
+  function render() {
+    var shown = allItems.filter(passes);
+    feedEl.textContent = "";
+    $("count").textContent = allItems.length ? "Showing " + shown.length + " of " + allItems.length : "";
+
+    if (!shown.length) {
+      feedEl.appendChild(line("div", allItems.length ? "No alerts match your filters." : "Waiting for the first alert...", "empty"));
+      return;
+    }
+
+    shown.forEach(function (it) {
       if (!/^\d{1,20}$/.test(it.placeId) || !/^[0-9a-fA-F-]{36}$/.test(it.jobId)) return;
-      var key = it.jobId + it.t;
       var a = document.createElement("a");
       a.className = "item " + String(it.rarity).replace(/[^A-Za-z]/g, "");
-      if (!firstLoad && !known[key]) a.className += " new";
-      known[key] = true;
+      if (newKeys[it.jobId + it.t]) a.className += " new";
       a.href = "?placeId=" + it.placeId + "&jobId=" + it.jobId;
       a.dataset.egg = it.egg;
 
@@ -171,11 +381,11 @@
       a.appendChild(info);
       feedEl.appendChild(a);
     });
-    firstLoad = false;
+    newKeys = {};
   }
 
   // ---------- join confirmation ----------
-  var dlg = document.getElementById("dlg");
+  var dlg = $("dlg");
   var pendingHref = "";
 
   function skipConfirm() {
@@ -189,14 +399,14 @@
     var href = a.getAttribute("href");
     if (skipConfirm()) { location.href = href; return; }
     pendingHref = href;
-    document.getElementById("dlgEgg").textContent = a.dataset.egg || "";
-    document.getElementById("never").checked = false;
+    $("dlgEgg").textContent = a.dataset.egg || "";
+    $("never").checked = false;
     dlg.showModal();
   });
 
-  document.getElementById("dlgNo").addEventListener("click", function () { dlg.close(); });
-  document.getElementById("dlgYes").addEventListener("click", function () {
-    if (document.getElementById("never").checked) {
+  $("dlgNo").addEventListener("click", function () { dlg.close(); });
+  $("dlgYes").addEventListener("click", function () {
+    if ($("never").checked) {
       try { localStorage.setItem("skipJoinConfirm", "1"); } catch (e) {}
     }
     dlg.close();
@@ -204,11 +414,12 @@
   });
   dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
 
+  // ---------- polling ----------
   function poll() {
-    if (!FEED_URL) { feedEl.firstChild.textContent = "Feed not set up yet."; return; }
+    if (!FEED_URL) { feedEl.textContent = "Feed not set up yet."; return; }
     fetch(FEED_URL, { cache: "no-store" })
       .then(function (r) { return r.json(); })
-      .then(function (d) { if (Array.isArray(d)) render(d); })
+      .then(function (d) { if (Array.isArray(d)) setItems(d); })
       .catch(function () {});
   }
 
@@ -216,10 +427,11 @@
     feedEl.querySelectorAll("span[data-t]").forEach(function (s) { s.textContent = ago(+s.dataset.t); });
   }, 1000);
 
+  loadF();
+  syncUI();
   poll();
 
-  // Check every 2s. A tiny background worker keeps the timer running even when this tab is hidden,
-  // because browsers slow down normal timers in background tabs.
+  // Check every 2s. A tiny background worker keeps the timer running even when this tab is hidden.
   try {
     var ticker = new Worker(URL.createObjectURL(new Blob(
       ["setInterval(function(){postMessage(1)},2000)"], { type: "text/javascript" })));
