@@ -6,8 +6,8 @@
 <title>Join Server</title>
 <style>
   body { margin:0; min-height:100vh; padding:20px; box-sizing:border-box;
-         display:grid; grid-template-columns:minmax(0,580px) minmax(0,440px) minmax(0,300px);
-         justify-content:space-between; align-items:center; gap:20px;
+         display:grid; grid-template-columns:minmax(0,1fr) minmax(0,440px) minmax(0,1fr);
+         align-items:center; gap:20px;
          background-color:#1e1f22;
          background-image:url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true");
          background-size:cover; background-position:center; background-repeat:no-repeat;
@@ -20,14 +20,28 @@
   code { display:block; margin-top:18px; padding:10px; background:#1e1f22; border-radius:8px;
          font-size:12px; word-break:break-all; color:#b5bac1; }
 
+  [hidden] { display:none !important; }
+  #eggbox { display:flex; flex-direction:column; align-items:center; gap:4px; margin-bottom:14px; }
+  #eggbox img { width:110px; height:110px; object-fit:contain; background:#1e1f22; border-radius:12px; margin-bottom:8px; }
+  .eggname { font-size:22px; font-weight:700; }
+  .eggstat { font-size:14px; color:#b5bac1; }
+
   /* ---- panels ---- */
   .panel { background:rgba(30,31,34,.88); border-radius:12px; padding:16px; align-self:start; margin-top:8px; }
   .panel h2 { margin:0 0 12px; font-size:16px; display:flex; justify-content:space-between; align-items:center; }
-  #left { display:flex; flex-direction:column; gap:12px; align-self:start; margin-top:8px; min-width:0; }
+  #left { display:flex; flex-direction:column; gap:12px; align-self:start; justify-self:start; width:100%; max-width:640px; margin-top:8px; min-width:0; }
+  #right { justify-self:end; width:100%; max-width:300px; box-sizing:border-box; }
+  #feedPanel { width:340px; max-width:100%; box-sizing:border-box; }
   #left .panel { margin-top:0; }
-  .filters { display:flex; flex-wrap:wrap; gap:12px; }
-  #opts { flex:1 1 200px; }
-  #vals { flex:2 1 290px; }
+  .filters { display:flex; flex-wrap:wrap; align-items:flex-start; gap:12px; }
+  #opts { flex:0 0 200px; box-sizing:border-box; }
+  #vals { flex:0 0 300px; box-sizing:border-box; }
+  details.panel > summary { cursor:pointer; font-size:16px; font-weight:700; list-style:none; display:flex; justify-content:space-between; align-items:center; }
+  details.panel > summary::-webkit-details-marker { display:none; }
+  details.panel > summary::after { content:"\25BE"; color:#b5bac1; transition:transform .15s; }
+  details.panel[open] > summary::after { transform:rotate(180deg); }
+  details.panel[open] > summary { margin-bottom:12px; }
+  .resetrow { margin-top:14px; text-align:right; }
 
   /* ---- egg options (switches) ---- */
   .opt { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
@@ -95,9 +109,10 @@
   .never { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:14px; font-size:12px; color:#b5bac1; cursor:pointer; }
 
   @keyframes flash { from { background:#3d5a80; } to { background:#2b2d31; } }
-  @media (max-width:1100px) {
+  @media (max-width:1200px) {
     body { grid-template-columns:minmax(0,1fr); justify-content:center; }
     .card { order:1; } #left { order:2; } #right { order:3; }
+    #left, #right { max-width:none; justify-self:stretch; }
     #feed { max-height:40vh; }
   }
 </style>
@@ -106,16 +121,16 @@
 
 <section id="left">
   <div class="filters">
-    <aside class="panel" id="opts">
-      <h2>Egg Options</h2>
+    <details class="panel" id="opts">
+      <summary>Egg Options</summary>
       <div class="opt"><div><b>Secrets</b><small>Only Secret rarities</small></div><button class="sw" type="button" role="switch" aria-checked="false" data-tier="Secret"></button></div>
       <div class="opt"><div><b>Eternals</b><small>Only Eternal rarities</small></div><button class="sw" type="button" role="switch" aria-checked="false" data-tier="Eternal"></button></div>
       <div class="opt"><div><b>Divine</b><small>Only Divine rarities</small></div><button class="sw" type="button" role="switch" aria-checked="false" data-tier="Divine"></button></div>
       <div class="opt"><div><b>All</b><small>Every new webhook</small></div><button class="sw" type="button" role="switch" aria-checked="true" data-tier="All"></button></div>
-    </aside>
+    </details>
 
-    <aside class="panel" id="vals">
-      <h2>Egg Values <button class="reset" id="reset" type="button">Reset</button></h2>
+    <details class="panel" id="vals">
+      <summary>Egg Values</summary>
       <p class="sub">Mutation</p>
       <div class="chips" id="chips">
         <button class="chip" type="button" data-key="golden">Golden</button>
@@ -129,7 +144,8 @@
       <div class="srow"><label for="kgMax">Maximum Kg <output id="kgMaxOut"></output></label><input type="range" id="kgMax" min="1" max="200" step="1" value="200"></div>
       <div class="srow"><label for="vMin">Minimum Value <output id="vMinOut"></output></label><input type="range" id="vMin" min="0" max="199" step="1" value="0"></div>
       <div class="srow"><label for="vMax">Maximum Value <output id="vMaxOut"></output></label><input type="range" id="vMax" min="1" max="200" step="1" value="200"></div>
-    </aside>
+    <div class="resetrow"><button class="reset" id="reset" type="button">Reset filters</button></div>
+    </details>
   </div>
 
   <aside class="panel" id="feedPanel">
@@ -139,6 +155,7 @@
 </section>
 
 <div class="card">
+  <div id="eggbox" hidden></div>
   <h1 id="title">Joining server...</h1>
   <p id="msg">Your browser may ask to open Roblox. Click Open / Allow.</p>
   <a id="btn" class="btn" href="#">Open Roblox</a>
@@ -344,7 +361,35 @@
 
   function safeImg(u) { return typeof u === "string" && /^https:\/\//i.test(u) ? u : ""; }
 
+  var cardFilled = false;
+  function fillCard(items) {
+    var it = null;
+    for (var i = 0; i < items.length; i++) {
+      if (String(items[i].jobId).toLowerCase() === jobId.toLowerCase() && String(items[i].placeId) === placeId) { it = items[i]; break; }
+    }
+    if (!it) return;
+    cardFilled = true;
+    var box = $("eggbox");
+    box.textContent = "";
+    var src = safeImg(it.image);
+    if (src) {
+      var img = document.createElement("img");
+      img.alt = "";
+      img.referrerPolicy = "no-referrer";
+      img.onerror = function () { img.remove(); };
+      img.src = src;
+      box.appendChild(img);
+    }
+    box.appendChild(line("div", it.egg, "eggname"));
+    box.appendChild(line("div", "Kg: " + it.kg, "eggstat"));
+    box.appendChild(line("div", "Mutation: " + (it.mutation && it.mutation !== "NONE" ? it.mutation : "None"), "eggstat"));
+    box.appendChild(line("div", "Value: " + (it.value || "Unknown"), "eggstat"));
+    box.hidden = false;
+    $("title").hidden = true;
+  }
+
   function setItems(items) {
+    if (valid && !cardFilled) fillCard(items);
     if (!items.length) return;
     var sig = items.map(function (it) { return it.jobId + it.t; }).join(",");
     if (sig === lastSig) return;   // nothing new
