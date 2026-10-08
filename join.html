@@ -29,13 +29,23 @@
   /* ---- panels ---- */
   .panel { background:rgba(30,31,34,.88); border-radius:12px; padding:16px; align-self:start; margin-top:8px; }
   .panel h2 { margin:0 0 12px; font-size:16px; display:flex; justify-content:space-between; align-items:center; }
-  #left { display:flex; flex-direction:column; gap:12px; align-self:start; justify-self:start; width:100%; max-width:640px; margin-top:8px; min-width:0; }
+  #left { display:flex; flex-direction:column; gap:12px; align-self:start; justify-self:start; width:100%; max-width:720px; margin-top:8px; min-width:0; }
   #right { justify-self:end; width:100%; max-width:300px; box-sizing:border-box; }
   #feedPanel { width:340px; max-width:100%; box-sizing:border-box; }
   #left .panel { margin-top:0; }
-  .filters { display:flex; flex-wrap:wrap; align-items:flex-start; gap:12px; }
-  #opts { flex:0 0 200px; box-sizing:border-box; }
-  #vals { flex:0 0 300px; box-sizing:border-box; }
+  .filters { display:flex; flex-wrap:wrap; align-items:flex-start; gap:10px; }
+  #opts { flex:0 0 180px; box-sizing:border-box; }
+  #vals { flex:0 0 270px; box-sizing:border-box; }
+  #eggs { flex:0 0 220px; box-sizing:border-box; }
+  #eggCount { color:#b5bac1; font-weight:400; font-size:13px; }
+  #eggList { max-height:320px; overflow-y:auto; }
+  .egghead { font-size:12px; font-weight:700; margin:10px 0 6px; }
+  .egghead:first-child { margin-top:0; }
+  .egghead.Secret { color:#E74C3C; } .egghead.Eternal { color:#9B59B6; } .egghead.Divine { color:#F1C40F; }
+  .egggrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .eggtile { display:flex; flex-direction:column; align-items:center; gap:4px; background:#2b2d31; border-radius:8px; padding:8px 4px; text-align:center; }
+  .eggtile img { width:44px; height:44px; object-fit:contain; background:#1e1f22; border-radius:6px; }
+  .eggtile span { font-size:11px; color:#f2f3f5; line-height:1.2; word-break:break-word; }
   details.panel > summary { cursor:pointer; font-size:16px; font-weight:700; list-style:none; display:flex; justify-content:space-between; align-items:center; }
   details.panel > summary::-webkit-details-marker { display:none; }
   details.panel > summary::after { content:"\25BE"; color:#b5bac1; transition:transform .15s; }
@@ -149,6 +159,11 @@
       <div class="srow"><label for="vMin">Minimum Value <output id="vMinOut"></output></label><input type="range" id="vMin" min="0" max="199" step="1" value="0"></div>
       <div class="srow"><label for="vMax">Maximum Value <output id="vMaxOut"></output></label><input type="range" id="vMax" min="1" max="200" step="1" value="200"></div>
     <div class="resetrow"><button class="reset" id="reset" type="button">Reset filters</button></div>
+    </details>
+
+    <details class="panel" id="eggs">
+      <summary><span>Notifying Eggs <span id="eggCount"></span></span></summary>
+      <div id="eggList"></div>
     </details>
   </div>
 
@@ -311,6 +326,7 @@
     $("kgMaxOut").textContent = kgLabel(F.kgMax);
     $("vMinOut").textContent = valLabel(F.vMin, true);
     $("vMaxOut").textContent = valLabel(F.vMax, false);
+    renderEggs();
   }
 
   function changed() { syncUI(); saveF(); render(); }
@@ -345,6 +361,66 @@
   $("vMin").addEventListener("input", function () { F.vMin = +this.value; if (F.vMax < F.vMin) F.vMax = F.vMin; changed(); });
   $("vMax").addEventListener("input", function () { F.vMax = +this.value; if (F.vMin > F.vMax) F.vMin = F.vMax; changed(); });
   $("reset").addEventListener("click", function () { F = defaults(); changed(); });
+
+  // ---------- notifying eggs list ----------
+  // [name, rarity, image]. Add a line here when you add an egg to the script.
+  var EGGS = [
+    ["RazorFang", "Secret", "https://asaiya2.github.io/steal-an-egg/Rock_Demon.png"],
+    ["Gargoyle", "Secret", "https://asaiya2.github.io/steal-an-egg/Gargoyle_Demon.png"],
+    ["Centaur", "Secret", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmpo9iE1MHMQNyB2lCJ6QtI4O_Stz7EvDQXu6HZ2WZTw&s"],
+    ["Pure Jellyfish", "Secret", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIXvOauCXxGctW9tMXU6YeSDuNiL8I_RxhFolmuKZy0A&s"],
+    ["Mutant Shark", "Secret", "https://static.wikia.nocookie.net/stealanegg/images/e/e5/Mutant_Shark.png/revision/latest?cb=20260901190802"],
+    ["Cosmic Skeleton", "Secret", "https://static.wikia.nocookie.net/stealanegg/images/9/97/Cosmic_Skeleton_Boss.png/revision/latest/scale-to-width-down/185?cb=20260904110709"],
+    ["Stag", "Secret", "https://github.com/Asaiya2/steal-an-egg/blob/main/stag.webp?raw=true"],
+    ["Starry Fox", "Secret", "https://asaiya2.github.io/steal-an-egg/Starry_fox.png"],
+    ["Skeleton Horse", "Eternal", "https://asaiya2.github.io/steal-an-egg/Skeleton_horse.png"],
+    ["Pegasus", "Eternal", "https://asaiya2.github.io/steal-an-egg/Pegasus.png"],
+    ["Oni Tiger", "Eternal", "https://asaiya2.github.io/steal-an-egg/Oni_Tiger.png"],
+    ["Gorilla King", "Eternal", "https://asaiya2.github.io/steal-an-egg/Gorrila.png"],
+    ["Eternal Lunar Dragon", "Eternal", "https://asaiya2.github.io/steal-an-egg/Lunar_Dragon.png"],
+    ["Celestial Sunlion", "Eternal", "https://asaiya2.github.io/steal-an-egg/sunlion.png"],
+    ["World Burner", "Divine", "https://asaiya2.github.io/steal-an-egg/World_Burner.png"],
+    ["ArchAngel", "Divine", "https://asaiya2.github.io/steal-an-egg/ArchAngel.png"],
+    ["Nightflame", "Divine", "https://asaiya2.github.io/steal-an-egg/Nightflame.png"],
+    ["Kitsune", "Divine", "https://asaiya2.github.io/steal-an-egg/Kitsune.png"],
+    ["Unicorn", "Divine", "https://asaiya2.github.io/steal-an-egg/Unicorn.png"],
+    ["Royal Skywhale", "Divine", "https://github.com/Asaiya2/steal-an-egg/blob/main/skywhale.png?raw=true"]
+  ];
+  var eggSig = "";
+
+  // shows only the eggs for the rarities switched on in Egg Options
+  function renderEggs() {
+    var sig = F.all ? "all" : Object.keys(F.tiers).sort().join(",");
+    if (sig === eggSig) return;
+    eggSig = sig;
+    var box = $("eggList");
+    box.textContent = "";
+    var total = 0;
+    TIERS.forEach(function (tier) {
+      if (!F.all && !F.tiers[tier]) return;
+      var list = EGGS.filter(function (e) { return e[1] === tier; });
+      if (!list.length) return;
+      total += list.length;
+      box.appendChild(line("div", tier + " (" + list.length + ")", "egghead " + tier));
+      var grid = document.createElement("div");
+      grid.className = "egggrid";
+      list.forEach(function (e) {
+        var tile = document.createElement("div");
+        tile.className = "eggtile";
+        var im = document.createElement("img");
+        im.alt = "";
+        im.referrerPolicy = "no-referrer";
+        im.loading = "lazy";
+        im.onerror = function () { im.style.visibility = "hidden"; };
+        im.src = e[2];
+        tile.appendChild(im);
+        tile.appendChild(line("span", e[0]));
+        grid.appendChild(tile);
+      });
+      box.appendChild(grid);
+    });
+    $("eggCount").textContent = "(" + total + ")";
+  }
 
   // ---------- live feed ----------
   var feedEl = $("feed");
