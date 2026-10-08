@@ -72,6 +72,17 @@
           border:1px solid #4e5058; border-radius:8px; font-size:13px; }
   #hook:focus { outline:2px solid #3498db; border-color:transparent; }
 
+  #ping, #pingType { box-sizing:border-box; padding:10px 12px; background:#1e1f22; color:#f2f3f5; border:1px solid #4e5058; border-radius:8px; font-size:13px; }
+  #ping { flex:1; min-width:0; }
+  .pinglabel { display:block; margin:12px 0 6px; font-size:12px; color:#b5bac1; }
+  .pingrow { display:flex; gap:6px; }
+  .hookbtns { display:flex; gap:6px; margin-top:12px; }
+  .hookbtns button { flex:1; padding:9px; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; color:#fff; border:0; }
+  .hookbtns .save { background:#3498db; } .hookbtns .ghostbtn { background:#4e5058; }
+  #hookStatus { margin-top:10px; font-size:12px; color:#7bd88f; min-height:16px; word-break:break-word; }
+  #hookStatus.bad { color:#ff7b72; }
+  .note { display:block; margin-top:8px; font-size:11px; color:#b5bac1; }
+
   /* ---- join confirmation ---- */
   dialog { background:#2b2d31; color:#f2f3f5; border:0; border-radius:12px; padding:24px; max-width:340px; width:88%;
            font-family:system-ui,Segoe UI,Arial,sans-serif; text-align:center; }
@@ -137,6 +148,18 @@
 <aside class="panel" id="right">
   <h2>Webhook</h2>
   <input id="hook" type="text" placeholder="Webhook" autocomplete="off" spellcheck="false">
+  <label class="pinglabel" for="ping">Enter Role ID (or) User ID (or) Type "Everyone" if you want it to ping everyone</label>
+  <div class="pingrow">
+    <input id="ping" type="text" placeholder="Role ID / User ID / Everyone" autocomplete="off" spellcheck="false">
+    <select id="pingType"><option value="role">Role</option><option value="user">User</option></select>
+  </div>
+  <div class="hookbtns">
+    <button id="hookSave" class="save" type="button">Save</button>
+    <button id="hookTest" class="ghostbtn" type="button">Test</button>
+    <button id="hookRemove" class="ghostbtn" type="button">Remove</button>
+  </div>
+  <div id="hookStatus"></div>
+  <small class="note">Your webhook is stored on our server so alerts can reach you while this page is closed. Press Remove to delete it.</small>
 </aside>
 
 <dialog id="dlg">
@@ -264,7 +287,7 @@
     $("vMaxOut").textContent = valLabel(F.vMax, false);
   }
 
-  function changed() { syncUI(); saveF(); render(); }
+  function changed() { syncUI(); saveF(); render(); scheduleSync(); }
 
   // rarity switches: pick one or two; picking all three (or none) becomes "All"
   $("opts").addEventListener("click", function (e) {
@@ -413,6 +436,80 @@
     location.href = pendingHref;
   });
   dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+
+  // ---------- webhook alerts ----------
+  var API = FEED_URL.replace(/\/feed$/, "");
+  var syncTimer = 0;
+
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+  function getToken() {
+    var t = lsGet("subToken") || "";
+    if (!/^[0-9a-f]{32}$/.test(t)) {
+      var a = new Uint8Array(16); crypto.getRandomValues(a);
+      t = Array.prototype.map.call(a, function (x) { return ("0" + x.toString(16)).slice(-2); }).join("");
+      lsSet("subToken", t);
+    }
+    return t;
+  }
+  function setStatus(msg, bad) { $("hookStatus").textContent = msg; $("hookStatus").className = bad ? "bad" : ""; }
+
+  function currentFilters() {
+    return {
+      tiers: F.all ? [] : Object.keys(F.tiers),
+      mut: Object.keys(F.mut),
+      kgMin: F.kgMin > 0 ? kgAt(F.kgMin) : null,
+      kgMax: F.kgMax < 200 ? kgAt(F.kgMax) : null,
+      vMin: F.vMin > 0 ? valAt(F.vMin) : null,
+      vMax: F.vMax < 200 ? valAt(F.vMax) : null
+    };
+  }
+
+  function post(path, body) {
+    return fetch(API + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+      .then(function (r) { return r.text().then(function (t) { return { ok: r.ok, t: t }; }); });
+  }
+
+  function savedUI() { $("hook").value = ""; $("hook").placeholder = "Webhook saved (paste a new one to replace)"; }
+
+  function sendSub(manual) {
+    var body = { token: getToken(), ping: $("ping").value, pingType: $("pingType").value, filters: currentFilters() };
+    var hook = $("hook").value.trim();
+    if (hook) body.webhook = hook;
+    setStatus(manual ? "Saving..." : "Updating filters...");
+    return post("/sub", body).then(function (res) {
+      if (!res.ok) { setStatus(res.t || "Could not save", true); return; }
+      lsSet("subActive", "1"); lsSet("pingText", $("ping").value); lsSet("pingType", $("pingType").value);
+      savedUI();
+      setStatus(manual ? "Saved. You will get alerts that match your filters." : "Filters updated.");
+    }).catch(function () { setStatus("Could not reach the server", true); });
+  }
+
+  function scheduleSync() {
+    if (lsGet("subActive") !== "1") return;
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(function () { sendSub(false); }, 800);
+  }
+
+  $("hookSave").addEventListener("click", function () { sendSub(true); });
+  $("hookTest").addEventListener("click", function () {
+    setStatus("Sending test...");
+    post("/subtest", { token: getToken() }).then(function (res) {
+      setStatus(res.ok ? "Test alert sent to your webhook." : (res.t || "Test failed"), !res.ok);
+    }).catch(function () { setStatus("Could not reach the server", true); });
+  });
+  $("hookRemove").addEventListener("click", function () {
+    post("/unsub", { token: getToken() }).then(function () {
+      lsDel("subActive"); $("hook").value = ""; $("hook").placeholder = "Webhook";
+      setStatus("Alerts removed. Your webhook was deleted from our server.");
+    }).catch(function () { setStatus("Could not reach the server", true); });
+  });
+
+  if (lsGet("pingText")) $("ping").value = lsGet("pingText");
+  if (lsGet("pingType") === "user") $("pingType").value = "user";
+  if (lsGet("subActive") === "1") { savedUI(); setStatus("Alerts are on."); }
 
   // ---------- polling ----------
   function poll() {
