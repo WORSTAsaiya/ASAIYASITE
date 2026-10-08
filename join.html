@@ -106,7 +106,6 @@
   .pages span { font-size:12px; color:#b5bac1; margin:0 4px; }
   .pg { padding:8px 14px; background:#2b2d31; color:#b5bac1; border:1px solid #4e5058; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; }
   .pg.sel { background:#3498db; border-color:#3498db; color:#fff; }
-  #blank { grid-column:2; }
 
   /* ---- webhook input ---- */
   #hook { width:100%; box-sizing:border-box; padding:10px 12px; background:#1e1f22; color:#f2f3f5;
@@ -145,7 +144,6 @@
     body::before { content:""; order:0; aspect-ratio:1983 / 793; border-radius:12px;
                    background:var(--wall) center / cover no-repeat; }
     body.nowall::before { display:none; }
-    #blank { grid-column:1; }
     .card { order:1; padding:22px 18px; } #left { order:2; } #right { order:3; }
     #left, #right { max-width:none; justify-self:stretch; }
     #opts, #vals, #eggs { flex:1 1 100%; }
@@ -217,11 +215,6 @@
   <code id="raw"></code>
 </div>
 
-<div class="card" id="blank" hidden>
-  <h1>Inexistent</h1>
-  <p>This page doesn't exist yet.</p>
-</div>
-
 <aside class="panel" id="right">
   <h2>Webhook <a class="discord" href="https://discord.gg/W0RST" target="_blank" rel="noopener noreferrer">Join Our Discord Server</a></h2>
   <div class="slots" id="slots">
@@ -260,7 +253,7 @@
   // or with the file name of an image you uploaded next to join.html (for example "bg2.png").
   var WALLPAPERS = {
     1: "https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true",
-    2: "https://media1.tenor.com/m/7zgRvAcRNv0AAAAd/mihoyo-genshin.gif",
+    2: "Channel 2 image",
     3: "Channel 3 image"
   };
   function $(id) { return document.getElementById(id); }
@@ -756,7 +749,6 @@
     var n = +b.dataset.pg;
     document.querySelectorAll(".pg").forEach(function (x) { x.classList.toggle("sel", x === b); });
     ["left", "joinCard", "right"].forEach(function (id) { $(id).hidden = n !== 1; });
-    $("blank").hidden = n === 1;
     setWallpaper(n);
   });
   setWallpaper(1);
