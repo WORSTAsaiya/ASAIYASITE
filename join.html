@@ -86,6 +86,10 @@
           border:1px solid #4e5058; border-radius:8px; font-size:13px; }
   #hook:focus { outline:2px solid #3498db; border-color:transparent; }
 
+  .slots { display:flex; gap:6px; margin-bottom:10px; }
+  .slot { flex:1; position:relative; padding:8px 4px; background:#2b2d31; color:#b5bac1; border:1px solid #4e5058; border-radius:8px; font-size:12px; cursor:pointer; }
+  .slot.sel { background:#3498db; border-color:#3498db; color:#fff; }
+  .slot.on::after { content:""; position:absolute; top:5px; right:6px; width:7px; height:7px; border-radius:50%; background:#43b581; }
   #ping, #pingType { box-sizing:border-box; padding:10px 12px; background:#1e1f22; color:#f2f3f5; border:1px solid #4e5058; border-radius:8px; font-size:13px; }
   #ping { flex:1; min-width:0; }
   .pinglabel { display:block; margin:12px 0 6px; font-size:12px; color:#b5bac1; }
@@ -164,6 +168,11 @@
 
 <aside class="panel" id="right">
   <h2>Webhook</h2>
+  <div class="slots" id="slots">
+    <button class="slot sel" type="button" data-slot="1">Webhook 1</button>
+    <button class="slot" type="button" data-slot="2">Webhook 2</button>
+    <button class="slot" type="button" data-slot="3">Webhook 3</button>
+  </div>
   <input id="hook" type="text" placeholder="Webhook" autocomplete="off" spellcheck="false">
   <label class="pinglabel" for="ping">Enter Role ID (or) User ID (or) Type "Everyone" if you want it to ping everyone</label>
   <div class="pingrow">
@@ -176,7 +185,7 @@
     <button id="hookRemove" class="ghostbtn" type="button">Remove</button>
   </div>
   <div id="hookStatus"></div>
-  <small class="note">Your webhook is stored on our server so alerts can reach you while this page is closed. Press Remove to delete it.</small>
+  <small class="note">You can save up to 3 webhooks, each with its own Egg Options and Egg Values. Pick a webhook, set your options, then press Save. Webhooks are stored on our server so alerts reach you while this page is closed. Remove deletes the selected one.</small>
 </aside>
 
 <dialog id="dlg">
@@ -304,7 +313,7 @@
     $("vMaxOut").textContent = valLabel(F.vMax, false);
   }
 
-  function changed() { syncUI(); saveF(); render(); scheduleSync(); }
+  function changed() { syncUI(); saveF(); render(); }
 
   // rarity switches: pick one or two; picking all three (or none) becomes "All"
   $("opts").addEventListener("click", function (e) {
@@ -482,13 +491,13 @@
   });
   dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
 
-  // ---------- webhook alerts ----------
+  // ---------- webhook alerts (3 slots) ----------
   var API = FEED_URL.replace(/\/feed$/, "");
-  var syncTimer = 0;
+  var SLOT = 1;
+  var slots = {};
 
   function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
-  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
 
   function getToken() {
     var t = lsGet("subToken") || "";
@@ -508,8 +517,21 @@
       kgMin: F.kgMin > 0 ? kgAt(F.kgMin) : null,
       kgMax: F.kgMax < 200 ? kgAt(F.kgMax) : null,
       vMin: F.vMin > 0 ? valAt(F.vMin) : null,
-      vMax: F.vMax < 200 ? valAt(F.vMax) : null
+      vMax: F.vMax < 200 ? valAt(F.vMax) : null,
+      pos: { kgMin: F.kgMin, kgMax: F.kgMax, vMin: F.vMin, vMax: F.vMax }
     };
+  }
+
+  function applyFilters(f) {
+    var n = defaults();
+    n.all = !(f.tiers && f.tiers.length);
+    if (!n.all) f.tiers.forEach(function (t) { if (TIERS.indexOf(t) > -1) n.tiers[t] = true; });
+    (f.mut || []).forEach(function (m) { if (MUTS.indexOf(m) > -1) n.mut[m] = true; });
+    var p = f.pos || {};
+    n.kgMin = clampInt(p.kgMin, 0, 199, 0); n.kgMax = clampInt(p.kgMax, 1, 200, 200);
+    n.vMin = clampInt(p.vMin, 0, 199, 0);   n.vMax = clampInt(p.vMax, 1, 200, 200);
+    F = n;
+    changed();
   }
 
   function post(path, body) {
@@ -517,44 +539,78 @@
       .then(function (r) { return r.text().then(function (t) { return { ok: r.ok, t: t }; }); });
   }
 
-  function savedUI() { $("hook").value = ""; $("hook").placeholder = "Webhook saved (paste a new one to replace)"; }
+  function paintTabs() {
+    document.querySelectorAll(".slot").forEach(function (b) {
+      var n = +b.dataset.slot;
+      b.classList.toggle("sel", n === SLOT);
+      b.classList.toggle("on", !!slots[n]);
+    });
+  }
 
-  function sendSub(manual) {
-    var body = { token: getToken(), ping: $("ping").value, pingType: $("pingType").value, filters: currentFilters() };
+  function selectSlot(n, loadFilters) {
+    SLOT = n;
+    paintTabs();
+    var s = slots[n];
+    $("hook").value = "";
+    if (s) {
+      $("hook").placeholder = "Webhook saved (paste a new one to replace)";
+      $("ping").value = s.ping;
+      $("pingType").value = s.pingType;
+      if (loadFilters && s.filters) applyFilters(s.filters);
+      setStatus("Webhook " + n + " is on. Change the options, then press Save to update it.");
+    } else {
+      $("hook").placeholder = "Webhook";
+      $("ping").value = "";
+      setStatus("Webhook " + n + " is empty. Set your options, paste a webhook, then press Save.");
+    }
+  }
+
+  function refreshSlots(reselect) {
+    return post("/slots", { token: getToken() }).then(function (res) {
+      var list = [];
+      try { list = JSON.parse(res.t); } catch (e) {}
+      slots = {};
+      list.forEach(function (r) { slots[r.slot] = r; });
+      if (reselect) selectSlot(SLOT, false); else paintTabs();
+    }).catch(function () {});
+  }
+
+  $("slots").addEventListener("click", function (e) {
+    var b = e.target.closest(".slot");
+    if (b) selectSlot(+b.dataset.slot, true);
+  });
+
+  $("hookSave").addEventListener("click", function () {
+    var body = { token: getToken(), slot: SLOT, ping: $("ping").value, pingType: $("pingType").value, filters: currentFilters() };
     var hook = $("hook").value.trim();
     if (hook) body.webhook = hook;
-    setStatus(manual ? "Saving..." : "Updating filters...");
-    return post("/sub", body).then(function (res) {
+    setStatus("Saving...");
+    post("/sub", body).then(function (res) {
       if (!res.ok) { setStatus(res.t || "Could not save", true); return; }
-      lsSet("subActive", "1"); lsSet("pingText", $("ping").value); lsSet("pingType", $("pingType").value);
-      savedUI();
-      setStatus(manual ? "Saved. You will get alerts that match your filters." : "Filters updated.");
+      return refreshSlots(true).then(function () {
+        setStatus("Saved to Webhook " + SLOT + ". Eggs that match these options will be sent there.");
+      });
     }).catch(function () { setStatus("Could not reach the server", true); });
-  }
+  });
 
-  function scheduleSync() {
-    if (lsGet("subActive") !== "1") return;
-    clearTimeout(syncTimer);
-    syncTimer = setTimeout(function () { sendSub(false); }, 800);
-  }
-
-  $("hookSave").addEventListener("click", function () { sendSub(true); });
   $("hookTest").addEventListener("click", function () {
     setStatus("Sending test...");
-    post("/subtest", { token: getToken() }).then(function (res) {
-      setStatus(res.ok ? "Test alert sent to your webhook." : (res.t || "Test failed"), !res.ok);
-    }).catch(function () { setStatus("Could not reach the server", true); });
-  });
-  $("hookRemove").addEventListener("click", function () {
-    post("/unsub", { token: getToken() }).then(function () {
-      lsDel("subActive"); $("hook").value = ""; $("hook").placeholder = "Webhook";
-      setStatus("Alerts removed. Your webhook was deleted from our server.");
+    post("/subtest", { token: getToken(), slot: SLOT }).then(function (res) {
+      setStatus(res.ok ? "Test alert sent to Webhook " + SLOT + "." : (res.t || "Test failed"), !res.ok);
     }).catch(function () { setStatus("Could not reach the server", true); });
   });
 
-  if (lsGet("pingText")) $("ping").value = lsGet("pingText");
-  if (lsGet("pingType") === "user") $("pingType").value = "user";
-  if (lsGet("subActive") === "1") { savedUI(); setStatus("Alerts are on."); }
+  $("hookRemove").addEventListener("click", function () {
+    var n = SLOT;
+    post("/unsub", { token: getToken(), slot: n }).then(function () {
+      return refreshSlots(true).then(function () { setStatus("Webhook " + n + " removed and deleted from our server."); });
+    }).catch(function () { setStatus("Could not reach the server", true); });
+  });
+
+  refreshSlots(false).then(function () {
+    var first = [1, 2, 3].filter(function (n) { return slots[n]; })[0];
+    if (first) selectSlot(first, true); else selectSlot(1, false);
+  });
 
   // ---------- polling ----------
   function poll() {
