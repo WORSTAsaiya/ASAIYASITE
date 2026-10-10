@@ -165,9 +165,9 @@
   #gate button.btn:disabled { opacity:.6; cursor:wait; }
   #gate.shake { animation:shake .4s; }
   #tear { position:fixed; inset:0; z-index:1000; pointer-events:none; overflow:hidden; }
-  #tear .half { position:absolute; top:0; bottom:0; width:52%; opacity:0; background:#2ecc71; }
-  #tear .l { left:0; transform-origin:0 100%; }
-  #tear .r { right:0; transform-origin:100% 100%; }
+  #tear .half { position:absolute; inset:0; opacity:0; background:#2ecc71 center / cover no-repeat; }
+  #tear .l { transform-origin:25% 100%; }
+  #tear .r { transform-origin:75% 100%; }
   #tear.flood .half { animation:tearFlood .4s ease-out forwards; }
   #tear.split .half { opacity:1; }
   #tear.split .l { animation:tearL .95s cubic-bezier(.65,0,.35,1) forwards; }
@@ -179,8 +179,8 @@
   body.enter #feedPanel { animation:inU .6s .9s cubic-bezier(.2,.8,.2,1) both; }
   body.enter #right  { animation:inR .6s .6s  cubic-bezier(.2,.8,.2,1) both; }
   @keyframes tearFlood { from { opacity:0; } to { opacity:1; } }
-  @keyframes tearL { from { transform:none; } to { transform:translateX(-104%) rotate(-3deg); } }
-  @keyframes tearR { from { transform:none; } to { transform:translateX(104%) rotate(3deg); } }
+  @keyframes tearL { from { transform:none; } to { transform:translateX(-105%) rotate(-3deg); } }
+  @keyframes tearR { from { transform:none; } to { transform:translateX(105%) rotate(3deg); } }
   @keyframes inL { from { opacity:0; transform:translateX(-60px); } to { opacity:1; transform:none; } }
   @keyframes inR { from { opacity:0; transform:translateX(60px); } to { opacity:1; transform:none; } }
   @keyframes inU { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:none; } }
@@ -343,6 +343,10 @@
 <script>
   var FEED_URL = "https://eggfeed.asaiyamain.workers.dev/feed";
   var unlocked = false, authChecked = false;   // the password is checked by the Worker, it is not stored in this file
+  var passMem = "";   // the typed password lives only in memory, so a reload asks for it again
+  // Image or GIF that gets torn in half when the password is right. Paste a link, or the file name of an
+  // image uploaded next to join.html (for example "tear.gif"). Empty = plain green.
+  var TEAR_IMAGE = "";
 
   // Wallpaper for each channel. Replace the placeholder text with an image link,
   // or with the file name of an image you uploaded next to join.html (for example "bg2.png").
@@ -749,7 +753,7 @@
   }
 
   function post(path, body) {
-    return fetch(API + path, { method: "POST", headers: { "Content-Type": "application/json", "x-pass": encodeURIComponent(lsGet("eggPw") || "") }, body: JSON.stringify(body) })
+    return fetch(API + path, { method: "POST", headers: { "Content-Type": "application/json", "x-pass": encodeURIComponent(passMem) }, body: JSON.stringify(body) })
       .then(function (r) {
         if (r.status === 401) relock();
         return r.text().then(function (t) { return { ok: r.ok, t: t }; });
@@ -1154,24 +1158,25 @@
   // the Worker checks the password, so it never appears in this file
   function relock() {
     unlocked = false; authChecked = true;
-    try { localStorage.removeItem("eggPw"); } catch (e) {}
+    passMem = "";
     showView();
   }
   function unlock() {
     unlocked = true; authChecked = true;
     showView(); poll(); initSlots();
   }
-  // torn edge: the two green halves share the same jagged line
+  // torn edge: both halves are full screen and clipped along the same jagged line, so the image stays in one piece
   (function () {
-    var xs = [97, 94, 99, 95, 100, 93, 98, 94, 99, 95, 97, 93, 100, 96, 94, 99, 95], n = xs.length - 1;
-    var lp = [], rp = [];
-    xs.forEach(function (x, i) {
-      var y = (i * 100 / n) + "%";
-      lp.push(x + "% " + y);
-      rp.push((x - 92.3077).toFixed(3) + "% " + y);
-    });
-    document.querySelector("#tear .l").style.clipPath = "polygon(0 0, " + lp.join(", ") + ", 0 100%)";
-    document.querySelector("#tear .r").style.clipPath = "polygon(" + rp.join(", ") + ", 100% 100%, 100% 0)";
+    var L = document.querySelector("#tear .l"), R = document.querySelector("#tear .r");
+    var xs = [97, 94, 99, 95, 100, 93, 98, 94, 99, 95, 97, 93, 100, 96, 94, 99, 95], n = xs.length - 1, pts = [];
+    xs.forEach(function (x, i) { pts.push((x * 0.52).toFixed(2) + "% " + (i * 100 / n) + "%"); });
+    L.style.clipPath = "polygon(0 0, " + pts.join(", ") + ", 0 100%)";
+    R.style.clipPath = "polygon(" + pts.join(", ") + ", 100% 100%, 100% 0)";
+    if (TEAR_IMAGE) {
+      var u = 'url("' + TEAR_IMAGE.replace(/"/g, "%22") + '")';
+      L.style.backgroundImage = u; R.style.backgroundImage = u;
+      new Image().src = TEAR_IMAGE;   // load it early so it shows instantly
+    }
   })();
 
   // correct password typed: green flood, tear in half, panels slide in
@@ -1202,11 +1207,11 @@
       .then(function (r) {
         done();
         if (r.ok) {
-          if (fromUser) lsSet("eggPw", pw);
+          if (fromUser) passMem = pw;
           $("pw").value = ""; $("pwErr").textContent = "";
-          if (fromUser) reveal(); else unlock();   // returning visitors skip the animation
+          if (fromUser) reveal(); else unlock();   // unlock() without typing only happens when no password is set
         } else {
-          if (!fromUser) { try { localStorage.removeItem("eggPw"); } catch (e) {} }
+          if (!fromUser) passMem = "";
           authChecked = true; showView();
           if (fromUser) { $("pwErr").textContent = "Wrong password"; shake(); }
         }
@@ -1233,7 +1238,8 @@
       .catch(function () {});
   }
   loadInviteCard();
-  checkAuth(lsGet("eggPw") || "", false);
+  try { localStorage.removeItem("eggPw"); } catch (e) {}   // clean up the password older versions saved
+  checkAuth("", false);
 
   // ---------- polling ----------
   // ---------- egg countdown (4:50 from the first alert of a round) ----------
@@ -1254,7 +1260,7 @@
   function poll() {
     if (!FEED_URL) { feedEl.textContent = "Feed not set up yet."; return; }
     if (!unlocked) return;
-    fetch(FEED_URL, { cache: "no-store", headers: { "x-pass": encodeURIComponent(lsGet("eggPw") || "") } })
+    fetch(FEED_URL, { cache: "no-store", headers: { "x-pass": encodeURIComponent(passMem) } })
       .then(function (r) { if (r.status === 401) { relock(); throw 0; } return r.json(); })
       .then(function (d) {
         var items = Array.isArray(d) ? d : (d && d.items);
