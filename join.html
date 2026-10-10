@@ -101,6 +101,9 @@
   .discord:hover { filter:brightness(1.1); }
   .feedhead { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
   .feedhead #count { margin:0; }
+  .feed-clear { background:transparent; border:1px solid #ff7b72; color:#ff7b72; border-radius:7px; padding:5px 9px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; transition:background .15s,color .15s; }
+  .feed-clear:hover { background:#ff7b72; color:#1e1f22; }
+  .feed-left { display:flex; align-items:center; gap:8px; min-width:0; }
   #cycle { font-size:12px; font-weight:700; color:#f2f3f5; text-align:right; }
   #cycle.done { color:#b5bac1; font-weight:400; }
   .pages { grid-column:1 / -1; justify-self:center; order:-1; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:8px 10px; background:rgba(30,31,34,.88); padding:6px 10px; border-radius:12px; }
@@ -382,7 +385,7 @@
   </div>
 
   <aside class="panel" id="feedPanel">
-    <div class="feedhead"><div id="count"></div><div id="cycle"></div></div>
+    <div class="feedhead"><div class="feed-left"><div id="count"></div><button id="feedClear" class="feed-clear" type="button">Clear</button></div><div id="cycle"></div></div>
     <div id="feed"><div class="empty">Waiting for the first alert...</div></div>
   </aside>
 </section>
@@ -1058,6 +1061,14 @@
     });
     newKeys = {};
   }
+
+  // Clear the currently displayed batch locally. The same batch stays cleared
+  // on subsequent polls; a changed feed signature (new batch) appears normally.
+  $("feedClear").addEventListener("click", function () {
+    allItems = [];
+    newKeys = {};
+    render();
+  });
 
   // ---------- join confirmation ----------
   var dlg = $("dlg");
