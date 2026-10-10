@@ -140,39 +140,59 @@
   #hookStatus.bad { color:#ff7b72; }
   .note { display:block; margin-top:8px; font-size:11px; color:#b5bac1; }
 
-  /* ---- calculator (inside the right panel, under the webhooks) ---- */
-  #calcPage { grid-column:2; align-self:start; margin-top:8px; }
-  .calc { margin:0; }
-  .calc h2 { margin:0 0 12px; font-size:16px; }
-  .calc label.cl { display:block; margin:10px 0 6px; font-size:12px; color:#b5bac1; }
-  #calcEgg, #calcKg, #calcRarity { width:100%; box-sizing:border-box; padding:10px 12px; background:#1e1f22; color:#f2f3f5;
-                      border:1px solid #4e5058; border-radius:8px; font-size:13px; }
-  #calcEgg:focus, #calcKg:focus, #calcRarity:focus { outline:2px solid #3498db; border-color:transparent; }
-  .calcout { margin-top:14px; padding:12px; background:#1e1f22; border-radius:8px; }
-  .calcout .big { font-size:22px; font-weight:700; color:#7bd88f; word-break:break-word; }
-  .calcout .line { font-size:12px; color:#b5bac1; margin-top:6px; word-break:break-word; }
-  .calcout .warn { font-size:12px; color:#f1c40f; margin-top:6px; }
-  .calcout .bad { color:#ff7b72; }
-
-    /* ---- calculator button, history and animations ---- */
-  .calcbtn { width:100%; margin-top:14px; padding:11px; border:0; border-radius:8px; background:#3498db; color:#fff; font-weight:700; font-size:14px; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, filter .15s ease; }
-  .calcbtn:hover { transform:translateY(-1px); box-shadow:0 0 14px rgba(52,152,219,.6); filter:brightness(1.08); }
-  .calcbtn:active { transform:scale(.97); box-shadow:none; }
-  .calcout.pop { animation:calcPop .45s cubic-bezier(.2,.8,.2,1); }
-  .histhead { display:flex; justify-content:space-between; align-items:center; margin:18px 0 8px; }
-  .histhead h3 { margin:0; font-size:14px; }
-  .clearbtn { background:none; border:1px solid #ff7b72; color:#ff7b72; border-radius:999px; padding:3px 10px; font-size:12px; cursor:pointer; transition:background .15s, color .15s, transform .15s; }
-  .clearbtn:hover { background:#ff7b72; color:#1e1f22; transform:scale(1.05); }
-  #calcHist { max-height:260px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; }
-  .hitem { background:#2b2d31; border-radius:8px; padding:10px 12px; border-left:3px solid #3498db; transition:transform .15s ease, background .15s ease; }
-  .hitem:hover { background:#34363c; transform:translateX(3px); }
-  .hitem.new { animation:histIn .4s cubic-bezier(.2,.8,.2,1); }
-  .hitem b { font-size:13px; }
-  .hitem .hval { color:#7bd88f; font-weight:700; font-size:14px; margin-top:2px; }
-  .hitem .hmeta { font-size:11px; color:#b5bac1; margin-top:3px; word-break:break-word; }
-  .hempty { font-size:12px; color:#b5bac1; }
-  @keyframes calcPop { from { opacity:0; transform:scale(.95) translateY(8px); } to { opacity:1; transform:none; } }
-  @keyframes histIn { from { opacity:0; transform:translateX(-28px); } to { opacity:1; transform:none; } }
+#calcPage { grid-column:1 / -1; justify-self:center; width:100%; max-width:1040px; align-self:start; margin-top:8px; padding:0; overflow:hidden; box-sizing:border-box; background:#0f1a2b; border:3px solid #3aa6e8; }
+@media (max-width:1200px) { #calcPage { grid-column:1; } }
+.cc-title { margin:0; padding:12px 18px; font-size:22px; background:linear-gradient(#2d9be0,#1b6fb0); text-shadow:0 2px 0 rgba(0,0,0,.4); }
+.cc-main { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:14px; padding:14px; }
+@media (max-width:760px) { .cc-main { grid-template-columns:minmax(0,1fr); } }
+.cc-search { width:100%; box-sizing:border-box; padding:10px 12px; background:#0a111d; color:#f2f3f5; border:1px solid #2b4466; border-radius:6px; font-size:13px; }
+.cc-search:focus { outline:2px solid #3aa6e8; border-color:transparent; }
+.cc-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
+.cc-tab { padding:5px 12px; border-radius:999px; border:1px solid #2b4466; background:#0a111d; color:#f2f3f5; font-size:12px; font-weight:700; cursor:pointer; }
+.cc-tab.on { border-color:var(--c,#3aa6e8); box-shadow:0 0 8px var(--c,#3aa6e8); color:var(--c,#fff); }
+.cc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:8px; max-height:560px; overflow-y:auto; padding:8px; background:#0a111d; border-radius:8px; }
+.cc-tile { position:relative; aspect-ratio:1; padding:0; border:2px solid transparent; border-radius:6px; cursor:pointer; overflow:hidden; color:#fff;
+           background:color-mix(in srgb, var(--c) 80%, #000); transition:transform .12s; }
+.cc-tile:hover { transform:scale(1.04); }
+.cc-tile.sel { border-color:#fff; box-shadow:0 0 0 2px var(--c); }
+.cc-tile img { position:absolute; inset:22% 8% 6%; width:84%; height:72%; object-fit:contain; }
+.cc-tile span { position:absolute; top:4px; left:2px; right:2px; font-size:10px; font-weight:800; line-height:1.1; text-shadow:0 1px 2px #000, 0 0 3px #000; }
+.cc-none { grid-column:1 / -1; padding:30px; text-align:center; color:#b5bac1; font-size:13px; }
+.cc-side { display:flex; flex-direction:column; gap:12px; min-width:0; }
+.cc-prev { text-align:center; padding:14px; border-radius:8px; background:linear-gradient(#0e6a8c,#0a3a55); }
+.cc-prev img { width:96px; height:96px; object-fit:contain; }
+.cc-prev b { display:block; font-size:20px; text-shadow:0 2px 0 #000; }
+.cc-prev .r { font-size:12px; font-weight:700; }
+.cc-prev .m { font-size:16px; font-weight:800; color:#2ee06a; }
+.cc-box { padding:12px; border:2px solid #1f8f3a; border-radius:8px; background:#07140d; }
+.cc-lbl { margin:10px 0 5px; font-size:10px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#80c090; }
+.cc-lbl:first-child { margin-top:0; }
+.cc-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.cc-field { padding:8px; text-align:center; font-size:18px; font-weight:800; background:#0a111d; border:1px solid #2b4466; border-radius:6px; color:#fff; width:100%; box-sizing:border-box; }
+.cc-field:focus { outline:2px solid #3aa6e8; }
+.cc-chips { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.cc-chip { padding:7px 4px; border:2px solid transparent; border-radius:6px; background:#17261c; color:#f2f3f5; font-size:12px; font-weight:800; cursor:pointer; }
+.cc-chip small { display:block; font-size:10px; opacity:.7; }
+.cc-chip.on { border-color:#2ee06a; background:#1d4a2c; }
+.cc-chip.wide { grid-column:1 / -1; }
+.cc-chip.gold.on { border-color:#f1c40f; background:#4d4210; }
+.cc-final { padding:12px; text-align:center; border-radius:8px; background:linear-gradient(#2ee06a,#16a34a); color:#fff; }
+.cc-final small { display:block; font-size:10px; font-weight:800; letter-spacing:.08em; }
+.cc-final b { font-size:28px; text-shadow:0 2px 0 rgba(0,0,0,.35); word-break:break-word; }
+.cc-link { background:none; border:0; color:#80c090; font-size:11px; cursor:pointer; text-decoration:underline; padding:0; }
+.cc-break { margin-top:8px; font-size:12px; color:#b5bac1; }
+.cc-break div { margin-top:4px; }
+.cc-break .warn { color:#f1c40f; }
+.cc-btns { display:flex; gap:6px; margin-top:10px; }
+.cc-btns button { flex:1; padding:9px; border:0; border-radius:6px; background:#3498db; color:#fff; font-weight:800; font-size:12px; cursor:pointer; }
+.cc-btns .ghost { background:#4e5058; }
+.cc-hist { padding:0 14px 14px; }
+.cc-hist h3 { margin:0 0 8px; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:#80848e; display:flex; justify-content:space-between; align-items:center; }
+#calcHist { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px; max-height:220px; overflow-y:auto; }
+.hitem { background:#0a111d; border-left:3px solid var(--acc,#3498db); border-radius:6px; padding:8px 10px; font-size:12px; }
+.hitem .hval { color:var(--acc,#7bd88f); font-weight:800; font-size:14px; }
+.hitem .hmeta { font-size:11px; color:#b5bac1; margin-top:2px; word-break:break-word; }
+.hempty { font-size:12px; color:#b5bac1; }
 
   /* ---- join confirmation ---- */
   dialog { background:#2b2d31; color:#f2f3f5; border:0; border-radius:12px; padding:24px; max-width:340px; width:88%;
@@ -439,21 +459,34 @@
 
 <!-- Page: Egg Calculator -->
 <section class="panel" id="calcPage" hidden>
-<div class="calc" id="calc">
-  <h2>Egg Calculator</h2>
-  <label class="cl" for="calcRarity">Rarity</label>
-  <select id="calcRarity"></select>
-  <label class="cl" for="calcEgg">Egg</label>
-  <select id="calcEgg"></select>
-  <label class="cl" for="calcKg">Weight (Kg)</label>
-  <input id="calcKg" type="text" inputmode="decimal" placeholder="e.g. 2270421" autocomplete="off" spellcheck="false">
-  <label class="cl">Mutations (pick any)</label>
-  <div class="chips" id="calcChips"></div>
-  <button id="calcBtn" class="calcbtn" type="button">Calculate</button>
-  <div class="calcout" id="calcOut"></div>
-  <div class="histhead"><h3>History</h3><button id="calcClear" class="clearbtn" type="button" hidden>Clear history</button></div>
-  <div id="calcHist"></div>
-</div>
+  <h2 class="cc-title">Value Calculator</h2>
+  <div class="cc-main">
+    <div>
+      <input class="cc-search" id="ccSearch" type="text" placeholder="Search eggs by name..." autocomplete="off" spellcheck="false">
+      <div class="cc-tabs" id="ccTabs"></div>
+      <div class="cc-grid" id="ccGrid"></div>
+    </div>
+    <div class="cc-side">
+      <div class="cc-prev" id="ccPrev"></div>
+      <div class="cc-box">
+        <div class="cc-lbl">Weight (Kg)</div>
+        <div class="cc-row">
+          <input class="cc-field" id="calcKg" type="text" inputmode="decimal" placeholder="e.g. 35000 or 2.2M" autocomplete="off" spellcheck="false">
+          <div class="cc-field" id="ccHatch">-</div>
+        </div>
+        <div class="cc-lbl">Variants (stack additively)</div>
+        <div class="cc-chips" id="ccVariants"></div>
+        <div class="cc-lbl">Mutations (stack additively)</div>
+        <div class="cc-chips" id="ccMuts"></div>
+        <div class="cc-lbl">Gamepasses</div>
+        <div class="cc-chips"><button class="cc-chip gold wide" id="ccPass" type="button">2X MONEY<small>2x final value</small></button></div>
+      </div>
+      <div class="cc-final"><small>FINAL INCOME RATE</small><b id="ccFinal">-</b></div>
+      <div><button class="cc-link" id="ccBreakBtn" type="button">+ Stat Breakdown</button><div class="cc-break" id="ccBreak" hidden></div></div>
+      <div class="cc-btns"><button id="calcBtn" type="button">Save to history</button></div>
+    </div>
+  </div>
+  <div class="cc-hist"><h3>History <button id="calcClear" class="cc-link" type="button" hidden>Clear history</button></h3><div id="calcHist"></div></div>
 </section>
 
 <!-- Page: Egg Values. Details on the left, island toggles on the right (details above the list on phones) -->
@@ -1423,11 +1456,11 @@
   // name, multiplier. Mutations add together: 1 + sum(multiplier - 1)
   var CALC_MUTS = [
     ["Silver", 1.2], ["Golden", 2.5], ["Rainbow", 3.5], ["Parasite", 3],
-    ["Bloom", 1.25], ["Spirit Bloom", 2.5], ["Fractured", 2.75], ["Scrambled", 2.75], ["Enchanted", 2.85]
+    ["Bloom", 1.25], ["Spirit Bloom", 2.5], ["Fractured", 2.75], ["Scrambled", 2.75], ["Nitro", 2.75], ["Enchanted", 2.85]
   ];
   var CALC_LOW = 0.5;     // at or below this ratio the low curve is used (5000 Kg Gargoyle matches it)
   var CALC_HIGH = 125;    // above this ratio the flatter 0.40 curve is used
-  var calcPicked = {};
+  var CALC_COLORS = { Common: "#aab0b8", Uncommon: "#5ac85a", Rare: "#4aa3ff", Epic: "#b06cff", Legendary: "#ffa534", Mythic: "#ff5a8a", Cosmic: "#6ee7ff", Secret: "#E74C3C", Eternal: "#9B59B6", Divine: "#F1C40F" };
 
   function calcWeightMult(ratio) {
     if (ratio > CALC_HIGH) return Math.pow(CALC_HIGH, 37 / 60) * Math.pow(ratio / CALC_HIGH, 0.40);
@@ -1440,133 +1473,198 @@
     return "$" + n.toFixed(2) + u[i] + "/s";
   }
 
-  function calcRun(pressed) {
-    if (pressed !== true) { var hint = $("calcOut"); hint.textContent = ""; hint.appendChild(line("div", "Press Calculate to see the value.", "line")); return; }
-    var out = $("calcOut");
-    out.textContent = "";
-    var egg = CALC_EGGS[+$("calcEgg").value];
-    var kg = parseFloat($("calcKg").value.replace(/[,\s]/g, ""));
-    if (!egg) return;
-    if (egg[3] === null) {
-      out.appendChild(line("div", calcMoney(egg[2]), "big"));
-      calcSave(egg, null, [], egg[2]);
-      out.appendChild(line("div", "Base income only. This egg's base weight is not known yet, so the weight can't be used.", "warn"));
-      return;
-    }
-    if (isNaN(kg) || kg <= 0) {
-      out.appendChild(line("div", "Type a weight in Kg to see the value.", "line"));
-      return;
-    }
-    var ratio = kg / egg[3];
-    var base = egg[2] * calcWeightMult(ratio);
-    var mult = 1, names = [];
-    CALC_MUTS.forEach(function (m) {
-      if (calcPicked[m[0]]) { mult += m[1] - 1; names.push(m[0]); }
-    });
-    out.appendChild(line("div", calcMoney(base * mult), "big"));
-    calcSave(egg, kg, names, base * mult);
-    out.appendChild(line("div", ratio.toFixed(ratio < 10 ? 3 : 1) + "x its base weight (" + egg[3].toLocaleString("en-US") + " Kg)", "line"));
-    if (names.length) {
-      out.appendChild(line("div", "Without mutations: " + calcMoney(base), "line"));
-      out.appendChild(line("div", names.join(" + ") + ": x" + mult.toFixed(2).replace(/\.?0+$/, ""), "line"));
-    }
-    if (egg[4]) out.appendChild(line("div", "This egg's base numbers are marked as estimates, so the result may be a little off.", "warn"));
-    if (ratio > CALC_LOW && ratio < 0.9) out.appendChild(line("div", "Eggs between 0.5x and 0.9x base weight are not fully tested yet.", "warn"));
-  }
-
   // ---- calculator history (saved in this browser) ----
   var CALC_HIST_KEY = "calcHistory";
   function histLoad() {
     try { var a = JSON.parse(localStorage.getItem(CALC_HIST_KEY) || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; }
   }
   function histSave(a) { try { localStorage.setItem(CALC_HIST_KEY, JSON.stringify(a)); } catch (e) {} }
-  function calcSave(egg, kg, names, value) {
-    var a = histLoad();
-    a.unshift({ egg: egg[0], rarity: egg[1], kg: kg, muts: names, value: value, t: Date.now() });
-    if (a.length > 100) a.length = 100;   // keeps the newest 100
-    histSave(a);
-    renderHistory(true);
+/* ============ BLOCK 3: JS (paste after calcMoney) ============ */
+var calcPicked = {}, calcSel = -1, calcTier = "All", calcQuery = "", calcPass = false, calcLast = null;
+var CALC_VARIANTS = ["Silver", "Golden", "Rainbow"];
+
+function calcParseKg(s) {
+  var m = String(s || "").replace(/[,\s]/g, "").match(/^(\d*\.?\d+)([kmbt]?)$/i);
+  if (!m) return NaN;
+  return parseFloat(m[1]) * ({ "": 1, k: 1e3, m: 1e6, b: 1e9, t: 1e12 })[m[2].toLowerCase()];
+}
+
+// one function does the math and returns everything the UI needs
+function calcCompute() {
+  var egg = CALC_EGGS[calcSel];
+  if (!egg) return null;
+  var r = { egg: egg, names: [], mult: 1, notes: [] };
+  CALC_MUTS.forEach(function (m) { if (calcPicked[m[0]]) { r.mult += m[1] - 1; r.names.push(m[0]); } });
+  if (egg[3] === null) {
+    r.kg = null; r.wm = 1; r.base = egg[2];
+    r.notes.push("Base weight unknown, so weight is ignored.");
+  } else {
+    r.kg = calcParseKg($("calcKg").value);
+    if (!(r.kg > 0)) return { egg: egg, bad: true };
+    r.ratio = r.kg / egg[3];
+    r.wm = calcWeightMult(r.ratio);
+    r.base = egg[2] * r.wm;
+    if (r.ratio > CALC_LOW && r.ratio < 0.9) r.notes.push("0.5x to 0.9x base weight is not fully tested yet.");
   }
-  function renderHistory(animateNewest) {
-    var box = $("calcHist"), a = histLoad();
-    box.textContent = "";
-    $("calcClear").hidden = !a.length;
-    if (!a.length) { box.appendChild(line("div", "No calculations yet.", "hempty")); return; }
-    a.forEach(function (h, i) {
-      var d = document.createElement("div");
-      d.className = "hitem" + (animateNewest && i === 0 ? " new" : "");
-      d.appendChild(line("b", h.egg + " (" + h.rarity + ")"));
-      d.appendChild(line("div", calcMoney(h.value), "hval"));
-      var meta = [];
-      meta.push(typeof h.kg === "number" ? h.kg.toLocaleString("en-US") + " Kg" : "Base income only");
-      meta.push(h.muts && h.muts.length ? h.muts.join(" + ") : "No mutations");
-      meta.push(new Date(h.t).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }));
-      d.appendChild(line("div", meta.join(" | "), "hmeta"));
-      box.appendChild(d);
-    });
-  }
-  $("calcBtn").addEventListener("click", function () {
-    calcRun(true);
-    var o = $("calcOut");
-    o.classList.remove("pop"); void o.offsetWidth; o.classList.add("pop");
+  if (egg[4]) r.notes.push("This egg's base numbers are estimates.");
+  r.final = r.base * r.mult * (calcPass ? 2 : 1);
+  return r;
+}
+
+function calcUpdate() {
+  var r = calcCompute(), out = $("ccFinal"), br = $("ccBreak");
+  calcLast = r && !r.bad ? r : null;
+  out.textContent = calcLast ? calcMoney(r.final) : "-";
+  br.textContent = "";
+  if (!r) return;
+  if (r.bad) { br.appendChild(line("div", "Type a weight in Kg.", "warn")); return; }
+  if (r.ratio) br.appendChild(line("div", r.ratio.toFixed(r.ratio < 10 ? 3 : 1) + "x base weight (" + r.egg[3].toLocaleString("en-US") + " Kg), weight multiplier x" + r.wm.toFixed(3)));
+  br.appendChild(line("div", "Base income: " + calcMoney(r.base)));
+  if (r.names.length) br.appendChild(line("div", r.names.join(" + ") + ": x" + r.mult.toFixed(2).replace(/\.?0+$/, "")));
+  if (calcPass) br.appendChild(line("div", "2X Money: x2"));
+  r.notes.forEach(function (n) { br.appendChild(line("div", n, "warn")); });
+}
+
+function calcShowEgg() {
+  var egg = CALC_EGGS[calcSel], p = $("ccPrev");
+  p.textContent = "";
+  if (!egg) return;
+  var col = CALC_COLORS[egg[1]];
+  var src = eggImg(egg[0]);
+  if (src) { var im = document.createElement("img"); im.alt = ""; im.referrerPolicy = "no-referrer"; im.onerror = function () { im.remove(); }; im.src = src; p.appendChild(im); }
+  p.appendChild(line("b", egg[0]));
+  var r = line("div", egg[1], "r"); r.style.color = col; p.appendChild(r);
+  p.appendChild(line("div", calcMoney(egg[2]), "m"));
+  $("calcKg").value = egg[3] === null ? "" : String(egg[3]);
+  $("calcKg").disabled = egg[3] === null;
+  var g = (typeof GROW_BY_RARITY !== "undefined" && GROW_BY_RARITY) ? GROW_BY_RARITY[egg[1]] : null;
+  $("ccHatch").textContent = g ? fmtTime(g) : "-";
+  calcUpdate();
+}
+
+function calcRenderGrid() {
+  var box = $("ccGrid"), q = norm(calcQuery), rank = CALC_TIERS.slice().reverse();
+  box.textContent = "";
+  var idx = [];
+  CALC_EGGS.forEach(function (e, i) {
+    if (calcTier !== "All" && e[1] !== calcTier) return;
+    if (q && norm(e[0]).indexOf(q) < 0) return;
+    idx.push(i);
   });
-  $("calcKg").addEventListener("keydown", function (e) { if (e.key === "Enter") $("calcBtn").click(); });
-  $("calcClear").addEventListener("click", function () { histSave([]); renderHistory(); });
+  idx.sort(function (a, b) {
+    var A = CALC_EGGS[a], B = CALC_EGGS[b];
+    return rank.indexOf(B[1]) - rank.indexOf(A[1]) || B[2] - A[2];
+  });
+  if (!idx.length) { box.appendChild(line("div", "No eggs found.", "cc-none")); return; }
+  idx.forEach(function (i) {
+    var e = CALC_EGGS[i], b = document.createElement("button");
+    b.type = "button"; b.className = "cc-tile" + (i === calcSel ? " sel" : "");
+    b.style.setProperty("--c", CALC_COLORS[e[1]]);
+    b.dataset.i = i;
+    b.appendChild(line("span", e[0]));
+    var u = eggImg(e[0]);
+    if (u) { var im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer"; im.onerror = function () { im.remove(); }; im.src = u; b.appendChild(im); }
+    box.appendChild(b);
+  });
+}
+
+function calcMakeChips(box, names, extraNone) {
+  if (extraNone) {
+    var n = document.createElement("button");
+    n.type = "button"; n.className = "cc-chip on"; n.dataset.none = "1";
+    n.appendChild(document.createTextNode("None")); n.appendChild(line("small", "1x"));
+    box.appendChild(n);
+  }
+  names.forEach(function (name) {
+    var m = CALC_MUTS.filter(function (x) { return x[0] === name; })[0];
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "cc-chip" + (name === "Parasite" ? " wide" : ""); b.dataset.name = name;
+    b.appendChild(document.createTextNode(name)); b.appendChild(line("small", m[1] + "x"));
+    box.appendChild(b);
+  });
+}
+function calcSyncChips() {
+  document.querySelectorAll("#ccVariants .cc-chip, #ccMuts .cc-chip").forEach(function (c) {
+    if (c.dataset.none) c.classList.toggle("on", !CALC_VARIANTS.some(function (v) { return calcPicked[v]; }));
+    else c.classList.toggle("on", !!calcPicked[c.dataset.name]);
+  });
+  $("ccPass").classList.toggle("on", calcPass);
+}
+
+// ---- history (saved in this browser, newest 100) ----
+function calcSave() {
+  if (!calcLast) return;
+  var a = histLoad();
+  a.unshift({ egg: calcLast.egg[0], rarity: calcLast.egg[1], kg: calcLast.kg, muts: calcLast.names.concat(calcPass ? ["2X Money"] : []), value: calcLast.final, t: Date.now() });
+  if (a.length > 100) a.length = 100;
+  histSave(a);
   renderHistory();
+}
+function renderHistory() {
+  var box = $("calcHist"), a = histLoad();
+  box.textContent = "";
+  $("calcClear").hidden = !a.length;
+  if (!a.length) { box.appendChild(line("div", "No saved calculations yet.", "hempty")); return; }
+  a.forEach(function (h) {
+    var d = document.createElement("div");
+    d.className = "hitem";
+    d.style.setProperty("--acc", CALC_COLORS[h.rarity] || "#3498db");
+    d.appendChild(line("b", h.egg + " (" + h.rarity + ")"));
+    d.appendChild(line("div", calcMoney(h.value), "hval"));
+    d.appendChild(line("div", [typeof h.kg === "number" ? h.kg.toLocaleString("en-US") + " Kg" : "Base income only", h.muts && h.muts.length ? h.muts.join(" + ") : "No mutations"].join(" | "), "hmeta"));
+    box.appendChild(d);
+  });
+}
 
-  (function setupCalc() {
-    var sel = $("calcEgg");
-    var rar = $("calcRarity");
+document.addEventListener("DOMContentLoaded", function () {
+  // rarity tabs, game order: Common ... Divine
+  var tabs = $("ccTabs");
+  ["All"].concat(CALC_TIERS.slice().reverse()).forEach(function (t) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "cc-tab" + (t === "All" ? " on" : ""); b.dataset.t = t; b.textContent = t;
+    if (CALC_COLORS[t]) b.style.setProperty("--c", CALC_COLORS[t]);
+    tabs.appendChild(b);
+  });
+  tabs.addEventListener("click", function (e) {
+    var b = e.target.closest(".cc-tab"); if (!b) return;
+    calcTier = b.dataset.t;
+    tabs.querySelectorAll(".cc-tab").forEach(function (x) { x.classList.toggle("on", x === b); });
+    calcRenderGrid();
+  });
+  $("ccSearch").addEventListener("input", function () { calcQuery = this.value; calcRenderGrid(); });
+  $("ccGrid").addEventListener("click", function (e) {
+    var b = e.target.closest(".cc-tile"); if (!b) return;
+    calcSel = +b.dataset.i;
+    $("ccGrid").querySelectorAll(".cc-tile").forEach(function (x) { x.classList.toggle("sel", x === b); });
+    calcShowEgg();
+  });
 
-    // rarity dropdown, with how many eggs each one has
-    CALC_TIERS.forEach(function (tier) {
-      var n = CALC_EGGS.filter(function (e) { return e[1] === tier; }).length;
-      var o = document.createElement("option");
-      o.value = tier;
-      o.textContent = tier + " (" + n + ")";
-      rar.appendChild(o);
-    });
+  calcMakeChips($("ccVariants"), CALC_VARIANTS, true);
+  calcMakeChips($("ccMuts"), CALC_MUTS.map(function (m) { return m[0]; }).filter(function (n) { return CALC_VARIANTS.indexOf(n) < 0 && n !== "Parasite"; }).concat(["Parasite"]), false);
+  function chipClick(e) {
+    var c = e.target.closest(".cc-chip"); if (!c) return;
+    if (c.dataset.none) CALC_VARIANTS.forEach(function (v) { delete calcPicked[v]; });
+    else if (calcPicked[c.dataset.name]) delete calcPicked[c.dataset.name];
+    else calcPicked[c.dataset.name] = true;
+    calcSyncChips(); calcUpdate();
+  }
+  $("ccVariants").addEventListener("click", chipClick);
+  $("ccMuts").addEventListener("click", chipClick);
+  $("ccPass").addEventListener("click", function () { calcPass = !calcPass; calcSyncChips(); calcUpdate(); });
+  $("calcKg").addEventListener("input", calcUpdate);
+  $("calcBtn").addEventListener("click", calcSave);
+  $("calcClear").addEventListener("click", function () { histSave([]); renderHistory(); });
+  $("ccBreakBtn").addEventListener("click", function () {
+    var b = $("ccBreak"); b.hidden = !b.hidden;
+    this.textContent = b.hidden ? "+ Stat Breakdown" : "- Stat Breakdown";
+  });
+  $("ccBreak").hidden = true;
 
-    // egg dropdown: only the eggs of the chosen rarity
-    function fillEggs() {
-      sel.textContent = "";
-      CALC_EGGS.forEach(function (e, i) {
-        if (e[1] !== rar.value) return;
-        var o = document.createElement("option");
-        o.value = i;
-        o.textContent = e[0] + (e[3] === null ? " (weight unknown)" : "");
-        sel.appendChild(o);
-      });
-      calcRun();
-    }
-
-    rar.value = "Secret";
-    fillEggs();
-    CALC_EGGS.forEach(function (e, i) { if (e[0] === "Gargoyle") sel.value = i; });
-    calcRun();
-    rar.addEventListener("change", fillEggs);
-
-    var chips = $("calcChips");
-    CALC_MUTS.forEach(function (m) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "chip";
-      b.textContent = m[0];
-      b.dataset.name = m[0];
-      chips.appendChild(b);
-    });
-    chips.addEventListener("click", function (e) {
-      var c = e.target.closest(".chip");
-      if (!c) return;
-      var n = c.dataset.name;
-      if (calcPicked[n]) delete calcPicked[n]; else calcPicked[n] = true;
-      c.classList.toggle("on", !!calcPicked[n]);
-      calcRun();
-    });
-    sel.addEventListener("change", calcRun);
-    $("calcKg").addEventListener("input", calcRun);
-    calcRun();
-  })();
+  calcRenderGrid();
+  CALC_EGGS.forEach(function (e, i) { if (e[0] === "Gargoyle") calcSel = i; });
+  calcShowEgg();
+  renderHistory();
+});
 
   // ---------- egg values page (islands) ----------
   var ISLANDS = [
