@@ -322,6 +322,9 @@
 #verifyPage, #soonPage { grid-column:2; }
 @media (max-width:1200px) { #verifyPage, #soonPage { grid-column:1; } }
 .btn.off { opacity:.5; pointer-events:none; }
+#verifyPage.vgood { box-shadow:0 0 0 2px #43b581, 0 0 28px rgba(67,181,129,.5); }
+#verifyPage.vbad  { box-shadow:0 0 0 2px #ff7b72, 0 0 28px rgba(255,123,114,.45); }
+#vpOpen { padding:12px 22px; font-size:15px; }
 </style>
 </head>
 <body>
@@ -464,9 +467,11 @@
 </section>
 
 <div class="card" id="verifyPage" hidden>
-  <h1>Verification</h1>
+  <div id="vpIcon" style="font-size:44px;line-height:1" hidden></div>
+  <h1 id="vpTitle">Verification</h1>
   <p id="vpServer"></p>
   <a id="vpLogin" class="btn" href="#">Login with Discord</a>
+  <a id="vpOpen" class="btn discord" href="https://discord.com/channels/@me" target="_blank" rel="noopener noreferrer" hidden>Open Discord</a>
   <small class="note">To block ban evasion we store a hashed copy of your IP address.</small>
 </div>
 <div class="card" id="soonPage" hidden>
@@ -2417,6 +2422,39 @@
       ? "Log in with Discord to verify and unlock the server."
       : "Open this page from the verify link in your server.";
   })();
+  // show the result after coming back from Discord (?status=...)
+  (function () {
+    var st = (q.get("status") || "").toLowerCase();
+    var GOOD = { already: "You're already verified. You have the role.",
+                 success: "Verification complete! The role has been added.",
+                 ok:      "Verification complete! The role has been added.",
+                 verified:"Verification complete! The role has been added." };
+    var BAD  = { error:   "Something went wrong. Please try again.",
+                 failed:  "Verification failed. Please try again.",
+                 denied:  "This account or network can't be verified.",
+                 banned:  "This account or network can't be verified.",
+                 invalid: "The verification link is invalid. Please try again." };
+    var good = GOOD.hasOwnProperty(st), bad = BAD.hasOwnProperty(st);
+    if (!good && !bad) return;
+
+    var card = $("verifyPage");
+    card.classList.add(good ? "vgood" : "vbad");
+    $("vpIcon").textContent = good ? "\u2705" : "\u274C";
+    $("vpIcon").hidden = false;
+    $("vpTitle").textContent = good ? "Verified" : "Verification failed";
+    $("vpTitle").style.color = good ? "#43b581" : "#ff7b72";
+    $("vpServer").textContent = good ? GOOD[st] : BAD[st];
+
+    if (good) {
+      $("vpLogin").hidden = true;
+      var o = $("vpOpen");
+      if (guildId) o.href = "https://discord.com/channels/" + guildId;
+      o.hidden = false;
+    } else {
+      $("vpLogin").textContent = "Try again";
+    }
+  })();
+
   curCh = +$("chSel").value; curPg = +$("pgSel").value;
   showView();
 
