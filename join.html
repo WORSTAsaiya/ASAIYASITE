@@ -179,6 +179,10 @@
   #tear.zoom .scene { animation:welZoom 1s cubic-bezier(.7,0,.95,.4) forwards; }
   #tear .l { transform-origin:25% 100%; }
   #tear .r { transform-origin:75% 100%; }
+  /* one whole scene until the tear starts, so no seam shows; the two halves swap in at that moment */
+  #tear .l, #tear .r { visibility:hidden; }
+  #tear.split .l, #tear.split .r { visibility:visible; }
+  #tear.split .w { display:none; }
   #tear.flood .half { animation:tearFlood .4s ease-out forwards; }
   #tear.split .half { opacity:1; }
   #tear.split .l { animation:tearL .95s cubic-bezier(.65,0,.35,1) forwards; }
@@ -354,6 +358,7 @@
 </dialog>
 
 <div id="tear" hidden>
+  <div class="half w"><div class="scene"><div class="wel"><span>Welcome</span></div></div></div>
   <div class="half l"><div class="scene"><div class="wel"><span>Welcome</span></div></div></div>
   <div class="half r"><div class="scene"><div class="wel"><span>Welcome</span></div></div></div>
 </div>
