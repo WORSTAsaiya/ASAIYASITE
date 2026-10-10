@@ -314,7 +314,7 @@
 
 <script>
   var FEED_URL = "https://eggfeed.asaiyamain.workers.dev/feed";
-  var PASSWORD = "W_1010203040506070809010";   // set your password here. Empty = no password required
+  var unlocked = false, authChecked = false;   // the password is checked by the Worker, it is not stored in this file
 
   // Wallpaper for each channel. Replace the placeholder text with an image link,
   // or with the file name of an image you uploaded next to join.html (for example "bg2.png").
@@ -585,7 +585,6 @@
   }
 
   function setItems(items) {
-    if (valid && !cardFilled) fillCard(items);
     if (!items.length) return;
     var sig = items.map(function (it) { return it.jobId + it.t; }).join(",");
     if (sig === lastSig) return;   // nothing new
@@ -722,8 +721,11 @@
   }
 
   function post(path, body) {
-    return fetch(API + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
-      .then(function (r) { return r.text().then(function (t) { return { ok: r.ok, t: t }; }); });
+    return fetch(API + path, { method: "POST", headers: { "Content-Type": "application/json", "x-pass": encodeURIComponent(lsGet("eggPw") || "") }, body: JSON.stringify(body) })
+      .then(function (r) {
+        if (r.status === 401) relock();
+        return r.text().then(function (t) { return { ok: r.ok, t: t }; });
+      });
   }
 
   function paintTabs() {
@@ -794,10 +796,12 @@
     }).catch(function () { setStatus("Could not reach the server", true); });
   });
 
-  refreshSlots(false).then(function () {
-    var first = [1, 2, 3].filter(function (n) { return slots[n]; })[0];
-    if (first) selectSlot(first, true); else selectSlot(1, false);
-  });
+  function initSlots() {
+    refreshSlots(false).then(function () {
+      var first = [1, 2, 3].filter(function (n) { return slots[n]; })[0];
+      if (first) selectSlot(first, true); else selectSlot(1, false);
+    });
+  }
 
   // ---------- egg calculator ----------
   // Same math as the Roblox script. [name, rarity, base income per second, base weight in Kg (null = unknown), estimated?]
@@ -1103,17 +1107,15 @@
   }
 
   // ---------- channels and pages ----------
-  function isUnlocked() { return !PASSWORD || lsGet("eggPw") === PASSWORD; }
-
   function showView() {
     var ch = +$("chSel").value, pg = +$("pgSel").value;
     var live = ch === 1;                      // only channel 1 exists for now
     var notifier = live && pg === 1;
-    var open = isUnlocked();
+    var open = unlocked;
     $("pgSel").disabled = !live;
     $("left").hidden = !(notifier && open);
     $("right").hidden = !(notifier && open);
-    $("gate").hidden = !(notifier && !open);
+    $("gate").hidden = !(notifier && authChecked && !open);
     $("joinCard").hidden = !(live && pg === 4);
     $("valuesPage").hidden = !(live && pg === 2);
     $("calcPage").hidden = !(live && pg === 3);
@@ -1121,16 +1123,32 @@
     setWallpaper(ch);
   }
 
-  function tryUnlock() {
-    if ($("pw").value === PASSWORD) {
-      lsSet("eggPw", PASSWORD);
-      $("pw").value = "";
-      $("pwErr").textContent = "";
-      showView();
-    } else {
-      $("pwErr").textContent = "Wrong password";
-    }
+  // the Worker checks the password, so it never appears in this file
+  function relock() {
+    unlocked = false; authChecked = true;
+    try { localStorage.removeItem("eggPw"); } catch (e) {}
+    showView();
   }
+  function unlock() {
+    unlocked = true; authChecked = true;
+    showView(); poll(); initSlots();
+  }
+  function checkAuth(pw, fromUser) {
+    fetch(API + "/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: pw }) })
+      .then(function (r) {
+        if (r.ok) {
+          if (fromUser) lsSet("eggPw", pw);
+          $("pw").value = ""; $("pwErr").textContent = "";
+          unlock();
+        } else {
+          if (!fromUser) { try { localStorage.removeItem("eggPw"); } catch (e) {} }
+          authChecked = true; showView();
+          if (fromUser) $("pwErr").textContent = "Wrong password";
+        }
+      })
+      .catch(function () { authChecked = true; showView(); $("pwErr").textContent = "Could not reach the server"; });
+  }
+  function tryUnlock() { checkAuth($("pw").value, true); }
   $("pwBtn").addEventListener("click", tryUnlock);
   $("pw").addEventListener("keydown", function (e) { if (e.key === "Enter") tryUnlock(); });
 
@@ -1140,6 +1158,17 @@
   // a Discord invite link (?placeId=...&jobId=...) opens the Join tab
   if (placeId || jobId) $("pgSel").value = "4";
   showView();
+
+  // the Join tab loads just that one egg from the Worker (public, no password needed)
+  function loadInviteCard() {
+    if (!valid) return;
+    fetch(API + "/egg?placeId=" + encodeURIComponent(placeId) + "&jobId=" + encodeURIComponent(jobId), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (it) { if (it) fillCard([it]); })
+      .catch(function () {});
+  }
+  loadInviteCard();
+  checkAuth(lsGet("eggPw") || "", false);
 
   // ---------- polling ----------
   // ---------- egg countdown (4:50 from the first alert of a round) ----------
@@ -1159,8 +1188,9 @@
 
   function poll() {
     if (!FEED_URL) { feedEl.textContent = "Feed not set up yet."; return; }
-    fetch(FEED_URL, { cache: "no-store" })
-      .then(function (r) { return r.json(); })
+    if (!unlocked) return;
+    fetch(FEED_URL, { cache: "no-store", headers: { "x-pass": encodeURIComponent(lsGet("eggPw") || "") } })
+      .then(function (r) { if (r.status === 401) { relock(); throw 0; } return r.json(); })
       .then(function (d) {
         var items = Array.isArray(d) ? d : (d && d.items);
         if (d && d.cycle) {
