@@ -2402,7 +2402,7 @@
   $("pgSel").addEventListener("change", transition);
 
   // a Discord invite link (?placeId=...&jobId=...) opens the Join tab
-  var VERIFY_LOGIN_URL = "";   // set to the Worker's login address when it exists
+  var VERIFY_LOGIN_URL = "https://asaiya-verify.asaiyamain.workers.dev/verify/discord/login";
   var guildId = /^\d{15,25}$/.test(q.get("guild") || "") ? q.get("guild") : "";
   if (q.get("ch") === "discord") {
     $("chSel").value = "2";
