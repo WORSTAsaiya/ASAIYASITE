@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Join Server</title>
 <style>
-  body { --wall:url("https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true"); margin:0; min-height:100vh; padding:20px; box-sizing:border-box;
+  body { --wall:none; margin:0; min-height:100vh; padding:20px; box-sizing:border-box;
          display:grid; grid-template-columns:minmax(0,1fr) minmax(0,440px) minmax(0,1fr);
          grid-template-rows:auto 1fr; align-items:center; gap:20px;
          background-color:#1e1f22;
          background-image:var(--wall);
          background-size:cover; background-position:center; background-repeat:no-repeat; background-attachment:fixed;
          color:#f2f3f5; font-family:system-ui,Segoe UI,Arial,sans-serif; }
+  body.brownlock { background-color:#4a2c1a; }
   .card { background:#2b2d31; padding:28px 32px; border-radius:12px; text-align:center; }
   h1 { margin:0 0 8px; font-size:22px; }
   p { margin:6px 0 18px; color:#b5bac1; font-size:14px; }
@@ -165,7 +166,17 @@
   #gate button.btn:disabled { opacity:.6; cursor:wait; }
   #gate.shake { animation:shake .4s; }
   #tear { position:fixed; inset:0; z-index:1000; pointer-events:none; overflow:hidden; }
-  #tear .half { position:absolute; inset:0; opacity:0; background:#2ecc71 center / cover no-repeat; }
+  #tear .half { position:absolute; inset:0; opacity:0; background:#000; }
+  #tear .scene { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transform-origin:50% 50%; background:center / contain no-repeat; }
+  #tear .scene.img .wel { display:none; }
+  #tear .wel { position:relative; color:#fff; font:700 clamp(26px,6vw,72px)/1 system-ui,Segoe UI,Arial,sans-serif; letter-spacing:.12em; opacity:0; }
+  #tear .wel::before, #tear .wel::after { content:""; position:absolute; width:1em; height:1em; border:0 solid #fff; opacity:0; }
+  #tear .wel::before { left:-1.5em; bottom:-.5em; border-left-width:.2em; border-bottom-width:.2em; border-bottom-left-radius:.15em; }
+  #tear .wel::after { right:-1.35em; top:-.5em; border-top-width:.2em; border-right-width:.2em; border-top-right-radius:.15em; }
+  #tear.flood .wel { animation:welIn .8s .35s ease-out forwards; }
+  #tear.flood .wel::before { animation:brL .8s .35s ease-out forwards; }
+  #tear.flood .wel::after { animation:brR .8s .35s ease-out forwards; }
+  #tear.zoom .scene { animation:welZoom 1s cubic-bezier(.7,0,.95,.4) forwards; }
   #tear .l { transform-origin:25% 100%; }
   #tear .r { transform-origin:75% 100%; }
   #tear.flood .half { animation:tearFlood .4s ease-out forwards; }
@@ -178,6 +189,10 @@
   body.enter #eggs   { animation:inL .6s .75s cubic-bezier(.2,.8,.2,1) both; }
   body.enter #feedPanel { animation:inU .6s .9s cubic-bezier(.2,.8,.2,1) both; }
   body.enter #right  { animation:inR .6s .6s  cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes welIn { from { opacity:0; letter-spacing:.5em; } to { opacity:1; letter-spacing:.12em; } }
+  @keyframes brL { from { opacity:0; transform:translate(-1em,.8em); } to { opacity:1; transform:none; } }
+  @keyframes brR { from { opacity:0; transform:translate(1em,-.8em); } to { opacity:1; transform:none; } }
+  @keyframes welZoom { from { transform:scale(1); } to { transform:scale(26); } }
   @keyframes tearFlood { from { opacity:0; } to { opacity:1; } }
   @keyframes tearL { from { transform:none; } to { transform:translateX(-105%) rotate(-3deg); } }
   @keyframes tearR { from { transform:none; } to { transform:translateX(105%) rotate(3deg); } }
@@ -338,15 +353,18 @@
   <label class="never"><input type="checkbox" id="never"> Never remind again</label>
 </dialog>
 
-<div id="tear" hidden><div class="half l"></div><div class="half r"></div></div>
+<div id="tear" hidden>
+  <div class="half l"><div class="scene"><div class="wel"><span>Welcome</span></div></div></div>
+  <div class="half r"><div class="scene"><div class="wel"><span>Welcome</span></div></div></div>
+</div>
 
 <script>
   var FEED_URL = "https://eggfeed.asaiyamain.workers.dev/feed";
   var unlocked = false, authChecked = false;   // the password is checked by the Worker, it is not stored in this file
   var passMem = "";   // the typed password lives only in memory, so a reload asks for it again
-  // Image or GIF that gets torn in half when the password is right. Paste a link, or the file name of an
-  // image uploaded next to join.html (for example "tear.gif"). Empty = plain green.
-  var TEAR_IMAGE = "";
+  // Optional: show an image instead of the built-in "Welcome" text during the unlock animation.
+  // Paste a link, or the file name of an image uploaded next to join.html. Empty = built-in Welcome.
+  var WELCOME_IMAGE = "";
 
   // Wallpaper for each channel. Replace the placeholder text with an image link,
   // or with the file name of an image you uploaded next to join.html (for example "bg2.png").
@@ -1132,10 +1150,13 @@
   function isImage(v) { return /^https?:\/\//i.test(v) || /\.(png|jpe?g|gif|webp|avif|svg)$/i.test(v); }
   function setWallpaper(n) {
     var v = WALLPAPERS[n] || "";
-    var ok = isImage(v);
+    // Egg Notifiers before the password: plain brown, and the wallpaper is not even requested
+    var locked = n === 1 && +$("pgSel").value === 1 && !unlocked;
+    var ok = isImage(v) && !locked;
     document.body.style.setProperty("--wall", ok ? 'url("' + v.replace(/"/g, "%22") + '")' : "none");
     document.body.classList.toggle("nowall", !ok);
-    $("wallLabel").textContent = ok ? "" : v;
+    document.body.classList.toggle("brownlock", locked);
+    $("wallLabel").textContent = (ok || locked) ? "" : v;
   }
 
   // ---------- channels and pages ----------
@@ -1172,27 +1193,30 @@
     xs.forEach(function (x, i) { pts.push((x * 0.52).toFixed(2) + "% " + (i * 100 / n) + "%"); });
     L.style.clipPath = "polygon(0 0, " + pts.join(", ") + ", 0 100%)";
     R.style.clipPath = "polygon(" + pts.join(", ") + ", 100% 100%, 100% 0)";
-    if (TEAR_IMAGE) {
-      var u = 'url("' + TEAR_IMAGE.replace(/"/g, "%22") + '")';
-      L.style.backgroundImage = u; R.style.backgroundImage = u;
-      new Image().src = TEAR_IMAGE;   // load it early so it shows instantly
+    if (WELCOME_IMAGE) {
+      var u = 'url("' + WELCOME_IMAGE.replace(/"/g, "%22") + '")';
+      document.querySelectorAll("#tear .scene").forEach(function (sc) { sc.style.backgroundImage = u; sc.classList.add("img"); });
+      new Image().src = WELCOME_IMAGE;   // load it early so it shows instantly
     }
   })();
 
-  // correct password typed: green flood, tear in half, panels slide in
+  // correct password typed: black screen, "Welcome" appears, zooms in hard, then the screen tears in half
   function reveal() {
     var t = $("tear");
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { unlock(); return; }
+    // the wallpaper is only requested now, so it is loaded by the time the screen tears open
+    if (isImage(WALLPAPERS[1] || "")) { try { new Image().src = WALLPAPERS[1]; } catch (e) {} }
     t.hidden = false; t.className = "";
     void t.offsetWidth;
     t.className = "flood";
+    setTimeout(function () { t.className = "flood zoom"; }, 1600);
     setTimeout(function () {
       unlock();
       document.body.classList.add("enter");
-      t.className = "split";
-    }, 450);
-    setTimeout(function () { t.hidden = true; t.className = ""; }, 1600);
-    setTimeout(function () { document.body.classList.remove("enter"); }, 2400);
+      t.className = "flood zoom split";
+    }, 2600);
+    setTimeout(function () { t.hidden = true; t.className = ""; }, 4300);
+    setTimeout(function () { document.body.classList.remove("enter"); }, 5100);
   }
   function shake() {
     var g = $("gate");
