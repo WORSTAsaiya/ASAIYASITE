@@ -108,6 +108,8 @@
   .pages select:focus { outline:2px solid #3498db; border-color:transparent; }
   .pages select:disabled { opacity:.5; cursor:not-allowed; }
   #blank, #joinCard, #gate { grid-column:2; }
+  #left { grid-column:1; }
+  #right { grid-column:3; }
   #gate input { width:100%; box-sizing:border-box; padding:10px 12px; margin:6px 0 12px; background:#1e1f22; color:#f2f3f5;
                 border:1px solid #4e5058; border-radius:8px; font-size:14px; }
   #gate input:focus { outline:2px solid #3498db; border-color:transparent; }
@@ -165,7 +167,7 @@
     body::before { content:""; order:0; aspect-ratio:1983 / 793; border-radius:12px;
                    background:var(--wall) center / cover no-repeat; }
     body.nowall::before { display:none; }
-    #blank, #calcPage, #joinCard, #gate { grid-column:1; }
+    #blank, #calcPage, #joinCard, #gate, #left, #right { grid-column:1; }
     .card { order:1; padding:22px 18px; } #left { order:2; } #right { order:3; }
     #left, #right { max-width:none; justify-self:stretch; }
     #opts, #vals, #eggs { flex:1 1 100%; }
@@ -312,7 +314,7 @@
 
 <script>
   var FEED_URL = "https://eggfeed.asaiyamain.workers.dev/feed";
-  var PASSWORD = "";   // set your password here. Empty = no password required
+  var PASSWORD = "W_1010203040506070809010";   // set your password here. Empty = no password required
 
   // Wallpaper for each channel. Replace the placeholder text with an image link,
   // or with the file name of an image you uploaded next to join.html (for example "bg2.png").
