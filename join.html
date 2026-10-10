@@ -206,13 +206,38 @@
   @keyframes shake { 20%, 60% { transform:translateX(-8px); } 40%, 80% { transform:translateX(8px); } }
   @media (prefers-reduced-motion:reduce) { #tear { display:none !important; } body.enter * { animation:none !important; } }
 
+  /* ---- egg values page (islands) ---- */
+  #valuesPage { grid-column:2; align-self:start; margin-top:8px; max-height:calc(100vh - 110px); overflow-y:auto; }
+  .isl { margin-bottom:10px; background:#2b2d31; border-radius:10px; padding:0 12px; }
+  .isl > summary { cursor:pointer; font-weight:700; font-size:14px; padding:11px 0; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .isl > summary::-webkit-details-marker { display:none; }
+  .isl > summary::after { content:"\25BE"; color:#b5bac1; transition:transform .15s; }
+  .isl[open] > summary::after { transform:rotate(180deg); }
+  .isl .cnt { color:#b5bac1; font-weight:400; font-size:12px; margin-left:auto; }
+  .isl[open] { padding-bottom:6px; }
+  .vegg { background:#1e1f22; border-radius:8px; margin-bottom:6px; overflow:hidden; animation:slideIn .45s cubic-bezier(.2,.8,.2,1) both; }
+  .vhead { width:100%; display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 12px; background:none; border:0; color:#f2f3f5; font-size:13px; font-weight:700; cursor:pointer; text-align:left; }
+  .vhead small { font-weight:400; color:#b5bac1; font-size:11px; }
+  .vleft { display:flex; align-items:center; gap:8px; min-width:0; }
+  .vthumb { width:28px; height:28px; object-fit:contain; background:#2b2d31; border-radius:6px; flex:none; }
+  .vbody { padding:2px 12px 12px; }
+  .vbody .vname { font-size:16px; font-weight:700; margin-bottom:8px; }
+  .vbody input[type=range] { width:100%; accent-color:#3498db; margin:4px 0 10px; }
+  .vimg { display:block; width:96px; height:96px; object-fit:contain; background:#2b2d31; border-radius:10px; margin:0 0 8px; }
+  .vimgrow { display:flex; gap:6px; margin:0 0 10px; }
+  .vimgrow input { flex:1; min-width:0; box-sizing:border-box; padding:8px 10px; background:#2b2d31; color:#f2f3f5; border:1px solid #4e5058; border-radius:8px; font-size:12px; }
+  .vimgrow input:focus { outline:2px solid #3498db; border-color:transparent; }
+  .vimgrow button { padding:8px 12px; background:#3498db; color:#fff; border:0; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; }
+  @keyframes slideIn { from { opacity:0; transform:translateX(-40px); } to { opacity:1; transform:none; } }
+
   @keyframes flash { from { background:#3d5a80; } to { background:#2b2d31; } }
   @media (max-width:1200px) {
     body { grid-template-columns:minmax(0,1fr); justify-content:center; align-items:start; background-image:none; }
     body::before { content:""; order:0; aspect-ratio:1983 / 793; border-radius:12px;
                    background:var(--wall) center / cover no-repeat; }
     body.nowall::before { display:none; }
-    #blank, #calcPage, #joinCard, #gate, #left, #right { grid-column:1; }
+    #blank, #calcPage, #valuesPage, #joinCard, #gate, #left, #right { grid-column:1; }
+    #valuesPage { max-height:none; }
     .card { order:1; padding:22px 18px; } #left { order:2; } #right { order:3; }
     #left, #right { max-width:none; justify-self:stretch; }
     #opts, #vals, #eggs { flex:1 1 100%; }
@@ -345,8 +370,11 @@
 </div>
 </section>
 
-<!-- Page: Egg Values (empty for now) -->
-<section id="valuesPage" hidden></section>
+<!-- Page: Egg Values (islands) -->
+<section class="panel" id="valuesPage" hidden>
+  <h2>Egg Values</h2>
+  <div id="valIslands"></div>
+</section>
 
 <div id="wallLabel"></div>
 
@@ -379,6 +407,101 @@
     3: "Channel 3 image"
   };
   function $(id) { return document.getElementById(id); }
+
+  // ---------- EGG IMAGES ----------
+  // One image link per egg. Put the link between the quotes ("" = no image yet).
+  // The name on the left must match the egg name exactly. Links must start with https://
+  // These images are used on the Egg Values page, in the Notifying Eggs list and in the live feed.
+  var EGG_IMAGES = {
+    // Forest
+    "Chicken": "", "Dog": "", "Bird": "", "Burrowing Owl": "", "Raccoon": "", "Fox": "", "Bear": "", "Brr Brr Patapim": "",
+    // Lake
+    "Frog": "", "Duckling": "", "Catfish": "", "Turtle": "", "Trulimero Trulicina": "", "Swan": "", "Axolotl": "", "Leviathan": "",
+    // Desert
+    "Jerboa": "", "Fennec": "", "Camel": "", "Tob Tobi Tob Tob": "", "Snake": "", "Sand Spider": "", "Scorpion": "", "Royal Sphinx": "",
+    // Jungle
+    "Chimpanzee": "", "Toucan": "", "Crocodile": "", "Gorilla": "", "Orangutini Ananassini": "", "Spider": "", "Tiger": "", "King Snake": "",
+    // Snow
+    "Penguin": "", "Walrus": "", "Polar Bear": "", "Sabertooth Tiger": "", "Mammoth": "", "King Mammoth": "", "Yeti": "", "Ice Dragon": "",
+    // Volcano
+    "Lava Gecko": "", "Lava Frog": "", "Flaming Bull": "", "Lava Iguana": "", "Chillin Chilli": "", "Cerberus": "", "Phoenix": "", "Lava Dragon": "",
+    // Abyss Ocean
+    "Parrotfish": "", "Swordfish": "", "Shark": "", "Orca": "", "Whale Shark": "", "Beluga Whale": "", "Kraken": "", "El Maja": "",
+    // Prehistoric
+    "Dodo": "", "Pterodactyl": "", "Ankylosaurus": "", "Triceratops": "", "Bronto": "", "T-Rex": "", "Tralaledon": "", "Mosasaurus": "",
+    // Cosmic
+    "Centapede": "", "Cosmic Gecko": "", "Cosmic Gorilla": "", "La Vacca Saturno Saturnita": "",
+    "Cosmic Skeleton Boss": "https://static.wikia.nocookie.net/stealanegg/images/9/97/Cosmic_Skeleton_Boss.png/revision/latest/scale-to-width-down/185?cb=20260904110709",
+    "Cosmic Dragon": "",
+    "Eternal Lunar Dragon": "https://asaiya2.github.io/steal-an-egg/Lunar_Dragon.png",
+    "Unicorn": "https://asaiya2.github.io/steal-an-egg/Unicorn.png",
+    // Cherry Blossom
+    "Crane": "", "Salamander": "", "Red Panda": "", "Snowy Owl": "", "Koi": "",
+    "Stag": "https://github.com/Asaiya2/steal-an-egg/blob/main/stag.webp?raw=true",
+    "Oni Tiger": "https://asaiya2.github.io/steal-an-egg/Oni_Tiger.png",
+    "Kitsune": "https://asaiya2.github.io/steal-an-egg/Kitsune.png",
+    // Enchanted Forest
+    "Prism Gecko": "", "Petal Beetle": "", "Enchanted Bluejay": "", "Astral Jackalope": "",
+    "Starry Fox": "https://asaiya2.github.io/steal-an-egg/Starry_fox.png",
+    "Celestial Sunlion": "https://asaiya2.github.io/steal-an-egg/sunlion.png",
+    "Royal Skywhale": "https://github.com/Asaiya2/steal-an-egg/blob/main/skywhale.png?raw=true",
+    // Titan Temple
+    "Spideron": "", "Crustacia": "", "Bladehide": "", "Mantaris": "", "Rhinotaur": "",
+    "Gorilla King": "https://asaiya2.github.io/steal-an-egg/Gorrila.png",
+    "Nightflame": "https://asaiya2.github.io/steal-an-egg/Nightflame.png",
+    "Mutant Shark": "https://static.wikia.nocookie.net/stealanegg/images/e/e5/Mutant_Shark.png/revision/latest?cb=20260901190802",
+    // Angels & Demons
+    "Flame Sprite": "", "Light Dove": "", "Winged Lamb": "", "Toro": "", "Imp": "", "Sacred Moth": "", "Holy Peacock": "", "Demon Hound": "",
+    "Gargoyle": "https://asaiya2.github.io/steal-an-egg/Gargoyle_Demon.png",
+    "Pure Jellyfish": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIXvOauCXxGctW9tMXU6YeSDuNiL8I_RxhFolmuKZy0A&s",
+    "Centaur": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmpo9iE1MHMQNyB2lCJ6QtI4O_Stz7EvDQXu6HZ2WZTw&s",
+    "RazorFang": "https://asaiya2.github.io/steal-an-egg/Rock_Demon.png",
+    "Pegasus": "https://asaiya2.github.io/steal-an-egg/Pegasus.png",
+    "Skeleton Horse": "https://asaiya2.github.io/steal-an-egg/Skeleton_horse.png",
+    "Equinox": "",
+    "ArchAngel": "https://asaiya2.github.io/steal-an-egg/ArchAngel.png",
+    "World Burner": "https://asaiya2.github.io/steal-an-egg/World_Burner.png",
+    "Aetheron": "",
+    // Rift: Riftborn Egg
+    "Rift Eye": "", "Voidmaw": "", "Ventinal": "", "Wendigo": "", "Abyss Overlord": "", "World Eater": "",
+    // Rift: Riftbeasts Egg
+    "Void Angler": "", "Riftwing": "", "Dreadclaw": "", "Mawbreaker": "", "Void Serpent": "",
+    // Rift: Shattered Rift Egg
+    "Shardling": "", "Shattered Ram": "", "Shardwing": "", "Shattered Drake": "", "Shattered Colossus": "",
+    // Dr. Scramble: Biohazard / Experimental / Unstable / Other
+    "Toxic Rat": "", "Radcoon": "", "Toucax": "", "Nuceodile": "", "Nuclear Mantis": "",
+    "Wheel Hamster": "", "Stacked Turtle": "", "Three Headed Chicken": "", "Eyeball Crab": "", "Dreadstinger": "",
+    "Frogfly": "", "Spiderpig": "", "Sharkodile": "", "Rhinobear": "", "Octophant": "",
+    "Experiment #001": "", "Nibbles #013": "",
+    // Event rewards
+    "Eye Bat #021": "", "Citadel Snail #007": "", "Uncoiled Armadillo": "", "67": "", "Toxic Hedgehog": "", "Mecha Chompa": "",
+    "Pink Dragon Experiment #010": "", "Mecha Scrambler": "",
+    // Store: Luminous, Luminous Reroll, Extinction, Dragon
+    "Spike": "", "Spirit Manta": "", "Abyss Shark": "", "Electric Eel": "", "Terra Snapper": "", "Cthulhu": "",
+    "Luminous Spike": "", "Luminous Spirit Manta": "", "Luminous Abyss Shark": "", "Luminous Electric Eel": "", "Luminous Terra Snapper": "", "Luminous Cthulhu": "",
+    "Glyptodon": "", "Sabertooth": "",
+    "Baby Aurora Dragon": "", "Shadow Dragon": "", "Scorched Dragon": "", "Drilla": "", "Void Dragon": "", "Ember Dragon": "",
+    // Other (not sorted yet)
+    "Archdemon Dragon": "", "Gigantus": "", "Dunkleosteus": "", "Giant Sloth": "", "Terrorbird": "", "Ring Guard": "", "Ringlord": "",
+    "Skeletal Sabertooth": "", "Skeletal Gigantus": "", "Skeletal Dunkleosteus": "", "Skeletal Glyptodon": "", "Skeletal Terrorbird": "", "Skeletal Giant Sloth": ""
+    // Need an egg that is not listed? Add a line: "Egg Name": "https://link",
+  };
+
+  // images typed in on the Egg Values page are saved in this browser only
+  function localImgs() {
+    try { return JSON.parse(localStorage.getItem("eggImgs") || "{}") || {}; } catch (e) { return {}; }
+  }
+  function eggImg(name) {
+    var l = localImgs()[name];
+    if (typeof l === "string" && /^https:\/\//i.test(l)) return l;
+    var u = EGG_IMAGES[name];
+    return typeof u === "string" && /^https:\/\//i.test(u) ? u : "";
+  }
+  function setLocalImg(name, url) {
+    var o = localImgs();
+    if (url) o[name] = url; else delete o[name];
+    try { localStorage.setItem("eggImgs", JSON.stringify(o)); } catch (e) {}
+  }
 
   // ---------- join logic ----------
   var q = new URLSearchParams(location.search);
@@ -530,6 +653,7 @@
 
   // ---------- notifying eggs list ----------
   // [name, rarity, image]. Add a line here when you add an egg to the script.
+  // An image set in EGG_IMAGES (or typed on the Egg Values page) wins over the link in this list.
   var EGGS = [
     ["RazorFang", "Secret", "https://asaiya2.github.io/steal-an-egg/Rock_Demon.png"],
     ["Gargoyle", "Secret", "https://asaiya2.github.io/steal-an-egg/Gargoyle_Demon.png"],
@@ -578,7 +702,7 @@
         im.referrerPolicy = "no-referrer";
         im.loading = "lazy";
         im.onerror = function () { im.style.visibility = "hidden"; };
-        im.src = e[2];
+        im.src = eggImg(e[0]) || e[2];
         tile.appendChild(im);
         tile.appendChild(line("span", e[0]));
         grid.appendChild(tile);
@@ -622,7 +746,7 @@
     cardFilled = true;
     var box = $("eggbox");
     box.textContent = "";
-    var src = safeImg(it.image);
+    var src = safeImg(it.image) || eggImg(it.egg);
     if (src) {
       var img = document.createElement("img");
       img.alt = "";
@@ -675,7 +799,7 @@
 
       var pic = document.createElement("div");
       pic.className = "pic";
-      var src = safeImg(it.image);
+      var src = safeImg(it.image) || eggImg(it.egg);
       if (src) {
         var img = document.createElement("img");
         img.alt = "";
@@ -1149,6 +1273,174 @@
     sel.addEventListener("change", calcRun);
     $("calcKg").addEventListener("input", calcRun);
     calcRun();
+  })();
+
+  // ---------- egg values page (islands) ----------
+  var ISLANDS = [
+    ["Forest", "Chicken|Dog|Bird|Burrowing Owl|Raccoon|Fox|Bear|Brr Brr Patapim"],
+    ["Lake", "Frog|Duckling|Catfish|Turtle|Trulimero Trulicina|Swan|Axolotl|Leviathan"],
+    ["Desert", "Jerboa|Fennec|Camel|Tob Tobi Tob Tob|Snake|Sand Spider|Scorpion|Royal Sphinx"],
+    ["Jungle", "Chimpanzee|Toucan|Crocodile|Gorilla|Orangutini Ananassini|Spider|Tiger|King Snake"],
+    ["Snow", "Penguin|Walrus|Polar Bear|Sabertooth Tiger|Mammoth|King Mammoth|Yeti|Ice Dragon"],
+    ["Volcano", "Lava Gecko|Lava Frog|Flaming Bull|Lava Iguana|Chillin Chilli|Cerberus|Phoenix|Lava Dragon"],
+    ["Abyss Ocean", "Parrotfish|Swordfish|Shark|Orca|Whale Shark|Beluga Whale|Kraken|El Maja"],
+    ["Prehistoric", "Dodo|Pterodactyl|Ankylosaurus|Triceratops|Bronto|T-Rex|Tralaledon|Mosasaurus"],
+    ["Cosmic", "Centapede|Cosmic Gecko|Cosmic Gorilla|La Vacca Saturno Saturnita|Cosmic Skeleton Boss|Cosmic Dragon|Eternal Lunar Dragon|Unicorn"],
+    ["Cherry Blossom", "Crane|Salamander|Red Panda|Snowy Owl|Koi|Stag|Oni Tiger|Kitsune"],
+    ["Enchanted Forest", "Prism Gecko|Petal Beetle|Enchanted Bluejay|Astral Jackalope|Starry Fox|Celestial Sunlion|Royal Skywhale"],
+    ["Titan Temple", "Spideron|Crustacia|Bladehide|Mantaris|Rhinotaur|Gorilla King|Nightflame|Mutant Shark"],
+    ["Angels & Demons", "Flame Sprite|Light Dove|Winged Lamb|Toro|Imp|Sacred Moth|Holy Peacock|Demon Hound|Gargoyle|Pure Jellyfish|Centaur|RazorFang|Pegasus|Skeleton Horse|Equinox|ArchAngel|World Burner|Aetheron"],
+    ["Rift: Riftborn Egg", "Rift Eye|Voidmaw|Ventinal|Wendigo|Abyss Overlord|World Eater"],
+    ["Rift: Riftbeasts Egg", "Void Angler|Riftwing|Dreadclaw|Mawbreaker|Void Serpent"],
+    ["Rift: Shattered Rift Egg", "Shardling|Shattered Ram|Shardwing|Shattered Drake|Shattered Colossus"],
+    ["Dr. Scramble: Biohazard Egg", "Toxic Rat|Radcoon|Toucax|Nuceodile|Nuclear Mantis"],
+    ["Dr. Scramble: Experimental Egg", "Wheel Hamster|Stacked Turtle|Three Headed Chicken|Eyeball Crab|Dreadstinger"],
+    ["Dr. Scramble: Unstable Egg", "Frogfly|Spiderpig|Sharkodile|Rhinobear|Octophant"],
+    ["Dr. Scramble: Other", "Experiment #001|Nibbles #013"],
+    ["Event Rewards", "Eye Bat #021|Citadel Snail #007|Uncoiled Armadillo|67|Toxic Hedgehog|Mecha Chompa|Pink Dragon Experiment #010|Mecha Scrambler"],
+    ["Store: Luminous Egg", "Spike|Spirit Manta|Abyss Shark|Electric Eel|Terra Snapper|Cthulhu"],
+    ["Store: Luminous Reroll Egg", "Luminous Spike|Luminous Spirit Manta|Luminous Abyss Shark|Luminous Electric Eel|Luminous Terra Snapper|Luminous Cthulhu"],
+    ["Store: Extinction Egg", "Glyptodon|Sabertooth"],
+    ["Store: Dragon Egg", "Baby Aurora Dragon|Shadow Dragon|Scorched Dragon|Drilla|Void Dragon|Ember Dragon"],
+    ["Other (not sorted yet)", "Archdemon Dragon|Gigantus|Dunkleosteus|Giant Sloth|Terrorbird|Ring Guard|Ringlord|Skeletal Sabertooth|Skeletal Gigantus|Skeletal Dunkleosteus|Skeletal Glyptodon|Skeletal Terrorbird|Skeletal Giant Sloth"]
+  ];
+
+  (function setupValues() {
+    var byName = {};
+    CALC_EGGS.forEach(function (e) { byName[e[0]] = e; });
+    var root = $("valIslands");
+
+    function mkImg(cls) {
+      var im = document.createElement("img");
+      im.className = cls; im.alt = ""; im.referrerPolicy = "no-referrer";
+      im.onerror = function () { im.hidden = true; };
+      return im;
+    }
+
+    // body = what opens when an egg is pressed. onImg() refreshes the small picture in the egg's header.
+    function buildBody(body, name, e, onImg) {
+      body.appendChild(line("div", name, "vname"));
+
+      // image: shows the picture and lets you paste a link for it
+      var big = mkImg("vimg");
+      body.appendChild(big);
+      var row = document.createElement("div");
+      row.className = "vimgrow";
+      var inp = document.createElement("input");
+      inp.type = "text"; inp.placeholder = "Image link (https://...)"; inp.autocomplete = "off"; inp.spellcheck = false;
+      var sv = document.createElement("button");
+      sv.type = "button"; sv.textContent = "Set";
+      row.appendChild(inp); row.appendChild(sv);
+      body.appendChild(row);
+      function paintImg() {
+        var u = eggImg(name);
+        big.hidden = !u;
+        if (u) big.src = u;
+        onImg();
+      }
+      sv.addEventListener("click", function () {
+        var v = inp.value.trim();
+        if (v && !/^https:\/\//i.test(v)) { inp.value = ""; inp.placeholder = "Link must start with https://"; return; }
+        setLocalImg(name, v);
+        inp.value = "";
+        inp.placeholder = v ? "Image set (saved in this browser)" : "Image cleared";
+        paintImg();
+        eggSig = ""; renderEggs();   // refresh the Notifying Eggs list too
+      });
+      paintImg();
+
+      var out = document.createElement("div");
+      out.className = "calcout";
+      if (!e) {
+        out.appendChild(line("div", "No values yet for this egg.", "warn"));
+        body.appendChild(out);
+        return;
+      }
+      var picked = {};
+      var hasW = e[3] !== null;
+      var lab = line("label", "", "cl");
+      lab.style.cssText = "display:block;font-size:12px;color:#b5bac1;margin:6px 0 0";
+      var sl = document.createElement("input");
+      sl.type = "range"; sl.min = 0; sl.max = 1000; sl.value = 250;   // 0.1x ... 1000x base weight, 250 = 1x
+      if (hasW) { body.appendChild(lab); body.appendChild(sl); }
+      var chips = document.createElement("div");
+      chips.className = "chips";
+      CALC_MUTS.forEach(function (m) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "chip"; b.textContent = m[0];
+        b.addEventListener("click", function () {
+          if (picked[m[0]]) delete picked[m[0]]; else picked[m[0]] = true;
+          b.classList.toggle("on", !!picked[m[0]]);
+          run();
+        });
+        chips.appendChild(b);
+      });
+      body.appendChild(line("div", "Mutations", "sub"));
+      body.appendChild(chips);
+      body.appendChild(out);
+
+      function run() {
+        out.textContent = "";
+        var ratio = hasW ? Math.pow(10, sl.value / 1000 * 4 - 1) : 1;
+        var base = e[2] * (hasW ? calcWeightMult(ratio) : 1);
+        var mult = 1, names = [];
+        CALC_MUTS.forEach(function (m) { if (picked[m[0]]) { mult += m[1] - 1; names.push(m[0]); } });
+        if (hasW) lab.textContent = "Weight: " + compact(e[3] * ratio) + " Kg (" + (ratio < 10 ? ratio.toFixed(2) : ratio.toFixed(0)) + "x base " + compact(e[3]) + " Kg)";
+        out.appendChild(line("div", calcMoney(base * mult), "big"));
+        if (names.length) {
+          out.appendChild(line("div", "Without mutations: " + calcMoney(base), "line"));
+          out.appendChild(line("div", names.join(" + ") + ": x" + mult.toFixed(2).replace(/\.?0+$/, ""), "line"));
+        }
+        if (!hasW) out.appendChild(line("div", "Base income only. This egg's base weight is not known yet.", "warn"));
+        if (e[4]) out.appendChild(line("div", "Base numbers are estimates, so the result may be a little off.", "warn"));
+        if (hasW && ratio > CALC_LOW && ratio < 0.9) out.appendChild(line("div", "Between 0.5x and 0.9x base weight is not fully tested yet.", "warn"));
+      }
+      sl.addEventListener("input", run);
+      run();
+    }
+
+    ISLANDS.forEach(function (isl) {
+      var names = isl[1].split("|");
+      var d = document.createElement("details");
+      d.className = "isl";
+      d.open = true;                       // shown right away, click the title to hide
+      var s = document.createElement("summary");
+      s.appendChild(line("span", isl[0]));
+      s.appendChild(line("span", names.length + " eggs", "cnt"));
+      d.appendChild(s);
+
+      names.forEach(function (name, i) {
+        var e = byName[name];
+        var card = document.createElement("div");
+        card.className = "vegg";
+        card.style.animationDelay = (i * 70) + "ms";   // one at a time
+        var h = document.createElement("button");
+        h.type = "button"; h.className = "vhead";
+        var left = document.createElement("span");
+        left.className = "vleft";
+        var th = mkImg("vthumb");
+        function paintThumb() {
+          var u = eggImg(name);
+          th.hidden = !u;
+          if (u) th.src = u;
+        }
+        paintThumb();
+        left.appendChild(th);
+        left.appendChild(line("span", name));
+        h.appendChild(left);
+        h.appendChild(line("small", e ? e[1] : "no values yet"));
+        var body = document.createElement("div");
+        body.className = "vbody"; body.hidden = true;
+        var built = false;
+        h.addEventListener("click", function () {
+          body.hidden = !body.hidden;
+          if (!body.hidden && !built) { built = true; buildBody(body, name, e, paintThumb); }
+        });
+        card.appendChild(h); card.appendChild(body);
+        d.appendChild(card);
+      });
+      root.appendChild(d);
+    });
   })();
 
   // ---------- channel wallpapers ----------
