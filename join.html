@@ -151,6 +151,26 @@
   .calcout .warn { font-size:12px; color:#f1c40f; margin-top:6px; }
   .calcout .bad { color:#ff7b72; }
 
+    /* ---- calculator button, history and animations ---- */
+  .calcbtn { width:100%; margin-top:14px; padding:11px; border:0; border-radius:8px; background:#3498db; color:#fff; font-weight:700; font-size:14px; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, filter .15s ease; }
+  .calcbtn:hover { transform:translateY(-1px); box-shadow:0 0 14px rgba(52,152,219,.6); filter:brightness(1.08); }
+  .calcbtn:active { transform:scale(.97); box-shadow:none; }
+  .calcout.pop { animation:calcPop .45s cubic-bezier(.2,.8,.2,1); }
+  .histhead { display:flex; justify-content:space-between; align-items:center; margin:18px 0 8px; }
+  .histhead h3 { margin:0; font-size:14px; }
+  .clearbtn { background:none; border:1px solid #ff7b72; color:#ff7b72; border-radius:999px; padding:3px 10px; font-size:12px; cursor:pointer; transition:background .15s, color .15s, transform .15s; }
+  .clearbtn:hover { background:#ff7b72; color:#1e1f22; transform:scale(1.05); }
+  #calcHist { max-height:260px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; }
+  .hitem { background:#2b2d31; border-radius:8px; padding:10px 12px; border-left:3px solid #3498db; transition:transform .15s ease, background .15s ease; }
+  .hitem:hover { background:#34363c; transform:translateX(3px); }
+  .hitem.new { animation:histIn .4s cubic-bezier(.2,.8,.2,1); }
+  .hitem b { font-size:13px; }
+  .hitem .hval { color:#7bd88f; font-weight:700; font-size:14px; margin-top:2px; }
+  .hitem .hmeta { font-size:11px; color:#b5bac1; margin-top:3px; word-break:break-word; }
+  .hempty { font-size:12px; color:#b5bac1; }
+  @keyframes calcPop { from { opacity:0; transform:scale(.95) translateY(8px); } to { opacity:1; transform:none; } }
+  @keyframes histIn { from { opacity:0; transform:translateX(-28px); } to { opacity:1; transform:none; } }
+
   /* ---- join confirmation ---- */
   dialog { background:#2b2d31; color:#f2f3f5; border:0; border-radius:12px; padding:24px; max-width:340px; width:88%;
            font-family:system-ui,Segoe UI,Arial,sans-serif; text-align:center; }
@@ -206,8 +226,17 @@
   @keyframes shake { 20%, 60% { transform:translateX(-8px); } 40%, 80% { transform:translateX(8px); } }
   @media (prefers-reduced-motion:reduce) { #tear { display:none !important; } body.enter * { animation:none !important; } }
 
-  /* ---- egg values page (islands) ---- */
-  #valuesPage { grid-column:2; align-self:start; margin-top:8px; max-height:calc(100vh - 110px); overflow-y:auto; }
+  /* ---- egg values page: details on the left, islands on the right ---- */
+  #valDetail { grid-column:1; justify-self:start; width:100%; max-width:420px; align-self:start; margin-top:8px; box-sizing:border-box; min-width:0; }
+  #valuesPage { grid-column:3; justify-self:end; width:100%; max-width:340px; align-self:start; margin-top:8px; max-height:calc(100vh - 110px); overflow-y:auto; box-sizing:border-box; }
+  .vhint { color:#b5bac1; font-size:13px; text-align:center; padding:60px 10px; }
+  .vdet { animation:slideIn .4s cubic-bezier(.2,.8,.2,1) both; }
+  .vdet .vname { font-size:20px; font-weight:700; }
+  .vdet .vrar { font-size:12px; color:#b5bac1; margin:2px 0 10px; }
+  .vdet .vloc { font-size:13px; color:#b5bac1; margin:10px 0 4px; }
+  .vdet input[type=range] { width:100%; accent-color:#3498db; margin:4px 0 10px; }
+  .vimg { display:flex; align-items:center; justify-content:center; width:140px; height:140px; background:#1e1f22; border-radius:12px; overflow:hidden; font-size:12px; color:#b5bac1; text-align:center; }
+  .vimg img { width:100%; height:100%; object-fit:contain; display:block; }
   .isl { margin-bottom:10px; background:#2b2d31; border-radius:10px; padding:0 12px; }
   .isl > summary { cursor:pointer; font-weight:700; font-size:14px; padding:11px 0; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:8px; }
   .isl > summary::-webkit-details-marker { display:none; }
@@ -215,20 +244,29 @@
   .isl[open] > summary::after { transform:rotate(180deg); }
   .isl .cnt { color:#b5bac1; font-weight:400; font-size:12px; margin-left:auto; }
   .isl[open] { padding-bottom:6px; }
-  .vegg { background:#1e1f22; border-radius:8px; margin-bottom:6px; overflow:hidden; animation:slideIn .45s cubic-bezier(.2,.8,.2,1) both; }
-  .vhead { width:100%; display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 12px; background:none; border:0; color:#f2f3f5; font-size:13px; font-weight:700; cursor:pointer; text-align:left; }
-  .vhead small { font-weight:400; color:#b5bac1; font-size:11px; }
-  .vleft { display:flex; align-items:center; gap:8px; min-width:0; }
-  .vthumb { width:28px; height:28px; object-fit:contain; background:#2b2d31; border-radius:6px; flex:none; }
-  .vbody { padding:2px 12px 12px; }
-  .vbody .vname { font-size:16px; font-weight:700; margin-bottom:8px; }
-  .vbody input[type=range] { width:100%; accent-color:#3498db; margin:4px 0 10px; }
-  .vimg { display:block; width:96px; height:96px; object-fit:contain; background:#2b2d31; border-radius:10px; margin:0 0 8px; }
-  .vimgrow { display:flex; gap:6px; margin:0 0 10px; }
-  .vimgrow input { flex:1; min-width:0; box-sizing:border-box; padding:8px 10px; background:#2b2d31; color:#f2f3f5; border:1px solid #4e5058; border-radius:8px; font-size:12px; }
-  .vimgrow input:focus { outline:2px solid #3498db; border-color:transparent; }
-  .vimgrow button { padding:8px 12px; background:#3498db; color:#fff; border:0; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; }
+  .vegg { display:flex; align-items:center; gap:8px; width:100%; box-sizing:border-box; text-align:left; background:#1e1f22; border:0; color:#f2f3f5; border-radius:8px; padding:8px 12px; margin-bottom:6px; font-size:13px; font-weight:700; cursor:pointer; animation:slideInR .45s cubic-bezier(.2,.8,.2,1) backwards; transition:transform .18s ease, box-shadow .18s ease, background .18s ease; }
+  .vegg:hover { background:#34363c; transform:scale(1.03); box-shadow:0 0 12px rgba(52,152,219,.55); }
+  .vegg.sel { background:#3498db; box-shadow:0 0 10px rgba(52,152,219,.45); }
+  .vegg.sel:hover { background:#3498db; box-shadow:0 0 14px rgba(120,190,255,.75); }
+  .vthumb { width:28px; height:28px; object-fit:contain; background:#2b2d31; border-radius:6px; flex:none; transition:transform .18s ease; }
+  .vegg:hover .vthumb { transform:scale(1.08); }
+
+  /* ---- egg values tab: entrance animations (replay every time the tab opens) ---- */
+  
+  .isl { animation:islIn .35s cubic-bezier(.2,.8,.2,1) backwards; }
+  @keyframes dropIn { from { opacity:0; transform:translateY(-45px); } to { opacity:1; transform:none; } }
+  @keyframes islIn { from { opacity:0; transform:translateY(-14px); } to { opacity:1; transform:none; } }
+
+  /* ---- egg stats (Description + Stats sections) ---- */
+  .sec { background:#2b2d31; border-radius:8px; margin-top:12px; overflow:hidden; }
+  .sec h3 { margin:0; padding:10px 12px; font-size:14px; background:#34363c; }
+  .sec .sbody { padding:12px; font-size:13px; color:#b5bac1; min-height:22px; white-space:pre-wrap; word-break:break-word; }
+  .sgrid { display:grid; grid-template-columns:1fr 1fr; gap:16px 12px; }
+  .sk { font-size:11px; font-weight:700; color:#5fa8ff; }
+  .sv { font-size:14px; font-weight:700; margin-top:4px; word-break:break-word; }
+
   @keyframes slideIn { from { opacity:0; transform:translateX(-40px); } to { opacity:1; transform:none; } }
+  @keyframes slideInR { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:none; } }
 
   @keyframes flash { from { background:#3d5a80; } to { background:#2b2d31; } }
   @media (max-width:1200px) {
@@ -236,23 +274,31 @@
     body::before { content:""; order:0; aspect-ratio:1983 / 793; border-radius:12px;
                    background:var(--wall) center / cover no-repeat; }
     body.nowall::before { display:none; }
-    #blank, #calcPage, #valuesPage, #joinCard, #gate, #left, #right { grid-column:1; }
-    #valuesPage { max-height:none; }
+    #blank, #calcPage, #valDetail, #valuesPage, #joinCard, #gate, #left, #right { grid-column:1; }
+    #valDetail, #valuesPage { max-width:none; justify-self:stretch; max-height:none; }
     .card { order:1; padding:22px 18px; } #left { order:2; } #right { order:3; }
     #left, #right { max-width:none; justify-self:stretch; }
     #opts, #vals, #eggs { flex:1 1 100%; }
     #feedPanel { width:100%; }
     #feed { max-height:40vh; }
   }
+/* Discord button: top right of every page on the Steal an egg channel */
+#discordTop { position:absolute; top:14px; right:16px; z-index:50; font-size:13px; padding:9px 14px; }
+@media (max-width:960px) { body { padding-top:64px; } }
+#verifyPage, #soonPage { grid-column:2; }
+@media (max-width:1200px) { #verifyPage, #soonPage { grid-column:1; } }
+.btn.off { opacity:.5; pointer-events:none; }
 </style>
 </head>
 <body>
+<!-- FOR EVERY NEW PAGE, ADD THE DISCORD BUTTON ON THE TOP RIGHT -->
+<a id="discordTop" class="discord" href="https://discord.gg/W0RST" target="_blank" rel="noopener noreferrer">Join Our Discord Server</a>
 
 <nav class="pages" id="pages">
   <label for="chSel">Channels</label>
   <select id="chSel">
     <option value="1">Steal an egg</option>
-    <option value="2">Inexistent</option>
+    <option value="2">Discord</option>
     <option value="3">Inexistent</option>
   </select>
   <label for="pgSel">Pages</label>
@@ -332,7 +378,7 @@
 </div>
 
 <aside class="panel" id="right">
-  <h2>Webhook <a class="discord" href="https://discord.gg/W0RST" target="_blank" rel="noopener noreferrer">Join Our Discord Server</a></h2>
+  <h2>Webhook</h2>
   <div class="slots" id="slots">
     <button class="slot sel" type="button" data-slot="1">Webhook 1</button>
     <button class="slot" type="button" data-slot="2">Webhook 2</button>
@@ -366,15 +412,33 @@
   <input id="calcKg" type="text" inputmode="decimal" placeholder="e.g. 2270421" autocomplete="off" spellcheck="false">
   <label class="cl">Mutations (pick any)</label>
   <div class="chips" id="calcChips"></div>
+  <button id="calcBtn" class="calcbtn" type="button">Calculate</button>
   <div class="calcout" id="calcOut"></div>
+  <div class="histhead"><h3>History</h3><button id="calcClear" class="clearbtn" type="button" hidden>Clear history</button></div>
+  <div id="calcHist"></div>
 </div>
 </section>
 
-<!-- Page: Egg Values (islands) -->
+<!-- Page: Egg Values. Details on the left, island toggles on the right (details above the list on phones) -->
+<section class="panel" id="valDetail" hidden>
+  
+  <div id="valDetailBody"><div class="vhint">Press an egg to see its details here.</div></div>
+</section>
 <section class="panel" id="valuesPage" hidden>
-  <h2>Egg Values</h2>
+  <h2>Egg / Pet History</h2>
   <div id="valIslands"></div>
 </section>
+
+<div class="card" id="verifyPage" hidden>
+  <h1>Verification</h1>
+  <p id="vpServer"></p>
+  <a id="vpLogin" class="btn" href="#">Login with Discord</a>
+  <small class="note">To block ban evasion we store a hashed copy of your IP address.</small>
+</div>
+<div class="card" id="soonPage" hidden>
+  <h1 id="soonTitle">Coming soon</h1>
+  <p>This page is empty for now.</p>
+</div>
 
 <div id="wallLabel"></div>
 
@@ -409,98 +473,227 @@
   function $(id) { return document.getElementById(id); }
 
   // ---------- EGG IMAGES ----------
-  // One image link per egg. Put the link between the quotes ("" = no image yet).
+  // One egg per line:   "Egg Name": "https://image-link",
+  // Put the link between the second pair of quotes ("" = no image yet). Keep the comma at the end.
   // The name on the left must match the egg name exactly. Links must start with https://
   // These images are used on the Egg Values page, in the Notifying Eggs list and in the live feed.
   var EGG_IMAGES = {
     // Forest
-    "Chicken": "", "Dog": "", "Bird": "", "Burrowing Owl": "", "Raccoon": "", "Fox": "", "Bear": "", "Brr Brr Patapim": "",
+    "Chicken": "https://static.wikia.nocookie.net/stealanegg/images/a/a3/Chicken.png/revision/latest?cb=20260901193312",
+    "Dog": "https://static.wikia.nocookie.net/stealanegg/images/3/35/Dog.png/revision/latest?cb=20260904110641",
+    "Bird": "https://static.wikia.nocookie.net/stealanegg/images/7/70/Bird.png/revision/latest?cb=20260901193301",
+    "Burrowing Owl": "https://static.wikia.nocookie.net/stealanegg/images/1/12/Burrowing_Owl.png/revision/latest?cb=20260901193251",
+    "Raccoon": "https://static.wikia.nocookie.net/stealanegg/images/7/7c/Raccoon.png/revision/latest?cb=20260901193235",
+    "Fox": "https://static.wikia.nocookie.net/stealanegg/images/7/73/Fox.png/revision/latest?cb=20260904110112",
+    "Bear": "https://static.wikia.nocookie.net/stealanegg/images/a/a4/Bear.png/revision/latest?cb=20260901193222",
+    "Brr Brr Patapim": "https://static.wikia.nocookie.net/stealanegg/images/f/f7/Brr_Brr_Patapim.png/revision/latest?cb=20260901193213",
     // Lake
-    "Frog": "", "Duckling": "", "Catfish": "", "Turtle": "", "Trulimero Trulicina": "", "Swan": "", "Axolotl": "", "Leviathan": "",
+    "Frog": "https://static.wikia.nocookie.net/stealanegg/images/e/e6/Frog.png/revision/latest?cb=20260901192136",
+    "Duckling": "https://static.wikia.nocookie.net/stealanegg/images/b/b6/Duckling.png/revision/latest?cb=20260901192123",
+    "Catfish": "https://static.wikia.nocookie.net/stealanegg/images/9/99/Catfish.png/revision/latest?cb=20260901192110",
+    "Turtle": "https://static.wikia.nocookie.net/stealanegg/images/e/e9/Turtle.png/revision/latest?cb=20260901192056",
+    "Trulimero Trulicina": "https://static.wikia.nocookie.net/stealanegg/images/d/d3/Trulimero_Trulicina.png/revision/latest?cb=20260901192042",
+    "Swan": "https://static.wikia.nocookie.net/stealanegg/images/8/87/Swan.png/revision/latest?cb=20260901192021",
+    "Axolotl": "https://static.wikia.nocookie.net/stealanegg/images/9/91/Axolotl.png/revision/latest?cb=20260901192010",
+    "Leviathan": "https://static.wikia.nocookie.net/stealanegg/images/0/0a/Leviathan.png/revision/latest?cb=20260904110656",
     // Desert
-    "Jerboa": "", "Fennec": "", "Camel": "", "Tob Tobi Tob Tob": "", "Snake": "", "Sand Spider": "", "Scorpion": "", "Royal Sphinx": "",
+    "Jerboa": "https://static.wikia.nocookie.net/stealanegg/images/7/7a/Jerboa.png/revision/latest?cb=20260901192531",
+    "Fennec": "https://static.wikia.nocookie.net/stealanegg/images/9/91/Fennec.png/revision/latest?cb=20260901192514",
+    "Camel": "https://static.wikia.nocookie.net/stealanegg/images/0/09/Camel.png/revision/latest?cb=20260901192500",
+    "Tob Tobi Tob Tob": "https://static.wikia.nocookie.net/stealanegg/images/e/e9/Tob_Tobi_Tob_Tob.png/revision/latest?cb=20260901192447",
+    "Snake": "https://static.wikia.nocookie.net/stealanegg/images/5/5a/Snake.png/revision/latest?cb=20260901192437",
+    "Sand Spider": "https://static.wikia.nocookie.net/stealanegg/images/5/50/Sand_Spider.png/revision/latest?cb=20260901192429",
+    "Scorpion": "https://static.wikia.nocookie.net/stealanegg/images/a/ab/Scorpion.png/revision/latest?cb=20260901192421",
+    "Royal Sphinx": "https://static.wikia.nocookie.net/stealanegg/images/5/5a/Royal_Sphinx.png/revision/latest?cb=20260904025135",
     // Jungle
-    "Chimpanzee": "", "Toucan": "", "Crocodile": "", "Gorilla": "", "Orangutini Ananassini": "", "Spider": "", "Tiger": "", "King Snake": "",
+    "Chimpanzee": "https://static.wikia.nocookie.net/stealanegg/images/0/0c/Chimpanzee.png/revision/latest?cb=20260901191956",
+    "Toucan": "https://static.wikia.nocookie.net/stealanegg/images/e/e2/Toucan.png/revision/latest?cb=20260901191930",
+    "Crocodile": "https://static.wikia.nocookie.net/stealanegg/images/d/d6/Crocodile.png/revision/latest?cb=20260901191914",
+    "Gorilla": "https://static.wikia.nocookie.net/stealanegg/images/8/84/Gorilla.png/revision/latest?cb=20260904025208",
+    "Orangutini Ananassini": "https://static.wikia.nocookie.net/stealanegg/images/a/a7/Orangutini_Ananassini.png/revision/latest?cb=20260901191857",
+    "Spider": "https://static.wikia.nocookie.net/stealanegg/images/8/84/Spider.png/revision/latest?cb=20260901191847",
+    "Tiger": "https://static.wikia.nocookie.net/stealanegg/images/a/ae/Tiger.png/revision/latest?cb=20260901191839",
+    "King Snake": "https://static.wikia.nocookie.net/stealanegg/images/f/fc/King_Snake.png/revision/latest?cb=20260901191831",
     // Snow
-    "Penguin": "", "Walrus": "", "Polar Bear": "", "Sabertooth Tiger": "", "Mammoth": "", "King Mammoth": "", "Yeti": "", "Ice Dragon": "",
+    "Penguin": "https://static.wikia.nocookie.net/stealanegg/images/9/97/Penguin.png/revision/latest?cb=20260901190041",
+    "Walrus": "https://static.wikia.nocookie.net/stealanegg/images/7/79/Walrus.png/revision/latest?cb=20260901190028",
+    "Polar Bear": "https://static.wikia.nocookie.net/stealanegg/images/7/78/Polar_Bear.png/revision/latest?cb=20260901190019",
+    "Sabertooth Tiger": "https://static.wikia.nocookie.net/stealanegg/images/8/88/Sabertooth_Tiger.png/revision/latest?cb=20260904025152",
+    "Mammoth": "https://static.wikia.nocookie.net/stealanegg/images/a/a5/Mammoth.png/revision/latest?cb=20260901190010",
+    "King Mammoth": "https://static.wikia.nocookie.net/stealanegg/images/6/69/King_Mammoth.png/revision/latest?cb=20260904025144",
+    "Yeti": "https://static.wikia.nocookie.net/stealanegg/images/7/7d/Yeti.png/revision/latest?cb=20260904025057",
+    "Ice Dragon": "https://static.wikia.nocookie.net/stealanegg/images/b/bb/Ice_Dragon.png/revision/latest?cb=20260904110044",
     // Volcano
-    "Lava Gecko": "", "Lava Frog": "", "Flaming Bull": "", "Lava Iguana": "", "Chillin Chilli": "", "Cerberus": "", "Phoenix": "", "Lava Dragon": "",
+    "Lava Gecko": "https://static.wikia.nocookie.net/stealanegg/images/b/be/Lava_Gecko.png/revision/latest?cb=20260904110033",
+    "Lava Frog": "https://static.wikia.nocookie.net/stealanegg/images/b/bb/Lava_Frog.png/revision/latest?cb=20260904110021",
+    "Flaming Bull": "https://static.wikia.nocookie.net/stealanegg/images/1/19/Flaming_Bull.png/revision/latest?cb=20260901195723",
+    "Lava Iguana": "https://static.wikia.nocookie.net/stealanegg/images/f/f0/Lava_Iguana.png/revision/latest?cb=20260901195731",
+    "Chillin Chilli": "https://static.wikia.nocookie.net/stealanegg/images/3/3a/Chillin_Chilli.png/revision/latest?cb=20260901195323",
+    "Cerberus": "https://static.wikia.nocookie.net/stealanegg/images/4/45/Cerberus.png/revision/latest?cb=20260901194510",
+    "Phoenix": "https://static.wikia.nocookie.net/stealanegg/images/c/c1/Phoenix.png/revision/latest?cb=20260904025201",
+    "Lava Dragon": "https://static.wikia.nocookie.net/stealanegg/images/7/77/Lava_Dragon.png/revision/latest?cb=20260904025223",
     // Abyss Ocean
-    "Parrotfish": "", "Swordfish": "", "Shark": "", "Orca": "", "Whale Shark": "", "Beluga Whale": "", "Kraken": "", "El Maja": "",
+    "Parrotfish": "https://static.wikia.nocookie.net/stealanegg/images/7/7e/Parrotfish.png/revision/latest?cb=20260901184958",
+    "Swordfish": "https://static.wikia.nocookie.net/stealanegg/images/f/f7/Swordfish.png/revision/latest?cb=20260901184942",
+    "Shark": "https://static.wikia.nocookie.net/stealanegg/images/1/14/Shark.png/revision/latest?cb=20260904025214",
+    "Orca": "https://static.wikia.nocookie.net/stealanegg/images/7/75/Orca.png/revision/latest?cb=20260901184919",
+    "Whale Shark": "https://static.wikia.nocookie.net/stealanegg/images/9/91/Whale_Shark.png/revision/latest?cb=20260904025106",
+    "Beluga Whale": "https://static.wikia.nocookie.net/stealanegg/images/d/de/Beluga_Whale.png/revision/latest?cb=20260904025050",
+    "Kraken": "https://static.wikia.nocookie.net/stealanegg/images/d/d3/Kraken.png/revision/latest?cb=20260904110057",
+    "El Maja": "https://static.wikia.nocookie.net/stealanegg/images/9/9b/El_Maja.png/revision/latest?cb=20260908051427",
     // Prehistoric
-    "Dodo": "", "Pterodactyl": "", "Ankylosaurus": "", "Triceratops": "", "Bronto": "", "T-Rex": "", "Tralaledon": "", "Mosasaurus": "",
+    "Dodo": "https://static.wikia.nocookie.net/stealanegg/images/f/fc/Dodo.png/revision/latest?cb=20260901195001",
+    "Pterodactyl": "https://static.wikia.nocookie.net/stealanegg/images/4/49/Pterodactyl.png/revision/latest?cb=20260901195556",
+    "Ankylosaurus": "https://static.wikia.nocookie.net/stealanegg/images/a/a7/Ankylosaurus.png/revision/latest?cb=20260903140754",
+    "Triceratops": "https://static.wikia.nocookie.net/stealanegg/images/a/a1/Triceratops.png/revision/latest?cb=20260904025118",
+    "Bronto": "https://static.wikia.nocookie.net/stealanegg/images/1/19/Bronto.png/revision/latest?cb=20260904025043",
+    "T-Rex": "https://static.wikia.nocookie.net/stealanegg/images/f/f8/T-Rex.png/revision/latest?cb=20260903161834",
+    "Tralaledon": "https://static.wikia.nocookie.net/stealanegg/images/3/34/Tralaledon.png/revision/latest?cb=20260901194501",
+    "Mosasaurus": "https://static.wikia.nocookie.net/stealanegg/images/b/b0/Mosasaurus.png/revision/latest?cb=20260904025233",
     // Cosmic
-    "Centapede": "", "Cosmic Gecko": "", "Cosmic Gorilla": "", "La Vacca Saturno Saturnita": "",
+    "Centapede": "https://static.wikia.nocookie.net/stealanegg/images/a/a7/Centapede.png/revision/latest?cb=20260903140743",
+    "Cosmic Gecko": "https://static.wikia.nocookie.net/stealanegg/images/2/2a/Cosmic_Gecko.png/revision/latest?cb=20260901192914",
+    "Cosmic Gorilla": "https://static.wikia.nocookie.net/stealanegg/images/c/c3/Cosmic_Gorilla.png/revision/latest?cb=20260903140729",
+    "La Vacca Saturno Saturnita": "https://static.wikia.nocookie.net/stealanegg/images/e/ec/La_Vacca_Saturno_Saturnita.png/revision/latest?cb=20260901185226",
     "Cosmic Skeleton Boss": "https://static.wikia.nocookie.net/stealanegg/images/9/97/Cosmic_Skeleton_Boss.png/revision/latest/scale-to-width-down/185?cb=20260904110709",
-    "Cosmic Dragon": "",
+    "Cosmic Dragon": "https://static.wikia.nocookie.net/stealanegg/images/3/3e/Cosmic_Dragon.png/revision/latest?cb=20260903140720",
     "Eternal Lunar Dragon": "https://asaiya2.github.io/steal-an-egg/Lunar_Dragon.png",
     "Unicorn": "https://asaiya2.github.io/steal-an-egg/Unicorn.png",
     // Cherry Blossom
-    "Crane": "", "Salamander": "", "Red Panda": "", "Snowy Owl": "", "Koi": "",
+    "Crane": "https://static.wikia.nocookie.net/stealanegg/images/2/20/Crane.png/revision/latest?cb=20260903140823",
+    "Salamander": "https://static.wikia.nocookie.net/stealanegg/images/5/53/Salamander.png/revision/latest?cb=20260903135533",
+    "Red Panda": "https://static.wikia.nocookie.net/stealanegg/images/8/8b/Red_Panda.png/revision/latest?cb=20260903135550",
+    "Snowy Owl": "https://static.wikia.nocookie.net/stealanegg/images/c/c6/Snowy_Owl.png/revision/latest?cb=20260903135600",
+    "Koi": "https://static.wikia.nocookie.net/stealanegg/images/6/66/Koi.png/revision/latest?cb=20260903135610",
     "Stag": "https://github.com/Asaiya2/steal-an-egg/blob/main/stag.webp?raw=true",
     "Oni Tiger": "https://asaiya2.github.io/steal-an-egg/Oni_Tiger.png",
     "Kitsune": "https://asaiya2.github.io/steal-an-egg/Kitsune.png",
     // Enchanted Forest
-    "Prism Gecko": "", "Petal Beetle": "", "Enchanted Bluejay": "", "Astral Jackalope": "",
+    "Prism Gecko": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/6/69/Scorpio_Icon.png?width=75&format=jpg&auto=webp&quality=80",
+    "Petal Beetle": "https://stealegg.com/assets/images/pets/petal-beetle-enchanted.webp",
+    "Enchanted Bluejay": "https://stealegg.com/assets/images/pets/enchanted-bluejay-enchanted.webp",
+    "Astral Jackalope": "https://stealegg.com/assets/images/pets/astral-jackalope-enchanted.webp",
     "Starry Fox": "https://asaiya2.github.io/steal-an-egg/Starry_fox.png",
     "Celestial Sunlion": "https://asaiya2.github.io/steal-an-egg/sunlion.png",
+    "Spirit Panda": "https://stealegg.com/assets/images/pets/spirit-panda-enchanted.webp",
     "Royal Skywhale": "https://github.com/Asaiya2/steal-an-egg/blob/main/skywhale.png?raw=true",
     // Titan Temple
-    "Spideron": "", "Crustacia": "", "Bladehide": "", "Mantaris": "", "Rhinotaur": "",
+    "Spideron": "https://static.wikia.nocookie.net/stealanegg/images/4/4b/Spideron.png/revision/latest?cb=20260901190849",
+    "Crustacia": "https://static.wikia.nocookie.net/stealanegg/images/c/c3/Crustacia.png/revision/latest?cb=20260901190841",
+    "Bladehide": "https://static.wikia.nocookie.net/stealanegg/images/0/0d/Bladehide.png/revision/latest?cb=20260901190830",
+    "Mantaris": "https://static.wikia.nocookie.net/stealanegg/images/0/0e/Mantaris.png/revision/latest?cb=20260901190821",
+    "Rhinotaur": "https://static.wikia.nocookie.net/stealanegg/images/3/31/Rhinotaur.png/revision/latest?cb=20260901190811",
     "Gorilla King": "https://asaiya2.github.io/steal-an-egg/Gorrila.png",
     "Nightflame": "https://asaiya2.github.io/steal-an-egg/Nightflame.png",
     "Mutant Shark": "https://static.wikia.nocookie.net/stealanegg/images/e/e5/Mutant_Shark.png/revision/latest?cb=20260901190802",
     // Angels & Demons
-    "Flame Sprite": "", "Light Dove": "", "Winged Lamb": "", "Toro": "", "Imp": "", "Sacred Moth": "", "Holy Peacock": "", "Demon Hound": "",
+    "Flame Sprite": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/8/8f/Flame_Sprite_Pet_Steal_Egg.png?width=103&format=jpg&auto=webp&quality=80",
+    "Light Dove": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/9/9f/Light_Dove_Pet_Steal_Egg.png?width=103&format=jpg&auto=webp&quality=80",
+    "Winged Lamb": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/6/6d/Winged_Lamb_Pet_Steal_Egg.png?width=103&format=jpg&auto=webp&quality=80",
+    "Toro": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/f/f3/Toro_Steal_Egg.png?width=103&format=jpg&auto=webp&quality=80",
+    "Imp": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/d/d6/Imp_Pet_Steal_Egg.png?width=103&format=jpg&auto=webp&quality=80",
+    "Sacred Moth": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/9/90/Sacred_Moth_Pet_Steal_Egg.png?width=103&format=jpg&auto=webp&quality=80",
+    "Holy Peacock": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/a/a9/Holy_Peacock_Pet_Steal_Egg.png?width=103&format=jpg&auto=webp&quality=80",
+    "Demon Hound": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/1/14/Demon_Hound_Steal_Egg.png?width=103&format=jpg&auto=webp&quality=80",
     "Gargoyle": "https://asaiya2.github.io/steal-an-egg/Gargoyle_Demon.png",
     "Pure Jellyfish": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIXvOauCXxGctW9tMXU6YeSDuNiL8I_RxhFolmuKZy0A&s",
     "Centaur": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmpo9iE1MHMQNyB2lCJ6QtI4O_Stz7EvDQXu6HZ2WZTw&s",
     "RazorFang": "https://asaiya2.github.io/steal-an-egg/Rock_Demon.png",
     "Pegasus": "https://asaiya2.github.io/steal-an-egg/Pegasus.png",
     "Skeleton Horse": "https://asaiya2.github.io/steal-an-egg/Skeleton_horse.png",
-    "Equinox": "",
+    "Equinox": "https://static.wikia.nocookie.net/stealanegg/images/e/e7/Equinox.png/revision/latest?cb=20260913045536",
     "ArchAngel": "https://asaiya2.github.io/steal-an-egg/ArchAngel.png",
     "World Burner": "https://asaiya2.github.io/steal-an-egg/World_Burner.png",
-    "Aetheron": "",
+    "Aetheron": "https://static.wikia.nocookie.net/stealanegg/images/e/e7/Aetheron.png/revision/latest?cb=20260913045520",
     // Rift: Riftborn Egg
-    "Rift Eye": "", "Voidmaw": "", "Ventinal": "", "Wendigo": "", "Abyss Overlord": "", "World Eater": "",
+    "Rift Eye": "https://static.wikia.nocookie.net/stealanegg/images/1/13/Rift_Eye.png/revision/latest?cb=20260907220800",
+    "Voidmaw": "https://static.wikia.nocookie.net/stealanegg/images/8/84/Voidmaw.png/revision/latest?cb=20260907220809",
+    "Ventinal": "https://static.wikia.nocookie.net/stealanegg/images/1/14/Ventinal.png/revision/latest?cb=20260907220820",
+    "Wendigo": "https://static.wikia.nocookie.net/stealanegg/images/8/8a/Wendigo.png/revision/latest?cb=20260907220833",
+    "Abyss Overlord": "https://static.wikia.nocookie.net/stealanegg/images/6/60/Abyss_Overlord.png/revision/latest?cb=20260907221609",
+    "World Eater": "https://static.wikia.nocookie.net/stealanegg/images/4/40/World_Eater.png/revision/latest?cb=20260907220911",
     // Rift: Riftbeasts Egg
-    "Void Angler": "", "Riftwing": "", "Dreadclaw": "", "Mawbreaker": "", "Void Serpent": "",
+    "Void Angler": "https://static.wikia.nocookie.net/stealanegg/images/9/9b/Void_Angler.png/revision/latest?cb=20260907220925",
+    "Riftwing": "https://static.wikia.nocookie.net/stealanegg/images/d/db/Riftwing.png/revision/latest?cb=20260907221817",
+    "Dreadclaw": "https://static.wikia.nocookie.net/stealanegg/images/6/65/Dreadclaw.png/revision/latest?cb=20260907220951",
+    "Mawbreaker": "https://static.wikia.nocookie.net/stealanegg/images/4/43/Mawbreaker.png/revision/latest?cb=20260907221007",
+    "Void Serpent": "https://static.wikia.nocookie.net/stealanegg/images/0/04/Void_Serpent.png/revision/latest?cb=20260907221017",
     // Rift: Shattered Rift Egg
-    "Shardling": "", "Shattered Ram": "", "Shardwing": "", "Shattered Drake": "", "Shattered Colossus": "",
+    "Shardling": "https://static.wikia.nocookie.net/stealanegg/images/5/5b/Shardling.png/revision/latest?cb=20260907221031",
+    "Shattered Ram": "https://static.wikia.nocookie.net/stealanegg/images/4/44/Shattered_Ram.png/revision/latest?cb=20260907221048",
+    "Shardwing": "https://static.wikia.nocookie.net/stealanegg/images/5/56/Shardwing.png/revision/latest?cb=20260907221101",
+    "Shattered Drake": "https://static.wikia.nocookie.net/stealanegg/images/c/ce/Shattered_Drake.png/revision/latest?cb=20260907221122",
+    "Shattered Colossus": "https://static.wikia.nocookie.net/stealanegg/images/a/a4/Shattered_Colossus.png/revision/latest?cb=20260907221329",
     // Dr. Scramble: Biohazard / Experimental / Unstable / Other
-    "Toxic Rat": "", "Radcoon": "", "Toucax": "", "Nuceodile": "", "Nuclear Mantis": "",
-    "Wheel Hamster": "", "Stacked Turtle": "", "Three Headed Chicken": "", "Eyeball Crab": "", "Dreadstinger": "",
-    "Frogfly": "", "Spiderpig": "", "Sharkodile": "", "Rhinobear": "", "Octophant": "",
-    "Experiment #001": "", "Nibbles #013": "",
+    "Toxic Rat": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/8/87/Frogfly_Steal_Egg.png?width=103&format=jpg&auto=webp&quality=80",
+    "Radcoon": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/f/f6/Radcoon_Steal_Egg.png?width=97&format=jpg&auto=webp&quality=80",
+    "Toucax": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/e/ee/Toucax_Steal_Egg.png?width=96&format=jpg&auto=webp&quality=80",
+    "Nuceodile": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/a/aa/Nuceodile_Steal_Egg.png?width=107&format=jpg&auto=webp&quality=80",
+    "Nuclear Mantis": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/7/74/Nuclear_Mantis_Steal_Egg.png?width=107&format=jpg&auto=webp&quality=80",
+    "Wheel Hamster": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/a/ad/Wheel_Hamster_Steal_Pet.png?width=101&format=jpg&auto=webp&quality=80",
+    "Stacked Turtle": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/c/c0/Stacked_Turtle_Steal_Egg.png?width=94&format=jpg&auto=webp&quality=80",
+    "Three Headed Chicken": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/4/45/Three_Headed_Chicken.png?width=104&format=jpg&auto=webp&quality=80",
+    "Eyeball Crab": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/b/b4/Eyeball_Crab_Steal_Egg.png?width=107&format=jpg&auto=webp&quality=80",
+    "Dreadstinger": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/0/06/Dreadstinger_Steal_Egg.png?width=107&format=jpg&auto=webp&quality=80",
+    "Frogfly": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/8/87/Frogfly_Steal_Egg.png?width=103&format=jpg&auto=webp&quality=80",
+    "Spiderpig": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/1/13/Spiderpig_Steal_Egg.png?width=103&format=jpg&auto=webp&quality=80",
+    "Sharkodile": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/7/7f/Sharkodile_Steal_Egg.png?width=92&format=jpg&auto=webp&quality=80",
+    "Rhinobear": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/5/5d/Rhinobear_Steal_Egg.png?width=107&format=jpg&auto=webp&quality=80",
+    "Octophant": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/9/99/Octophant_Steal_Egg.png?width=107&format=jpg&auto=webp&quality=80",
+    "Experiment #001": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/1/14/Experiment_001_Steal_Egg.png?width=79&format=jpg&auto=webp&quality=80",
+    "Nibbles #013": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/0/00/Nibbles_Steal_an_Egg.png?width=79&format=jpg&auto=webp&quality=80",
     // Event rewards
-    "Eye Bat #021": "", "Citadel Snail #007": "", "Uncoiled Armadillo": "", "67": "", "Toxic Hedgehog": "", "Mecha Chompa": "",
-    "Pink Dragon Experiment #010": "", "Mecha Scrambler": "",
+    "Eye Bat #021": "https://stealegg.com/assets/images/pets/eye-bat-021-reviewed.webp",
+    "Citadel Snail #007": "https://stealegg.com/assets/images/pets/citadel-snail-007-reviewed.webp",
+    "Uncoiled Armadillo": "https://stealegg.com/assets/images/pets/uncoiled-armadillo-reviewed.webp",
+    "67": "https://stealegg.com/assets/images/pets/67-reviewed.webp",
+    "Toxic Hedgehog": "https://stealegg.com/assets/images/pets/toxic-hedgehog-reviewed.webp",
+    "Mecha Chompa": "https://stealegg.com/assets/images/pets/mecha-chompa-reviewed.webp",
+    "Pink Dragon Experiment #010": "https://stealegg.com/assets/images/pets/pink-dragon-experiment-010-reviewed.webp",
+    "Mecha Scrambler": "https://stealegg.com/assets/images/pets/mecha-scrambler-reviewed.webp",
     // Store: Luminous, Luminous Reroll, Extinction, Dragon
-    "Spike": "", "Spirit Manta": "", "Abyss Shark": "", "Electric Eel": "", "Terra Snapper": "", "Cthulhu": "",
-    "Luminous Spike": "", "Luminous Spirit Manta": "", "Luminous Abyss Shark": "", "Luminous Electric Eel": "", "Luminous Terra Snapper": "", "Luminous Cthulhu": "",
-    "Glyptodon": "", "Sabertooth": "",
-    "Baby Aurora Dragon": "", "Shadow Dragon": "", "Scorched Dragon": "", "Drilla": "", "Void Dragon": "", "Ember Dragon": "",
+    "Spike": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/d/de/Spike.png?width=121&format=jpg&auto=webp&quality=80",
+    "Spirit Manta": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/e/eb/Spirit_Manta.png?width=121&format=jpg&auto=webp&quality=80",
+    "Abyss Shark": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/0/0f/Abyss_Shark.png?width=121&format=jpg&auto=webp&quality=80",
+    "Electric Eel": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/1/1e/Electric_Eeel.png?width=121&format=jpg&auto=webp&quality=80",
+    "Terra Snapper": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/1/1b/Terra_Snapper.png?width=121&format=jpg&auto=webp&quality=80",
+    "Cthulhu": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/9/9e/Cthulhu.png?width=121&format=jpg&auto=webp&quality=80",
+    "Luminous Spike": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/1/13/Luminous_Spike.png?width=121&format=jpg&auto=webp&quality=80",
+    "Luminous Spirit Manta": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/5/52/Luminous_Manta.png?width=121&format=jpg&auto=webp&quality=80",
+    "Luminous Abyss Shark": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/2/20/Luminous_Abyss_Shark.png?width=121&format=jpg&auto=webp&quality=80",
+    "Luminous Electric Eel": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/c/c3/Luminous_Electric_Eel.png?width=121&format=jpg&auto=webp&quality=80",
+    "Luminous Terra Snapper": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/0/0b/Luminous_Terra_Snapper.png?width=121&format=jpg&auto=webp&quality=80",
+    "Luminous Cthulhu": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/5/54/Luminous_Cthulhu.png?width=121&format=jpg&auto=webp&quality=80",
+    "Glyptodon": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/7/7b/Glyptodon_Steal_Egg.png?width=115&format=jpg&auto=webp&quality=80",
+    "Sabertooth": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/2/28/Sabertooth_Extinction_Steal_Egg.png?width=144&format=jpg&auto=webp&quality=80",
+    "Baby Aurora Dragon": "https://static.wikia.nocookie.net/stealanegg/images/1/17/Baby_Aurora_Dragon.png/revision/latest?cb=20260910041443",
+    "Shadow Dragon": "https://static.wikia.nocookie.net/stealanegg/images/d/d5/Shadow_Dragon.png/revision/latest?cb=20260910041434",
+    "Scorched Dragon": "https://static.wikia.nocookie.net/stealanegg/images/c/c2/Scorched_Dragon.png/revision/latest?cb=20260910041417",
+    "Drilla": "https://static.wikia.nocookie.net/stealanegg/images/c/c9/Drilla.png/revision/latest?cb=20260908022914",
+    "Void Dragon": "https://static.wikia.nocookie.net/stealanegg/images/f/fb/Void_Dragon.png/revision/latest?cb=20260907221522",
+    "Ember Dragon": "https://static.wikia.nocookie.net/stealanegg/images/b/bb/Ember_Dragon.png/revision/latest?cb=20260910041425",
     // Other (not sorted yet)
-    "Archdemon Dragon": "", "Gigantus": "", "Dunkleosteus": "", "Giant Sloth": "", "Terrorbird": "", "Ring Guard": "", "Ringlord": "",
-    "Skeletal Sabertooth": "", "Skeletal Gigantus": "", "Skeletal Dunkleosteus": "", "Skeletal Glyptodon": "", "Skeletal Terrorbird": "", "Skeletal Giant Sloth": ""
+    "Archdemon Dragon": "https://stealegg.com/assets/images/pets/archdemon-dragon-reviewed.webp",
+    "Gigantus": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/3/3f/Gigantus_Steal_Egg.png?width=144&format=jpg&auto=webp&quality=80",
+    "Dunkleosteus": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/b/b5/Dunkleosteus_Steal_Egg.png?width=144&format=jpg&auto=webp&quality=80",
+    "Giant Sloth": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/d/db/Giant_Sloth_Steal_Egg.png?width=110&format=jpg&auto=webp&quality=80",
+    "Terrorbird": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/3/3d/Terrorbird_Steal_Egg.png?width=116&format=jpg&auto=webp&quality=80",
+    "Ring Guard": "https://static.wikia.nocookie.net/stealanegg/images/c/c7/Ring_Guard.png/revision/latest?cb=20260913045444",
+    "Ringlord": "https://static.wikia.nocookie.net/stealanegg/images/e/e8/Ringlord.png/revision/latest?cb=20260913045506",
+    "Skeletal Sabertooth": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/f/fe/Skeletal_Sabertooth_Steal_Egg.png?width=144&format=jpg&auto=webp&quality=80",
+    "Skeletal Gigantus": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/e/ed/Skeletal_Gigantus_Steal_Egg.png?width=144&format=jpg&auto=webp&quality=80",
+    "Skeletal Dunkleosteus": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/b/be/Skeletal_Dunkleosteus_Steal_Egg.png?width=144&format=jpg&auto=webp&quality=80",
+    "Skeletal Glyptodon": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/6/6f/Skeletal_Glyptodon_Steal_Egg.png?width=144&format=jpg&auto=webp&quality=80",
+    "Skeletal Terrorbird": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/d/d1/Skeletal_Terrorbird_Steal_Egg.png?width=144&format=jpg&auto=webp&quality=80",
+    "Skeletal Giant Sloth": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/3/36/Skeletal_Giant_Sloth_Steal_Egg.png?width=144&format=jpg&auto=webp&quality=80",
     // Need an egg that is not listed? Add a line: "Egg Name": "https://link",
+    // Need an egg that is not listed? Add a line like:  "Egg Name": "https://link",
   };
 
-  // images typed in on the Egg Values page are saved in this browser only
-  function localImgs() {
-    try { return JSON.parse(localStorage.getItem("eggImgs") || "{}") || {}; } catch (e) { return {}; }
-  }
   function eggImg(name) {
-    var l = localImgs()[name];
-    if (typeof l === "string" && /^https:\/\//i.test(l)) return l;
-    var u = EGG_IMAGES[name];
+    var i = EGG_INFO && EGG_INFO[name];
+    var u = (i && typeof i[0] === "string" && /^https:\/\//i.test(i[0])) ? i[0] : EGG_IMAGES[name];
     return typeof u === "string" && /^https:\/\//i.test(u) ? u : "";
-  }
-  function setLocalImg(name, url) {
-    var o = localImgs();
-    if (url) o[name] = url; else delete o[name];
-    try { localStorage.setItem("eggImgs", JSON.stringify(o)); } catch (e) {}
   }
 
   // ---------- join logic ----------
@@ -653,7 +846,7 @@
 
   // ---------- notifying eggs list ----------
   // [name, rarity, image]. Add a line here when you add an egg to the script.
-  // An image set in EGG_IMAGES (or typed on the Egg Values page) wins over the link in this list.
+  // An image set in EGG_IMAGES wins over the link in this list.
   var EGGS = [
     ["RazorFang", "Secret", "https://asaiya2.github.io/steal-an-egg/Rock_Demon.png"],
     ["Gargoyle", "Secret", "https://asaiya2.github.io/steal-an-egg/Gargoyle_Demon.png"],
@@ -671,7 +864,7 @@
     ["Celestial Sunlion", "Eternal", "https://asaiya2.github.io/steal-an-egg/sunlion.png"],
     ["World Burner", "Divine", "https://asaiya2.github.io/steal-an-egg/World_Burner.png"],
     ["ArchAngel", "Divine", "https://asaiya2.github.io/steal-an-egg/ArchAngel.png"],
-    ["Nightflame", "Divine", "https://asaiya2.github.io/steal-an-egg/Nightflame.png"],
+    ["Nightflame", "Divine", "https://stealegg.com/assets/images/pets/nightflame-reviewed.webp"],
     ["Kitsune", "Divine", "https://asaiya2.github.io/steal-an-egg/Kitsune.png"],
     ["Unicorn", "Divine", "https://asaiya2.github.io/steal-an-egg/Unicorn.png"],
     ["Royal Skywhale", "Divine", "https://github.com/Asaiya2/steal-an-egg/blob/main/skywhale.png?raw=true"]
@@ -774,8 +967,10 @@
       if (!firstLoad && !seenKeys[k]) newKeys[k] = true;
       seenKeys[k] = true;
     });
+    var wasFirst = firstLoad;
     firstLoad = false;
     allItems = items;
+    if (wasFirst) setTimeout(function () { if (!$("left").hidden) cascadeFeed(0); }, 0);
     render();
   }
 
@@ -1092,6 +1287,7 @@
     ["Holy Peacock", "Cosmic", 25000000, 9000, false],
     ["Spiderpig", "Cosmic", 25000000, 180, false],
     ["Toucax", "Cosmic", 30000000, 12, false],
+    ["Spirit Panda", "Cosmic", 35000000, null, true],
     ["Drilla", "Cosmic", 100000000, 5000, false],
     ["Three Headed Chicken", "Cosmic", 165000000, 24, false],
     ["Sand Spider", "Mythic", 16000, 120, false],
@@ -1190,7 +1386,8 @@
     return "$" + n.toFixed(2) + u[i] + "/s";
   }
 
-  function calcRun() {
+  function calcRun(pressed) {
+    if (pressed !== true) { var hint = $("calcOut"); hint.textContent = ""; hint.appendChild(line("div", "Press Calculate to see the value.", "line")); return; }
     var out = $("calcOut");
     out.textContent = "";
     var egg = CALC_EGGS[+$("calcEgg").value];
@@ -1198,6 +1395,7 @@
     if (!egg) return;
     if (egg[3] === null) {
       out.appendChild(line("div", calcMoney(egg[2]), "big"));
+      calcSave(egg, null, [], egg[2]);
       out.appendChild(line("div", "Base income only. This egg's base weight is not known yet, so the weight can't be used.", "warn"));
       return;
     }
@@ -1212,6 +1410,7 @@
       if (calcPicked[m[0]]) { mult += m[1] - 1; names.push(m[0]); }
     });
     out.appendChild(line("div", calcMoney(base * mult), "big"));
+    calcSave(egg, kg, names, base * mult);
     out.appendChild(line("div", ratio.toFixed(ratio < 10 ? 3 : 1) + "x its base weight (" + egg[3].toLocaleString("en-US") + " Kg)", "line"));
     if (names.length) {
       out.appendChild(line("div", "Without mutations: " + calcMoney(base), "line"));
@@ -1220,6 +1419,46 @@
     if (egg[4]) out.appendChild(line("div", "This egg's base numbers are marked as estimates, so the result may be a little off.", "warn"));
     if (ratio > CALC_LOW && ratio < 0.9) out.appendChild(line("div", "Eggs between 0.5x and 0.9x base weight are not fully tested yet.", "warn"));
   }
+
+  // ---- calculator history (saved in this browser) ----
+  var CALC_HIST_KEY = "calcHistory";
+  function histLoad() {
+    try { var a = JSON.parse(localStorage.getItem(CALC_HIST_KEY) || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; }
+  }
+  function histSave(a) { try { localStorage.setItem(CALC_HIST_KEY, JSON.stringify(a)); } catch (e) {} }
+  function calcSave(egg, kg, names, value) {
+    var a = histLoad();
+    a.unshift({ egg: egg[0], rarity: egg[1], kg: kg, muts: names, value: value, t: Date.now() });
+    if (a.length > 100) a.length = 100;   // keeps the newest 100
+    histSave(a);
+    renderHistory(true);
+  }
+  function renderHistory(animateNewest) {
+    var box = $("calcHist"), a = histLoad();
+    box.textContent = "";
+    $("calcClear").hidden = !a.length;
+    if (!a.length) { box.appendChild(line("div", "No calculations yet.", "hempty")); return; }
+    a.forEach(function (h, i) {
+      var d = document.createElement("div");
+      d.className = "hitem" + (animateNewest && i === 0 ? " new" : "");
+      d.appendChild(line("b", h.egg + " (" + h.rarity + ")"));
+      d.appendChild(line("div", calcMoney(h.value), "hval"));
+      var meta = [];
+      meta.push(typeof h.kg === "number" ? h.kg.toLocaleString("en-US") + " Kg" : "Base income only");
+      meta.push(h.muts && h.muts.length ? h.muts.join(" + ") : "No mutations");
+      meta.push(new Date(h.t).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }));
+      d.appendChild(line("div", meta.join(" | "), "hmeta"));
+      box.appendChild(d);
+    });
+  }
+  $("calcBtn").addEventListener("click", function () {
+    calcRun(true);
+    var o = $("calcOut");
+    o.classList.remove("pop"); void o.offsetWidth; o.classList.add("pop");
+  });
+  $("calcKg").addEventListener("keydown", function (e) { if (e.key === "Enter") $("calcBtn").click(); });
+  $("calcClear").addEventListener("click", function () { histSave([]); renderHistory(); });
+  renderHistory();
 
   (function setupCalc() {
     var sel = $("calcEgg");
@@ -1287,9 +1526,9 @@
     ["Prehistoric", "Dodo|Pterodactyl|Ankylosaurus|Triceratops|Bronto|T-Rex|Tralaledon|Mosasaurus"],
     ["Cosmic", "Centapede|Cosmic Gecko|Cosmic Gorilla|La Vacca Saturno Saturnita|Cosmic Skeleton Boss|Cosmic Dragon|Eternal Lunar Dragon|Unicorn"],
     ["Cherry Blossom", "Crane|Salamander|Red Panda|Snowy Owl|Koi|Stag|Oni Tiger|Kitsune"],
-    ["Enchanted Forest", "Prism Gecko|Petal Beetle|Enchanted Bluejay|Astral Jackalope|Starry Fox|Celestial Sunlion|Royal Skywhale"],
     ["Titan Temple", "Spideron|Crustacia|Bladehide|Mantaris|Rhinotaur|Gorilla King|Nightflame|Mutant Shark"],
     ["Angels & Demons", "Flame Sprite|Light Dove|Winged Lamb|Toro|Imp|Sacred Moth|Holy Peacock|Demon Hound|Gargoyle|Pure Jellyfish|Centaur|RazorFang|Pegasus|Skeleton Horse|Equinox|ArchAngel|World Burner|Aetheron"],
+    ["Enchanted Forest", "Prism Gecko|Petal Beetle|Enchanted Bluejay|Astral Jackalope|Spirit Panda|Starry Fox|Celestial Sunlion|Royal Skywhale"],
     ["Rift: Riftborn Egg", "Rift Eye|Voidmaw|Ventinal|Wendigo|Abyss Overlord|World Eater"],
     ["Rift: Riftbeasts Egg", "Void Angler|Riftwing|Dreadclaw|Mawbreaker|Void Serpent"],
     ["Rift: Shattered Rift Egg", "Shardling|Shattered Ram|Shardwing|Shattered Drake|Shattered Colossus"],
@@ -1305,104 +1544,571 @@
     ["Other (not sorted yet)", "Archdemon Dragon|Gigantus|Dunkleosteus|Giant Sloth|Terrorbird|Ring Guard|Ringlord|Skeletal Sabertooth|Skeletal Gigantus|Skeletal Dunkleosteus|Skeletal Glyptodon|Skeletal Terrorbird|Skeletal Giant Sloth"]
   ];
 
+  // ---------- egg stats (shown on the Egg Values page) ----------
+  // Rarity and MPS come from CALC_EGGS, Biome from the island the egg is listed under.
+  // Grow time is the same for every egg of a rarity (in seconds).
+  var GROW_BY_RARITY = { Common: 10, Uncommon: 25, Rare: 40, Epic: 90, Legendary: 300, Mythic: 240, Cosmic: 1800, Secret: 10800, Eternal: 32400, Divine: 57600 };
+  var RARITY_COLORS = { Common: "#aab0b8", Uncommon: "#5ac85a", Rare: "#4aa3ff", Epic: "#b06cff", Legendary: "#ffa534", Mythic: "#ff5a8a", Cosmic: "#6ee7ff", Secret: "#E74C3C", Eternal: "#9B59B6", Divine: "#F1C40F" };
+
+  // YOUR TEXT GOES HERE. For each egg you can set:
+  //   desc:   the Description text
+  //   reward: for example "+420 Speed, $100"
+  //   grow:   grow time in seconds (only needed to override or fill a missing one)
+  // Example: "Dog": { desc: "A loyal friend.", reward: "+100 Speed, $50" },
+
+  var EGG_INFO = {
+    // ===== Forest =====
+    "Dog": [
+      "",
+      "Dog description here"
+    ],
+    "Bird": [
+      "",
+      "Bird description here"
+    ],
+    "Burrowing Owl": [
+      "",
+      "Burrowing Owl description here"
+    ],
+    "Fox": [
+      "",
+      "Fox description here"
+    ],
+    "Bear": [
+      "",
+      "Bear description here"
+    ],
+    "Brr Brr Patapim": [
+      "",
+      "Brr Brr Patapim description here"
+    ],
+    // ===== Lake =====
+    "Frog": [
+      "",
+      "Frog description here"
+    ],
+    "Duckling": [
+      "",
+      "Duckling description here"
+    ],
+    "Catfish": [
+      "",
+      "Catfish description here"
+    ],
+    "Turtle": [
+      "",
+      "Turtle description here"
+    ],
+    "Trulimero Trulicina": [
+      "",
+      "Trulimero Trulicina description here"
+    ],
+    "Swan": [
+      "",
+      "Swan description here"
+    ],
+    "Axolotl": [
+      "",
+      "Axolotl description here"
+    ],
+    "Leviathan": [
+      "",
+      "Leviathan description here"
+    ],
+    // ===== Desert =====
+    "Jerboa": [
+      "",
+      "Jerboa description here"
+    ],
+    "Fennec": [
+      "",
+      "Fennec description here"
+    ],
+    "Camel": [
+      "",
+      "Camel description here"
+    ],
+    "Tob Tobi Tob Tob": [
+      "",
+      "Tob Tobi Tob Tob description here"
+    ],
+    "Snake": [
+      "",
+      "Snake description here"
+    ],
+    "Sand Spider": [
+      "",
+      "Sand Spider description here"
+    ],
+    "Scorpion": [
+      "",
+      "Scorpion description here"
+    ],
+    "Royal Sphinx": [
+      "",
+      "Royal Sphinx description here"
+    ],
+    // ===== Jungle =====
+    "Chimpanzee": [
+      "",
+      "Chimpanzee description here"
+    ],
+    "Toucan": [
+      "",
+      "Toucan description here"
+    ],
+    "Crocodile": [
+      "",
+      "Crocodile description here"
+    ],
+    "Gorilla": [
+      "",
+      "Gorilla description here"
+    ],
+    "Orangutini Ananassini": [
+      "",
+      "Orangutini Ananassini description here"
+    ],
+    "Spider": [
+      "",
+      "Spider description here"
+    ],
+    "Tiger": [
+      "",
+      "Tiger description here"
+    ],
+    "King Snake": [
+      "",
+      "King Snake description here"
+    ],
+    // ===== Snow =====
+    "Penguin": [
+      "",
+      "Penguin description here"
+    ],
+    "Walrus": [
+      "",
+      "Walrus description here"
+    ],
+    "Polar Bear": [
+      "",
+      "Polar Bear description here"
+    ],
+    "Sabertooth Tiger": [
+      "",
+      "Sabertooth Tiger description here"
+    ],
+    "Mammoth": [
+      "",
+      "Mammoth description here"
+    ],
+    "King Mammoth": [
+      "",
+      "King Mammoth description here"
+    ],
+    "Yeti": [
+      "",
+      "Yeti description here"
+    ],
+    "Ice Dragon": [
+      "",
+      "Ice Dragon description here"
+    ],
+    // ===== Volcano =====
+    "Lava Gecko": [
+      "",
+      "Lava Gecko description here"
+    ],
+    "Lava Frog": [
+      "",
+      "Lava Frog description here"
+    ],
+    "Flaming Bull": [
+      "",
+      "Flaming Bull description here"
+    ],
+    "Lava Iguana": [
+      "",
+      "Lava Iguana description here"
+    ],
+    "Chillin Chilli": [
+      "",
+      "Chillin Chilli description here"
+    ],
+    "Cerberus": [
+      "",
+      "Cerberus description here"
+    ],
+    "Phoenix": [
+      "",
+      "Phoenix description here"
+    ],
+    "Lava Dragon": [
+      "",
+      "Lava Dragon description here"
+    ],
+    // ===== Abyss Ocean =====
+    "Parrotfish": [
+      "",
+      "Parrotfish description here"
+    ],
+    "Swordfish": [
+      "",
+      "Swordfish description here"
+    ],
+    "Shark": [
+      "",
+      "Shark description here"
+    ],
+    "Orca": [
+      "",
+      "Orca description here"
+    ],
+    "Whale Shark": [
+      "",
+      "Whale Shark description here"
+    ],
+    "Beluga Whale": [
+      "",
+      "Beluga Whale description here"
+    ],
+    "Kraken": [
+      "",
+      "Kraken description here"
+    ],
+    "El Maja": [
+      "",
+      "El Maja description here"
+    ],
+    // ===== Prehistoric =====
+    "Dodo": [
+      "",
+      "Dodo description here"
+    ],
+    "Pterodactyl": [
+      "",
+      "Pterodactyl description here"
+    ],
+    "Ankylosaurus": [
+      "",
+      "Ankylosaurus description here"
+    ],
+    "Triceratops": [
+      "",
+      "Triceratops description here"
+    ],
+    "Bronto": [
+      "",
+      "Bronto description here"
+    ],
+    "T-Rex": [
+      "",
+      "T-Rex description here"
+    ],
+    "Tralaledon": [
+      "",
+      "Tralaledon description here"
+    ],
+    "Mosasaurus": [
+      "",
+      "Mosasaurus description here"
+    ],
+    // ===== Cosmic =====
+    "Centapede": [
+      "",
+      "Centapede description here"
+    ],
+    "Cosmic Gecko": [
+      "",
+      "Cosmic Gecko description here"
+    ],
+    "Cosmic Gorilla": [
+      "",
+      "Cosmic Gorilla description here"
+    ],
+    "La Vacca Saturno Saturnita": [
+      "",
+      "La Vacca Saturno Saturnita description here"
+    ],
+    "Cosmic Skeleton Boss": [
+      "",
+      "Cosmic Skeleton Boss description here"
+    ],
+    "Cosmic Dragon": [
+      "",
+      "Cosmic Dragon description here"
+    ],
+    "Eternal Lunar Dragon": [
+      "",
+      "Eternal Lunar Dragon description here"
+    ],
+    "Unicorn": [
+      "",
+      "Unicorn description here"
+    ],
+    // ===== Cherry Blossom =====
+    "Crane": [
+      "",
+      "Crane description here"
+    ],
+    "Salamander": [
+      "",
+      "Salamander description here"
+    ],
+    "Red Panda": [
+      "",
+      "Red Panda description here"
+    ],
+    "Snowy Owl": [
+      "",
+      "Snowy Owl description here"
+    ],
+    "Koi": [
+      "",
+      "Koi description here"
+    ],
+    "Stag": [
+      "",
+      "Stag description here"
+    ],
+    "Oni Tiger": [
+      "",
+      "Oni Tiger description here"
+    ],
+    "Kitsune": [
+      "",
+      "Kitsune description here"
+    ],
+    // ===== Titan Temple =====
+    "Spideron": [
+      "",
+      "Spideron description here"
+    ],
+    "Crustacia": [
+      "",
+      "Crustacia description here"
+    ],
+    "Bladehide": [
+      "",
+      "Bladehide description here"
+    ],
+    "Mantaris": [
+      "",
+      "Mantaris description here"
+    ],
+    "Rhinotaur": [
+      "",
+      "Rhinotaur description here"
+    ],
+    "Gorilla King": [
+      "",
+      "Gorilla King description here"
+    ],
+    "Nightflame": [
+      "",
+      "Nightflame description here"
+    ],
+    "Mutant Shark": [
+      "",
+      "Mutant Shark description here"
+    ],
+    // ===== Angels & Demons =====
+    "Flame Sprite": [
+      "",
+      "Flame Sprite description here"
+    ],
+    "Light Dove": [
+      "",
+      "Light Dove description here"
+    ],
+    "Winged Lamb": [
+      "",
+      "Winged Lamb description here"
+    ],
+    "Toro": [
+      "",
+      "Toro description here"
+    ],
+    "Imp": [
+      "",
+      "Imp description here"
+    ],
+    "Sacred Moth": [
+      "",
+      "Sacred Moth description here"
+    ],
+    "Holy Peacock": [
+      "",
+      "Holy Peacock description here"
+    ],
+    "Demon Hound": [
+      "",
+      "Demon Hound description here"
+    ],
+    "Gargoyle": [
+      "",
+      "Gargoyle description here"
+    ],
+    "Pure Jellyfish": [
+      "",
+      "Pure Jellyfish description here"
+    ],
+    "Centaur": [
+      "",
+      "Centaur description here"
+    ],
+    "RazorFang": [
+      "",
+      "RazorFang description here"
+    ],
+    "Pegasus": [
+      "",
+      "Pegasus description here"
+    ],
+    "Skeleton Horse": [
+      "",
+      "Skeleton Horse description here"
+    ],
+    "Equinox": [
+      "",
+      "Equinox description here"
+    ],
+    "ArchAngel": [
+      "",
+      "ArchAngel description here"
+    ],
+    "World Burner": [
+      "",
+      "World Burner description here"
+    ],
+    "Aetheron": [
+      "",
+      "Aetheron description here"
+    ],
+    // ===== Enchanted Forest =====
+    "Prism Gecko": [
+      "",
+      "Prism Gecko description here"
+    ],
+    "Petal Beetle": [
+      "",
+      "Petal Beetle description here"
+    ],
+    "Enchanted Bluejay": [
+      "",
+      "Enchanted Bluejay description here"
+    ],
+    "Astral Jackalope": [
+      "",
+      "Astral Jackalope description here"
+    ],
+    "Spirit Panda": [
+      "",
+      "Spirit Panda description here"
+    ],
+    "Starry Fox": [
+      "",
+      "Starry Fox description here"
+    ],
+    "Celestial Sunlion": [
+      "",
+      "Celestial Sunlion description here"
+    ],
+    "Royal Skywhale": [
+      "",
+      "Big ass whale"
+    ],
+    // ===== Chicken and Raccoon (your existing entries) =====
+    "Chicken": [
+      "https://static.wikia.nocookie.net/stealanegg/images/a/a3/Chicken.png/revision/latest?cb=20260901193312",
+      "Chicken go tok togaok"
+    ],
+    "Raccoon": { desc: "", reward: "+620 Speed, $4500" }
+  };
+
+  
+
+  function fmtTime(s) {
+    if (typeof s !== "number" || !(s >= 0)) return "Unknown";
+    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60, out = [];
+    if (h) out.push(h + "h");
+    if (m) out.push(m + "m");
+    if (r || !out.length) out.push(r + "s");
+    return out.join(" ");
+  }
+
   (function setupValues() {
     var byName = {};
     CALC_EGGS.forEach(function (e) { byName[e[0]] = e; });
-    var root = $("valIslands");
+    var root = $("valIslands"), det = $("valDetailBody"), selBtn = null;
 
-    function mkImg(cls) {
-      var im = document.createElement("img");
-      im.className = cls; im.alt = ""; im.referrerPolicy = "no-referrer";
-      im.onerror = function () { im.hidden = true; };
-      return im;
+    function statBox(key, valueText, color) {
+      var d = document.createElement("div");
+      d.appendChild(line("div", key, "sk"));
+      var v = line("div", valueText, "sv");
+      if (color) v.style.color = color;
+      d.appendChild(v);
+      return d;
+    }
+    function section(title, bodyEl) {
+      var s = document.createElement("div");
+      s.className = "sec";
+      s.appendChild(line("h3", title));
+      var b = document.createElement("div");
+      b.className = "sbody";
+      b.appendChild(bodyEl);
+      s.appendChild(b);
+      return s;
     }
 
-    // body = what opens when an egg is pressed. onImg() refreshes the small picture in the egg's header.
-    function buildBody(body, name, e, onImg) {
-      body.appendChild(line("div", name, "vname"));
+    function showEgg(name, island, e) {
+      det.textContent = "";
+      var w = document.createElement("div");
+      w.className = "vdet";
+      var raw = EGG_INFO[name] || [];
+      var info = { image: raw[0] || "", desc: raw[1] || "" };
+      var rarity = e ? e[1] : "";
+      w.appendChild(line("div", name, "vname"));
+      w.appendChild(line("div", rarity || "No values yet", "vrar"));
 
-      // image: shows the picture and lets you paste a link for it
-      var big = mkImg("vimg");
-      body.appendChild(big);
-      var row = document.createElement("div");
-      row.className = "vimgrow";
-      var inp = document.createElement("input");
-      inp.type = "text"; inp.placeholder = "Image link (https://...)"; inp.autocomplete = "off"; inp.spellcheck = false;
-      var sv = document.createElement("button");
-      sv.type = "button"; sv.textContent = "Set";
-      row.appendChild(inp); row.appendChild(sv);
-      body.appendChild(row);
-      function paintImg() {
-        var u = eggImg(name);
-        big.hidden = !u;
-        if (u) big.src = u;
-        onImg();
-      }
-      sv.addEventListener("click", function () {
-        var v = inp.value.trim();
-        if (v && !/^https:\/\//i.test(v)) { inp.value = ""; inp.placeholder = "Link must start with https://"; return; }
-        setLocalImg(name, v);
-        inp.value = "";
-        inp.placeholder = v ? "Image set (saved in this browser)" : "Image cleared";
-        paintImg();
-        eggSig = ""; renderEggs();   // refresh the Notifying Eggs list too
-      });
-      paintImg();
+      // image: hardcoded in EGG_IMAGES
+      var box = document.createElement("div");
+      box.className = "vimg";
+      var u = eggImg(name);
+      if (u) {
+        var im = document.createElement("img");
+        im.alt = ""; im.referrerPolicy = "no-referrer";
+        im.onerror = function () { im.remove(); box.textContent = "No image yet"; };
+        im.src = u;
+        box.appendChild(im);
+      } else box.textContent = "No image yet";
+      w.appendChild(box);
 
-      var out = document.createElement("div");
-      out.className = "calcout";
-      if (!e) {
-        out.appendChild(line("div", "No values yet for this egg.", "warn"));
-        body.appendChild(out);
-        return;
-      }
-      var picked = {};
-      var hasW = e[3] !== null;
-      var lab = line("label", "", "cl");
-      lab.style.cssText = "display:block;font-size:12px;color:#b5bac1;margin:6px 0 0";
-      var sl = document.createElement("input");
-      sl.type = "range"; sl.min = 0; sl.max = 1000; sl.value = 250;   // 0.1x ... 1000x base weight, 250 = 1x
-      if (hasW) { body.appendChild(lab); body.appendChild(sl); }
-      var chips = document.createElement("div");
-      chips.className = "chips";
-      CALC_MUTS.forEach(function (m) {
-        var b = document.createElement("button");
-        b.type = "button"; b.className = "chip"; b.textContent = m[0];
-        b.addEventListener("click", function () {
-          if (picked[m[0]]) delete picked[m[0]]; else picked[m[0]] = true;
-          b.classList.toggle("on", !!picked[m[0]]);
-          run();
-        });
-        chips.appendChild(b);
-      });
-      body.appendChild(line("div", "Mutations", "sub"));
-      body.appendChild(chips);
-      body.appendChild(out);
+      // Description (you write it in EGG_INFO)
+      w.appendChild(section("Description", document.createTextNode(info.desc || "")));
 
-      function run() {
-        out.textContent = "";
-        var ratio = hasW ? Math.pow(10, sl.value / 1000 * 4 - 1) : 1;
-        var base = e[2] * (hasW ? calcWeightMult(ratio) : 1);
-        var mult = 1, names = [];
-        CALC_MUTS.forEach(function (m) { if (picked[m[0]]) { mult += m[1] - 1; names.push(m[0]); } });
-        if (hasW) lab.textContent = "Weight: " + compact(e[3] * ratio) + " Kg (" + (ratio < 10 ? ratio.toFixed(2) : ratio.toFixed(0)) + "x base " + compact(e[3]) + " Kg)";
-        out.appendChild(line("div", calcMoney(base * mult), "big"));
-        if (names.length) {
-          out.appendChild(line("div", "Without mutations: " + calcMoney(base), "line"));
-          out.appendChild(line("div", names.join(" + ") + ": x" + mult.toFixed(2).replace(/\.?0+$/, ""), "line"));
-        }
-        if (!hasW) out.appendChild(line("div", "Base income only. This egg's base weight is not known yet.", "warn"));
-        if (e[4]) out.appendChild(line("div", "Base numbers are estimates, so the result may be a little off.", "warn"));
-        if (hasW && ratio > CALC_LOW && ratio < 0.9) out.appendChild(line("div", "Between 0.5x and 0.9x base weight is not fully tested yet.", "warn"));
-      }
-      sl.addEventListener("input", run);
-      run();
+      // Stats
+      var biome = /^Rift:/.test(island) ? "The Rift" : island;
+      var grow = typeof info.grow === "number" ? info.grow : (e ? GROW_BY_RARITY[e[1]] : null);
+      var grid = document.createElement("div");
+      grid.className = "sgrid";
+      grid.appendChild(statBox("Rarity", rarity || "Unknown", RARITY_COLORS[rarity]));
+      grid.appendChild(statBox("Biome", biome, "#f0932b"));
+      grid.appendChild(statBox("MPS", e ? "$" + compact(e[2]) + "/s" : "Unknown"));  
+      grid.appendChild(statBox("Grow Time", fmtTime(grow)));
+      w.appendChild(section("Stats", grid));
+
+      det.appendChild(w);
     }
 
+    var tCursor = 0;   // when the next island is allowed to start
     ISLANDS.forEach(function (isl) {
+      var base = tCursor;
+      tCursor = base + 100 + (isl[1].split("|").length - 1) * 30 + 50;   // this island's last egg finishes, then the next island starts   // Forest first, then Lake, and so on down the list
       var names = isl[1].split("|");
       var d = document.createElement("details");
       d.className = "isl";
+      d.style.animationDelay = base + "ms";
       d.open = true;                       // shown right away, click the title to hide
       var s = document.createElement("summary");
       s.appendChild(line("span", isl[0]));
@@ -1411,33 +2117,24 @@
 
       names.forEach(function (name, i) {
         var e = byName[name];
-        var card = document.createElement("div");
-        card.className = "vegg";
-        card.style.animationDelay = (i * 70) + "ms";   // one at a time
-        var h = document.createElement("button");
-        h.type = "button"; h.className = "vhead";
-        var left = document.createElement("span");
-        left.className = "vleft";
-        var th = mkImg("vthumb");
-        function paintThumb() {
-          var u = eggImg(name);
-          th.hidden = !u;
-          if (u) th.src = u;
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "vegg";
+        b.style.animationDelay = (base + 100 + i * 5) + "ms";   // one at a time
+        var u = eggImg(name);
+        if (u) {
+          var th = document.createElement("img");
+          th.className = "vthumb"; th.alt = ""; th.referrerPolicy = "no-referrer"; th.loading = "lazy";
+          th.onerror = function () { th.remove(); };
+          th.src = u;
+          b.appendChild(th);
         }
-        paintThumb();
-        left.appendChild(th);
-        left.appendChild(line("span", name));
-        h.appendChild(left);
-        h.appendChild(line("small", e ? e[1] : "no values yet"));
-        var body = document.createElement("div");
-        body.className = "vbody"; body.hidden = true;
-        var built = false;
-        h.addEventListener("click", function () {
-          body.hidden = !body.hidden;
-          if (!body.hidden && !built) { built = true; buildBody(body, name, e, paintThumb); }
+        b.appendChild(line("span", name));
+        b.addEventListener("click", function () {
+          if (selBtn) selBtn.classList.remove("sel");
+          selBtn = b; b.classList.add("sel");
+          showEgg(name, isl[0], e);
         });
-        card.appendChild(h); card.appendChild(body);
-        d.appendChild(card);
+        d.appendChild(b);
       });
       root.appendChild(d);
     });
@@ -1456,20 +2153,40 @@
     $("wallLabel").textContent = (ok || locked) ? "" : v;
   }
 
-  // ---------- channels and pages ----------
+    // ---------- channels and pages ----------
+  var PAGES = {
+    1: [[1, "Egg Notifiers"], [2, "Egg Values"], [3, "Egg Calculator"], [4, "Join"]],
+    2: [[1, "Verification", "verification"], [2, "Roles", "roles"], [3, "Server Stuff", "server-stuff"]],
+    3: []
+  };
+  function fillPages(ch, pg) {
+    var sel = $("pgSel"), list = PAGES[ch] || [];
+    sel.textContent = "";
+    list.forEach(function (p) {
+      var o = document.createElement("option");
+      o.value = p[0]; o.textContent = p[1];
+      sel.appendChild(o);
+    });
+    if (list.length) sel.value = String(pg || list[0][0]);
+  }
   function showView() {
     var ch = +$("chSel").value, pg = +$("pgSel").value;
     var live = ch === 1;                      // only channel 1 exists for now
     var notifier = live && pg === 1;
     var open = unlocked;
-    $("pgSel").disabled = !live;
+    $("discordTop").hidden = !(live || ch === 2);   // FOR EVERY NEW PAGE, ADD THE DISCORD BUTTON ON THE TOP RIGHT (shows on every page of channel 1 automatically)
+    $("pgSel").disabled = !(live || ch === 2);
     $("left").hidden = !(notifier && open);
     $("right").hidden = !(notifier && open);
     $("gate").hidden = !(notifier && authChecked && !open);
     $("joinCard").hidden = !(live && pg === 4);
+    $("valDetail").hidden = !(live && pg === 2);
     $("valuesPage").hidden = !(live && pg === 2);
     $("calcPage").hidden = !(live && pg === 3);
-    $("blank").hidden = live;
+    $("blank").hidden = live || ch === 2;
+    $("verifyPage").hidden = !(ch === 2 && pg === 1);
+    $("soonPage").hidden = !(ch === 2 && pg >= 2);
+    $("soonTitle").textContent = pg === 3 ? "Server Stuff" : "Roles";
     setWallpaper(ch);
   }
 
@@ -1482,6 +2199,7 @@
   function unlock() {
     unlocked = true; authChecked = true;
     showView(); poll(); initSlots();
+    notifierLoadIn($("tear").hidden);   // the password reveal already animates the panels itself
   }
   // torn edge: both halves are full screen and clipped along the same jagged line, so the image stays in one piece
   (function () {
@@ -1543,11 +2261,93 @@
   $("pwBtn").addEventListener("click", tryUnlock);
   $("pw").addEventListener("keydown", function (e) { if (e.key === "Enter") tryUnlock(); });
 
-  $("chSel").addEventListener("change", showView);
-  $("pgSel").addEventListener("change", showView);
+  // ---------- tab / channel switch animations ----------
+  var VIEW_IDS = ["left", "right", "gate", "joinCard", "valDetail", "valuesPage", "calcPage", "verifyPage", "soonPage", "blank"];
+  var curCh, curPg, running = [], inflight = false;
+  function reduced() { return window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches; }
+  function canAnim() { return !reduced() && !!document.body.animate; }
+  function visibleEls() { return VIEW_IDS.map($).filter(function (el) { return el && !el.hidden; }); }
+  function stopAnims() { running.forEach(function (a) { a.cancel(); }); running = []; }
+
+  function play(els, from, to, ms, easing, done) {
+    if (!els.length) { done(); return; }
+    var left = els.length;
+    els.forEach(function (el) {
+      var a = el.animate([from, to], { duration: ms, easing: easing, fill: "forwards" });
+      running.push(a);
+      a.onfinish = function () { if (--left === 0) done(); };
+    });
+  }
+
+  function transition() {
+    var ch = +$("chSel").value;
+    if (ch !== curCh) fillPages(ch, 1);
+    var pg = +$("pgSel").value, kind, dir;
+    if (ch !== curCh) { kind = "ch"; dir = ch > curCh ? 1 : -1; }
+    else if (pg !== curPg) { kind = "pg"; dir = pg > curPg ? 1 : -1; }
+    else return;
+    curCh = ch; curPg = pg;
+    if (!canAnim()) { showView(); return; }
+
+    // pages: higher page = scroll LEFT, lower page = scroll RIGHT. channels slide up/down.
+    var side = kind === "pg";
+    var toOut  = side ? "translateX(" + (-dir * 100) + "vw)" : "translateY(" + (-dir * 50) + "px)";
+    var fromIn = side ? "translateX(" + (dir * 100) + "vw)"  : "translateY(" + (dir * 50) + "px)";
+    var op = side ? 1 : 0;
+    document.documentElement.style.overflowX = "hidden";
+
+    function enter() {
+      showView();
+      stopAnims();
+      play(visibleEls(), { transform: fromIn, opacity: op }, { transform: "none", opacity: 1 }, 380, "cubic-bezier(.2,.8,.2,1)", function () {
+        stopAnims(); inflight = false; document.documentElement.style.overflowX = "";
+      });
+      if (!$("left").hidden) notifierLoadIn(false);
+    }
+    if (inflight) { stopAnims(); enter(); return; }   // switched again mid-animation
+    inflight = true;
+    play(visibleEls(), { transform: "none", opacity: 1 }, { transform: toOut, opacity: op }, 260, "cubic-bezier(.5,0,.9,.5)", enter);
+  }
+
+  // ---------- Egg Notifier loading-in animation ----------
+  function notifierLoadIn(panels) {
+    if (!canAnim()) return;
+    function pop(el, from, delay) {
+      el.animate([{ opacity: 0, transform: from }, { opacity: 1, transform: "none" }],
+                 { duration: 450, delay: delay, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+    }
+    if (panels) ["opts", "vals", "eggs", "feedPanel", "right"].forEach(function (id, n) { pop($(id), "translateY(30px) scale(.97)", n * 90); });
+    Array.prototype.forEach.call(document.querySelectorAll("#right > *"), function (el, n) { pop(el, "translateY(14px)", 150 + n * 55); });
+    cascadeFeed(panels ? 350 : 150);
+  }
+  function cascadeFeed(base) {
+    if (!canAnim()) return;
+    Array.prototype.slice.call(feedEl.children, 0, 12).forEach(function (el, n) {
+      el.animate([{ opacity: 0, transform: "translateX(-26px)" }, { opacity: 1, transform: "none" }],
+                 { duration: 400, delay: base + n * 60, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+    });
+  }
+
+  $("chSel").addEventListener("change", transition);
+  $("pgSel").addEventListener("change", transition);
 
   // a Discord invite link (?placeId=...&jobId=...) opens the Join tab
-  if (placeId || jobId) $("pgSel").value = "4";
+  var VERIFY_LOGIN_URL = "";   // set to the Worker's login address when it exists
+  var guildId = /^\d{15,25}$/.test(q.get("guild") || "") ? q.get("guild") : "";
+  if (q.get("ch") === "discord") {
+    $("chSel").value = "2";
+    var want = PAGES[2].filter(function (p) { return p[2] === (q.get("pg") || "").toLowerCase(); })[0];
+    fillPages(2, want ? want[0] : 1);
+  } else if (placeId || jobId) $("pgSel").value = "4";
+  (function () {
+    var b = $("vpLogin");
+    if (VERIFY_LOGIN_URL && guildId) b.href = VERIFY_LOGIN_URL + "?guild=" + guildId;
+    else b.classList.add("off");
+    $("vpServer").textContent = guildId
+      ? "Log in with Discord to verify and unlock the server."
+      : "Open this page from the verify link in your server.";
+  })();
+  curCh = +$("chSel").value; curPg = +$("pgSel").value;
   showView();
 
   // the Join tab loads just that one egg from the Worker (public, no password needed)
