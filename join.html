@@ -182,44 +182,75 @@
   .dlgbtns .yes { background:#3498db; } .dlgbtns .no { background:#4e5058; }
   .never { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:14px; font-size:12px; color:#b5bac1; cursor:pointer; }
 
-  /* ---- unlock animation: green screen tears in half, then the panels slide in ---- */
+  /* Simple wallpaper reveal: fade from black to the original wallpaper without resizing it. */
+  #wallImpact { position:fixed; inset:0; z-index:900; pointer-events:none; display:none; background:#000; overflow:hidden; }
+  #wallImpact.active { display:block; }
+  #wallImpact .piece { position:absolute; inset:0; background-image:var(--impact-wall); background-size:cover; background-position:center center; background-repeat:no-repeat; opacity:0; }
+  #wallImpact.active .piece { animation:wallpaperFadeIn 1.05s ease-out forwards; }
+  #wallImpact .cracks, #wallImpact .dust { display:none !important; }
+  body.impact-pending { background-image:none !important; background-color:#000 !important; }
+  body.impact-pending::before { visibility:hidden !important; }
+  body.impact-pending > :not(#wallImpact):not(#tear) { visibility:hidden !important; }
+  body.impact-pending #wallImpact { visibility:visible !important; }
+  @keyframes wallpaperFadeIn { from { opacity:0; } to { opacity:1; } }
+  @media (prefers-reduced-motion:reduce) { #wallImpact { display:none !important; } }
+
+  /* ---- Raiden-inspired unlock: a violet dimensional slash cuts through Welcome ---- */
   #gate button.btn:disabled { opacity:.6; cursor:wait; }
   #gate.shake { animation:shake .4s; }
-  #tear { position:fixed; inset:0; z-index:1000; pointer-events:none; overflow:hidden; }
-  #tear .half { position:absolute; inset:0; opacity:0; background:#000; }
-  #tear .scene { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transform-origin:50% 50%; background:center / contain no-repeat; }
+  #tear { position:fixed; inset:0; z-index:1000; pointer-events:none; overflow:hidden; isolation:isolate;
+          background:radial-gradient(ellipse at center,#261044 0%,#100b1e 48%,#020207 100%); }
+  #tear[hidden] { display:none !important; }
+  #tear .half { position:absolute; inset:0; opacity:0; overflow:hidden;
+    background:radial-gradient(ellipse at 50% 48%,rgba(95,43,170,.24),transparent 58%),linear-gradient(135deg,#090611,#170d28 52%,#05040b); }
+  #tear.flood .w { opacity:1; }
+  #tear .scene { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    transform-origin:50% 50%; background:center / contain no-repeat; }
   #tear .scene.img .wel { display:none; }
-  #tear .wel { position:relative; color:#fff; font:700 clamp(26px,6vw,72px)/1 system-ui,Segoe UI,Arial,sans-serif; letter-spacing:.12em; opacity:0; }
-  #tear .wel::before, #tear .wel::after { content:""; position:absolute; width:1em; height:1em; border:0 solid #fff; opacity:0; }
-  #tear .wel::before { left:-1.5em; bottom:-.5em; border-left-width:.2em; border-bottom-width:.2em; border-bottom-left-radius:.15em; }
-  #tear .wel::after { right:-1.35em; top:-.5em; border-top-width:.2em; border-right-width:.2em; border-top-right-radius:.15em; }
-  #tear.flood .wel { animation:welIn .8s .35s ease-out forwards; }
-  #tear.flood .wel::before { animation:brL .8s .35s ease-out forwards; }
-  #tear.flood .wel::after { animation:brR .8s .35s ease-out forwards; }
-  #tear.zoom .scene { animation:welZoom 1s cubic-bezier(.7,0,.95,.4) forwards; }
-  #tear .l { transform-origin:25% 100%; }
-  #tear .r { transform-origin:75% 100%; }
-  /* one whole scene until the tear starts, so no seam shows; the two halves swap in at that moment */
+  #tear .wel { position:relative; z-index:2; color:#fff; font:800 clamp(26px,6vw,72px)/1 system-ui,Segoe UI,Arial,sans-serif;
+    letter-spacing:.16em; opacity:0; text-shadow:0 0 10px #a56aff,0 0 28px #8c35ff,0 0 58px rgba(141,53,255,.7); }
+  #tear .wel::before, #tear .wel::after { content:""; position:absolute; width:1em; height:1em; border:0 solid #d8baff; opacity:0; }
+  #tear .wel::before { left:-1.5em; bottom:-.5em; border-left-width:.12em; border-bottom-width:.12em; }
+  #tear .wel::after { right:-1.35em; top:-.5em; border-top-width:.12em; border-right-width:.12em; }
+  #tear.flood .wel { animation:welIn .55s .15s ease-out forwards; }
+  #tear.flood .wel::before { animation:brL .55s .15s ease-out forwards; }
+  #tear.flood .wel::after { animation:brR .55s .15s ease-out forwards; }
   #tear .l, #tear .r { visibility:hidden; }
   #tear.split .l, #tear.split .r { visibility:visible; }
   #tear.split .w { display:none; }
-  #tear.flood .half { animation:tearFlood .4s ease-out forwards; }
+  #tear .slash { position:absolute; z-index:8; left:-25%; top:50%; width:150%; height:clamp(5px,1.1vw,13px);
+    opacity:0; transform:translateY(-50%) rotate(-25deg) scaleX(0); transform-origin:center;
+    background:linear-gradient(90deg,transparent 0%,#8b35ff 18%,#f5eaff 49%,#fff 52%,#b56cff 70%,transparent 100%);
+    box-shadow:0 0 12px #9a42ff,0 0 32px #842cff,0 0 70px rgba(165,95,255,.9); }
+  #tear .slash::before { content:""; position:absolute; inset:-28px 0; background:linear-gradient(90deg,transparent,#873aff 35%,rgba(218,188,255,.8) 50%,#7d27ff 66%,transparent);
+    filter:blur(16px); }
+  #tear .rift { position:absolute; z-index:7; inset:0; opacity:0;
+    background:linear-gradient(115deg,transparent 0 47%,rgba(5,0,12,.98) 49.4%,#f4eaff 49.75%,#a94dff 50%,#2d075c 50.35%,transparent 52%); }
+  #tear.strike .slash { animation:raidenSlash .34s cubic-bezier(.15,.8,.2,1) forwards; }
+  #tear.strike .rift { animation:riftFlash .62s ease-out forwards; }
+  #tear.strike { animation:spaceFlash .22s ease-out; }
   #tear.split .half { opacity:1; }
-  #tear.split .l { animation:tearL .95s cubic-bezier(.65,0,.35,1) forwards; }
-  #tear.split .r { animation:tearR .95s cubic-bezier(.65,0,.35,1) forwards; }
+  /* Let the fractured purple surface become transparent as it opens, so the real page/background emerges gradually. */
+  #tear.split .l { animation:tearL 1.22s cubic-bezier(.18,.75,.22,1) forwards; }
+  #tear.split .r { animation:tearR 1.22s cubic-bezier(.18,.75,.22,1) forwards; }
+  #tear.split .slash { animation:slashFade .42s ease-out forwards; }
+  #tear.split .rift { animation:riftFade .5s ease-out forwards; }
   body.enter { overflow-x:hidden; }
-  body.enter #opts   { animation:inL .6s .45s cubic-bezier(.2,.8,.2,1) both; }
-  body.enter #vals   { animation:inL .6s .6s  cubic-bezier(.2,.8,.2,1) both; }
-  body.enter #eggs   { animation:inL .6s .75s cubic-bezier(.2,.8,.2,1) both; }
-  body.enter #feedPanel { animation:inU .6s .9s cubic-bezier(.2,.8,.2,1) both; }
-  body.enter #right  { animation:inR .6s .6s  cubic-bezier(.2,.8,.2,1) both; }
-  @keyframes welIn { from { opacity:0; letter-spacing:.5em; } to { opacity:1; letter-spacing:.12em; } }
+  body.enter #opts   { animation:inL .6s .35s cubic-bezier(.2,.8,.2,1) both; }
+  body.enter #vals   { animation:inL .6s .5s  cubic-bezier(.2,.8,.2,1) both; }
+  body.enter #eggs   { animation:inL .6s .65s cubic-bezier(.2,.8,.2,1) both; }
+  body.enter #feedPanel { animation:inU .6s .8s cubic-bezier(.2,.8,.2,1) both; }
+  body.enter #right  { animation:inR .6s .5s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes welIn { from { opacity:0; letter-spacing:.55em; filter:blur(5px); } to { opacity:1; letter-spacing:.16em; filter:blur(0); } }
   @keyframes brL { from { opacity:0; transform:translate(-1em,.8em); } to { opacity:1; transform:none; } }
   @keyframes brR { from { opacity:0; transform:translate(1em,-.8em); } to { opacity:1; transform:none; } }
-  @keyframes welZoom { from { transform:scale(1); } to { transform:scale(26); } }
-  @keyframes tearFlood { from { opacity:0; } to { opacity:1; } }
-  @keyframes tearL { from { transform:none; } to { transform:translateX(-105%) rotate(-3deg); } }
-  @keyframes tearR { from { transform:none; } to { transform:translateX(105%) rotate(3deg); } }
+  @keyframes raidenSlash { 0% { opacity:0; transform:translateY(-50%) rotate(-25deg) scaleX(0); } 20% { opacity:1; } 65% { opacity:1; transform:translateY(-50%) rotate(-25deg) scaleX(1); } 100% { opacity:0; transform:translateY(-50%) rotate(-25deg) scaleX(1.04); } }
+  @keyframes riftFlash { 0% { opacity:0; } 20% { opacity:1; } 100% { opacity:.8; } }
+  @keyframes spaceFlash { 0%,100% { filter:brightness(1); } 40% { filter:brightness(2.3); } }
+  @keyframes slashFade { from { opacity:.95; } to { opacity:0; } }
+  @keyframes riftFade { from { opacity:.8; } to { opacity:0; } }
+  @keyframes tearL { 0% { transform:none; opacity:1; } 45% { opacity:.92; } 100% { transform:translate(-105%,-3%) rotate(-2deg); opacity:0; } }
+  @keyframes tearR { 0% { transform:none; opacity:1; } 45% { opacity:.92; } 100% { transform:translate(105%,3%) rotate(2deg); opacity:0; } }
   @keyframes inL { from { opacity:0; transform:translateX(-60px); } to { opacity:1; transform:none; } }
   @keyframes inR { from { opacity:0; transform:translateX(60px); } to { opacity:1; transform:none; } }
   @keyframes inU { from { opacity:0; transform:translateY(40px); } to { opacity:1; transform:none; } }
@@ -449,10 +480,17 @@
   <label class="never"><input type="checkbox" id="never"> Never remind again</label>
 </dialog>
 
+<div id="wallImpact" aria-hidden="true">
+  <div class="piece left"></div><div class="piece right"></div>
+  <div class="cracks"></div><div class="dust"></div>
+</div>
+
 <div id="tear" hidden>
   <div class="half w"><div class="scene"><div class="wel"><span>Welcome</span></div></div></div>
   <div class="half l"><div class="scene"><div class="wel"><span>Welcome</span></div></div></div>
   <div class="half r"><div class="scene"><div class="wel"><span>Welcome</span></div></div></div>
+  <div class="rift"></div>
+  <div class="slash"></div>
 </div>
 
 <script>
@@ -2204,8 +2242,9 @@
   // torn edge: both halves are full screen and clipped along the same jagged line, so the image stays in one piece
   (function () {
     var L = document.querySelector("#tear .l"), R = document.querySelector("#tear .r");
-    var xs = [97, 94, 99, 95, 100, 93, 98, 94, 99, 95, 97, 93, 100, 96, 94, 99, 95], n = xs.length - 1, pts = [];
-    xs.forEach(function (x, i) { pts.push((x * 0.52).toFixed(2) + "% " + (i * 100 / n) + "%"); });
+    // Jagged diagonal cut: the rift travels from upper-right toward lower-left.
+    var xs = [78, 74, 77, 70, 73, 66, 69, 62, 64, 57, 60, 53, 56, 48, 51, 43, 46, 38, 41, 33, 36, 28, 31, 22], n = xs.length - 1, pts = [];
+    xs.forEach(function (x, i) { pts.push(x.toFixed(2) + "% " + (i * 100 / n).toFixed(2) + "%"); });
     L.style.clipPath = "polygon(0 0, " + pts.join(", ") + ", 0 100%)";
     R.style.clipPath = "polygon(" + pts.join(", ") + ", 100% 100%, 100% 0)";
     if (WELCOME_IMAGE) {
@@ -2215,23 +2254,43 @@
     }
   })();
 
-  // correct password typed: black screen, "Welcome" appears, zooms in hard, then the screen tears in half
+  // Correct password: keep the original Raiden-style slash, then animate the actual page wallpaper.
   function reveal() {
     var t = $("tear");
-    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { unlock(); return; }
-    // the wallpaper is only requested now, so it is loaded by the time the screen tears open
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { unlock(); document.body.classList.add("enter"); setTimeout(function () { document.body.classList.remove("enter"); }, 2200); return; }
     if (isImage(WALLPAPERS[1] || "")) { try { new Image().src = WALLPAPERS[1]; } catch (e) {} }
+    document.body.classList.add("impact-pending");
     t.hidden = false; t.className = "";
     void t.offsetWidth;
     t.className = "flood";
-    setTimeout(function () { t.className = "flood zoom"; }, 1600);
+    setTimeout(function () { t.classList.add("strike"); }, 950);
+    setTimeout(function () { unlock(); t.classList.add("split"); }, 1260);
     setTimeout(function () {
-      unlock();
+      t.hidden = true; t.className = "";
+      playWallpaperImpact();
+    }, 2650);
+  }
+  function playWallpaperImpact() {
+    var impact = $("wallImpact");
+    var wallpaper = getComputedStyle(document.body).getPropertyValue("--wall").trim();
+    if (!wallpaper || wallpaper === "none") {
+      document.body.classList.remove("impact-pending");
       document.body.classList.add("enter");
-      t.className = "flood zoom split";
-    }, 2600);
-    setTimeout(function () { t.hidden = true; t.className = ""; }, 4300);
-    setTimeout(function () { document.body.classList.remove("enter"); }, 5100);
+      setTimeout(function () { document.body.classList.remove("enter"); }, 2600);
+      return;
+    }
+    impact.style.setProperty("--impact-wall", wallpaper);
+    impact.classList.remove("active");
+    impact.style.display = "block";
+    void impact.offsetWidth;
+    impact.classList.add("active");
+    setTimeout(function () {
+      impact.classList.remove("active");
+      impact.style.display = "none";
+      document.body.classList.remove("impact-pending");
+      document.body.classList.add("enter");
+      setTimeout(function () { document.body.classList.remove("enter"); }, 2600);
+    }, 1100);
   }
   function shake() {
     var g = $("gate");
