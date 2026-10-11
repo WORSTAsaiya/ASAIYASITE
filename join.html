@@ -345,6 +345,130 @@
 #verifyPage.vgood { box-shadow:0 0 0 2px #43b581, 0 0 28px rgba(67,181,129,.5); }
 #verifyPage.vbad  { box-shadow:0 0 0 2px #ff7b72, 0 0 28px rgba(255,123,114,.45); }
 #vpOpen { padding:12px 22px; font-size:15px; }
+
+/* ================= LIFE: wiki, typing, calculator ================= */
+@keyframes lifeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes lifePop{from{opacity:0;transform:scale(.6) rotate(-6deg)}to{opacity:1;transform:none}}
+@keyframes lifeBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes lifeBlink{50%{opacity:0}}
+@keyframes lifePulse{50%{opacity:.85;transform:scale(1.15)}}
+@keyframes lifeHop{0%{transform:scale(.7,1.2) translateY(14px)}50%{transform:scale(1.1,.9) translateY(-14px)}100%{transform:none}}
+@keyframes lifeDrift{from{transform:translate(-4%,-3%) scale(1)}to{transform:translate(4%,3%) scale(1.15)}}
+@keyframes lifeShine{to{background-position:-200% 0}}
+@keyframes lifeSweep{0%{left:-60%}55%,100%{left:130%}}
+@keyframes lifeBump{40%{transform:scale(1.14)}}
+@keyframes lifePopOn{40%{transform:scale(1.12)}}
+@keyframes lifeWiggle{25%{transform:rotate(-8deg) scale(1.08)}75%{transform:rotate(8deg) scale(1.08)}}
+@keyframes lifeGlow{50%{box-shadow:0 0 0 2px var(--c),0 0 18px var(--c)}}
+
+/* wiki search */
+.wk-bar{position:sticky;top:0;z-index:3;background:#1e1f22;padding:2px 0 8px;margin-bottom:4px}
+.wk-search{width:100%;box-sizing:border-box;padding:9px 12px;background:#2b2d31;color:#f2f3f5;border:1px solid #4e5058;border-radius:8px;font-size:13px;transition:box-shadow .2s,border-color .2s}
+.wk-search:focus{outline:0;border-color:#3498db;box-shadow:0 0 0 3px rgba(52,152,219,.3),0 0 16px rgba(52,152,219,.35)}
+.wk-count{font-size:11px;color:#b5bac1;margin-top:5px;min-height:14px}
+.wk-none{text-align:center;color:#b5bac1;font-size:13px;padding:24px 8px;animation:lifeUp .4s both}
+.vhint{animation:lifeBob 3.2s ease-in-out infinite}
+
+/* egg detail: pressed -> stats -> description -> typing */
+.vdet .vname{animation:lifeUp .5s .05s both}
+.vdet .vrar{animation:lifeUp .5s .12s both}
+.vdet .vimg{animation:lifePop .55s .1s cubic-bezier(.3,1.5,.5,1) both,lifeBob 3.2s .7s ease-in-out infinite}
+.vdet .st{animation:lifeUp .5s .3s both}
+.vdet .sgrid>div{animation:lifeUp .4s both}
+.vdet .ds{animation:lifeUp .5s .85s both}
+.sec .sbody.typing::after{content:"";display:inline-block;width:2px;height:1em;margin-left:2px;background:#5fa8ff;vertical-align:text-bottom;animation:lifeBlink .8s steps(1) infinite}
+.ds .sbody{cursor:pointer}
+
+/* calculator */
+#calcPage{position:relative}
+#calcPage::before{content:"";position:absolute;inset:-30%;z-index:0;pointer-events:none;background:radial-gradient(circle at 20% 30%,rgba(58,166,232,.16),transparent 40%),radial-gradient(circle at 80% 70%,rgba(46,224,106,.12),transparent 40%);animation:lifeDrift 14s ease-in-out infinite alternate}
+#calcPage>*{position:relative;z-index:1}
+.cc-title{background-size:200% 100%;background-image:linear-gradient(100deg,#2d9be0 0%,#1b6fb0 35%,#4cc3ff 50%,#1b6fb0 65%,#2d9be0 100%);animation:lifeShine 6s linear infinite}
+.cc-search{transition:box-shadow .2s}
+.cc-search:focus{box-shadow:0 0 14px rgba(58,166,232,.5)}
+.cc-tab{transition:transform .15s,box-shadow .2s,border-color .2s}
+.cc-tab:hover{transform:translateY(-2px)}
+.cc-tile{animation:lifePop .4s cubic-bezier(.3,1.4,.5,1) backwards;transition:transform .18s,box-shadow .2s}
+.cc-tile:hover{transform:translateY(-3px) scale(1.06);box-shadow:0 6px 16px color-mix(in srgb,var(--c) 70%,transparent)}
+.cc-tile:hover img{animation:lifeWiggle .5s}
+.cc-tile.sel{animation:lifeGlow 1.8s ease-in-out infinite}
+.cc-prev{position:relative;overflow:hidden;--c:#3aa6e8}
+.cc-prev::before{content:"";position:absolute;left:50%;top:38%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;background:radial-gradient(circle,var(--c),transparent 68%);opacity:.5;animation:lifePulse 2.4s ease-in-out infinite}
+.cc-prev>*{position:relative}
+.cc-prev img{filter:drop-shadow(0 6px 8px rgba(0,0,0,.45));animation:lifeHop .6s cubic-bezier(.3,1.6,.5,1),lifeBob 3s .6s ease-in-out infinite}
+.cc-prev b,.cc-prev .r,.cc-prev .m{animation:lifeUp .45s both}
+.cc-field.bad{border-color:#ff7b72;box-shadow:0 0 8px rgba(255,123,114,.5)}
+.cc-chip{transition:transform .15s,background .2s,border-color .2s,box-shadow .2s}
+.cc-chip:hover{transform:translateY(-2px)}
+.cc-chip:active{transform:scale(.93)}
+.cc-chip.on{animation:lifePopOn .35s cubic-bezier(.3,1.7,.5,1);box-shadow:0 0 10px rgba(46,224,106,.4)}
+.cc-chip.gold.on{box-shadow:0 0 12px rgba(241,196,15,.55)}
+.cc-final{position:relative;overflow:hidden}
+.cc-final::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);animation:lifeSweep 3.8s ease-in-out infinite}
+.cc-final b{display:inline-block}
+.cc-final b.bump{animation:lifeBump .35s cubic-bezier(.3,1.6,.5,1)}
+.cc-break:not([hidden]){animation:lifeUp .3s both}
+.cc-btns button{transition:transform .15s,filter .15s,background .2s}
+.cc-btns button:hover{transform:translateY(-2px);filter:brightness(1.12)}
+.cc-btns button:active{transform:scale(.96)}
+.cc-btns button.saved{background:#2ee06a;animation:lifeBump .4s}
+.hitem{animation:lifeUp .4s both;transition:transform .15s}
+.hitem:hover{transform:translateX(4px)}
+@media (prefers-reduced-motion:reduce){
+  #calcPage::before,.cc-title,.cc-final::after,.cc-prev::before,.cc-prev *,.cc-tile,.cc-chip,.cc-break,.hitem,.vdet *,.vhint,.wk-none{animation:none !important}
+}
+
+/* ===== Calculator: full page, no box, glowing numbers ===== */
+#calcBg{position:fixed;inset:0;z-index:-1;background:#050b16 center/cover no-repeat}
+#calcBg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s}
+#calcBg video.on{opacity:1}
+#calcBg::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(5,11,22,.5),rgba(5,11,22,.72))}
+#calcPage{max-width:1500px;background:transparent;border:0;overflow:visible;padding:0}
+#calcPage::before{display:none}
+.cc-title{background-image:none;animation:none;background:none;text-align:center;font-size:30px;padding:6px 18px 2px;text-shadow:0 0 10px #4cc3ff,0 0 26px #2d9be0,0 0 50px rgba(45,155,224,.7)}
+.cc-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));max-height:calc(100vh - 300px);min-height:420px;background:rgba(8,14,26,.55);backdrop-filter:blur(6px)}
+.cc-box{background:rgba(7,20,13,.62);backdrop-filter:blur(8px)}
+.cc-prev{padding:22px 14px;background:linear-gradient(rgba(14,106,140,.55),rgba(10,58,85,.55));backdrop-filter:blur(6px)}
+.cc-prev img{width:190px;height:190px}
+.cc-prev::before{width:270px;height:270px;margin:-135px 0 0 -135px;top:42%}
+.cc-prev b{font-size:26px}
+.cc-prev .m{font-size:20px;text-shadow:0 0 8px currentColor,0 0 22px currentColor}
+.cc-hist{padding-top:4px}
+.hitem{background:rgba(10,17,29,.68)}
+@media (min-width:761px){.cc-main{grid-template-columns:minmax(0,1fr) 420px}}
+/* glowing numbers */
+.cc-final b{text-shadow:0 0 10px rgba(255,255,255,.95),0 0 28px rgba(46,224,106,.95)}
+.cc-final{box-shadow:0 0 14px rgba(46,224,106,.45);animation:lifeAura 2.6s ease-in-out infinite}
+@keyframes lifeAura{50%{box-shadow:0 0 34px rgba(46,224,106,.8)}}
+.cc-field{text-shadow:0 0 8px rgba(120,200,255,.9),0 0 18px rgba(58,166,232,.7)}
+.cc-chip small{text-shadow:0 0 6px currentColor;opacity:.85}
+.hitem .hval{text-shadow:0 0 8px currentColor,0 0 18px currentColor}
+@media (prefers-reduced-motion:reduce){.cc-final{animation:none !important}}
+
+/* ===== Calculator: bigger text ===== */
+.cc-title{font-size:42px}
+.cc-search{font-size:17px;padding:13px 14px}
+.cc-tab{font-size:15px;padding:7px 15px}
+.cc-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.cc-tile span{font-size:14px;line-height:1.15;top:6px}
+.cc-tile img{inset:27% 8% 6%;height:67%}
+.cc-lbl{font-size:14px;margin:14px 0 7px}
+.cc-field{font-size:26px;padding:10px}
+.cc-chip{font-size:16px;padding:10px 4px}
+.cc-chip small{font-size:13px}
+.cc-prev b{font-size:34px}
+.cc-prev .r{font-size:17px}
+.cc-prev .m{font-size:27px}
+.cc-final small{font-size:13px}
+.cc-final b{font-size:40px}
+.cc-link{font-size:15px}
+.cc-break{font-size:15px}
+.cc-btns button{font-size:16px;padding:12px}
+.cc-hist h3{font-size:15px}
+.hitem{font-size:15px}
+.hitem .hval{font-size:20px}
+.hitem .hmeta{font-size:14px}
+.hempty,.cc-none{font-size:16px}
 </style>
 </head>
 <body>
@@ -361,7 +485,7 @@
   <label for="pgSel">Pages</label>
   <select id="pgSel">
     <option value="1">Egg Notifiers</option>
-    <option value="2">Egg Values</option>
+    <option value="2">Egg Wiki</option>
     <option value="3">Egg Calculator</option>
     <option value="4">Join</option>
   </select>
@@ -457,6 +581,7 @@
 
 </aside>
 
+<div id="calcBg" hidden><video muted loop autoplay playsinline preload="auto"></video></div>
 <!-- Page: Egg Calculator -->
 <section class="panel" id="calcPage" hidden>
   <h2 class="cc-title">Value Calculator</h2>
@@ -495,8 +620,10 @@
   <div id="valDetailBody"><div class="vhint">Press an egg to see its details here.</div></div>
 </section>
 <section class="panel" id="valuesPage" hidden>
-  <h2>Egg / Pet History</h2>
+  <h2>Egg / Pet Wiki</h2>
+  <div class="wk-bar"><input class="wk-search" id="wkSearch" type="search" placeholder="Search Egg/Pet..." autocomplete="off" spellcheck="false"><div class="wk-count" id="wkCount"></div></div>
   <div id="valIslands"></div>
+  <div class="wk-none" id="wkNone" hidden>No egg or pet found.</div>
 </section>
 
 <div class="card" id="verifyPage" hidden>
@@ -545,10 +672,28 @@
   // Wallpaper for each channel. Replace the placeholder text with an image link,
   // or with the file name of an image you uploaded next to join.html (for example "bg2.png").
   var WALLPAPERS = {
-    1: "https://github.com/WORSTAsaiya/ASAIYASITE/blob/main/WORST.png?raw=true",
+    1: "https://cdn.jsdelivr.net/gh/WORSTAsaiya/ASAIYASITE@main/calc-pc.mp4",
     2: "https://media1.tenor.com/m/7zgRvAcRNv0AAAAd/mihoyo-genshin.gif",
     3: "Channel 3 image"
   };
+
+  // Egg Calculator background: PC only (phones keep the normal wallpaper). Image shows first, the video fades in over it.
+  var CALC_BG_IMG   = "https://cdn.jsdelivr.net/gh/WORSTAsaiya/ASAIYASITE@main/calc-pc.jpg";
+  var CALC_BG_VIDEO = "https://cdn.jsdelivr.net/gh/WORSTAsaiya/ASAIYASITE@main/calc-pc.mp4";
+  function calcBgShow(on) {
+    var bg = $("calcBg"), v = bg.querySelector("video");
+    var pc = window.matchMedia && matchMedia("(hover:hover) and (pointer:fine) and (min-width:761px)").matches;
+    bg.hidden = !(on && pc);
+    if (!on || !pc) { v.pause(); return; }
+    if (!bg.style.backgroundImage) bg.style.backgroundImage = 'url("' + CALC_BG_IMG + '")';
+    if (reduced()) return;                      // reduced motion: still image only
+    if (!v.getAttribute("src")) {
+      v.muted = true;
+      v.addEventListener("playing", function () { v.classList.add("on"); });
+      v.src = CALC_BG_VIDEO;
+    }
+    var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+  }
   function $(id) { return document.getElementById(id); }
 
   // ---------- EGG IMAGES ----------
@@ -1486,6 +1631,22 @@
   }
   function histSave(a) { try { localStorage.setItem(CALC_HIST_KEY, JSON.stringify(a)); } catch (e) {} }
 /* ============ BLOCK 3: JS (paste after calcMoney) ============ */
+var calcShown = 0, calcRaf = 0, calcSb = 0;
+// the number rolls up/down to the new value instead of snapping
+function calcShowFinal(v) {
+  var out = $("ccFinal");
+  cancelAnimationFrame(calcRaf);
+  if (v === null) { out.textContent = "-"; calcShown = 0; return; }
+  if (reduced() || calcShown === v) { out.textContent = calcMoney(v); calcShown = v; return; }
+  var from = calcShown, t0 = performance.now();
+  out.classList.remove("bump"); void out.offsetWidth; out.classList.add("bump");
+  (function step(now) {
+    var k = Math.min(1, (now - t0) / 550), cur = from + (v - from) * (1 - Math.pow(1 - k, 3));
+    out.textContent = calcMoney(k < 1 ? cur : v);
+    calcShown = k < 1 ? cur : v;
+    if (k < 1) calcRaf = requestAnimationFrame(step);
+  })(t0);
+}
 var calcPicked = {}, calcSel = -1, calcTier = "All", calcQuery = "", calcPass = false, calcLast = null;
 var CALC_VARIANTS = ["Silver", "Golden", "Rainbow"];
 
@@ -1520,7 +1681,8 @@ function calcCompute() {
 function calcUpdate() {
   var r = calcCompute(), out = $("ccFinal"), br = $("ccBreak");
   calcLast = r && !r.bad ? r : null;
-  out.textContent = calcLast ? calcMoney(r.final) : "-";
+  $("calcKg").classList.toggle("bad", !!(r && r.bad));
+  calcShowFinal(calcLast ? r.final : null);
   br.textContent = "";
   if (!r) return;
   if (r.bad) { br.appendChild(line("div", "Type a weight in Kg.", "warn")); return; }
@@ -1536,6 +1698,7 @@ function calcShowEgg() {
   p.textContent = "";
   if (!egg) return;
   var col = CALC_COLORS[egg[1]];
+  p.style.setProperty("--c", col);
   var src = eggImg(egg[0]);
   if (src) { var im = document.createElement("img"); im.alt = ""; im.referrerPolicy = "no-referrer"; im.onerror = function () { im.remove(); }; im.src = src; p.appendChild(im); }
   p.appendChild(line("b", egg[0]));
@@ -1562,11 +1725,12 @@ function calcRenderGrid() {
     return rank.indexOf(B[1]) - rank.indexOf(A[1]) || B[2] - A[2];
   });
   if (!idx.length) { box.appendChild(line("div", "No eggs found.", "cc-none")); return; }
-  idx.forEach(function (i) {
+  idx.forEach(function (i, n) {
     var e = CALC_EGGS[i], b = document.createElement("button");
     b.type = "button"; b.className = "cc-tile" + (i === calcSel ? " sel" : "");
     b.style.setProperty("--c", CALC_COLORS[e[1]]);
     b.dataset.i = i;
+    b.style.animationDelay = Math.min(n * 16, 420) + "ms";
     b.appendChild(line("span", e[0]));
     var u = eggImg(e[0]);
     if (u) { var im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer"; im.onerror = function () { im.remove(); }; im.src = u; b.appendChild(im); }
@@ -1605,6 +1769,9 @@ function calcSave() {
   if (a.length > 100) a.length = 100;
   histSave(a);
   renderHistory();
+  var sb = $("calcBtn"); sb.classList.remove("saved"); void sb.offsetWidth; sb.classList.add("saved"); sb.textContent = "Saved!";
+  clearTimeout(calcSb);
+  calcSb = setTimeout(function () { sb.classList.remove("saved"); sb.textContent = "Save to history"; }, 1200);
 }
 function renderHistory() {
   var box = $("calcHist"), a = histLoad();
@@ -1614,6 +1781,7 @@ function renderHistory() {
   a.forEach(function (h) {
     var d = document.createElement("div");
     d.className = "hitem";
+    d.style.animationDelay = Math.min(box.children.length * 40, 400) + "ms";
     d.style.setProperty("--acc", CALC_COLORS[h.rarity] || "#3498db");
     d.appendChild(line("b", h.egg + " (" + h.rarity + ")"));
     d.appendChild(line("div", calcMoney(h.value), "hval"));
@@ -2200,6 +2368,27 @@ document.addEventListener("DOMContentLoaded", function () {
     var byName = {};
     CALC_EGGS.forEach(function (e) { byName[e[0]] = e; });
     var root = $("valIslands"), det = $("valDetailBody"), selBtn = null;
+    var typeId = 0, typeTimer = 0, typeRaf = 0, groups = [];
+
+    // Description types itself out at 20 letters per second. Click it to skip.
+    function typeText(el, text) {
+      var id = ++typeId;
+      clearTimeout(typeTimer); cancelAnimationFrame(typeRaf);
+      if (!text) { el.textContent = "No description yet."; el.style.fontStyle = "italic"; return; }
+      if (reduced()) { el.textContent = text; return; }
+      var node = document.createTextNode(""), t0 = 0, shown = 0;
+      el.appendChild(node); el.classList.add("typing");
+      el.onclick = function () { if (id === typeId) { cancelAnimationFrame(typeRaf); node.nodeValue = text; el.classList.remove("typing"); } };
+      typeTimer = setTimeout(function () {       // waits until the Description box has appeared
+        t0 = performance.now();
+        (function tick(now) {
+          if (id !== typeId) return;
+          var n = Math.min(text.length, Math.floor((now - t0) * 20 / 1000) + 1);
+          if (n !== shown) { shown = n; node.nodeValue = text.slice(0, n); }
+          if (n < text.length) typeRaf = requestAnimationFrame(tick); else el.classList.remove("typing");
+        })(t0);
+      }, 1200);
+    }
 
     function statBox(key, valueText, color) {
       var d = document.createElement("div");
@@ -2243,9 +2432,6 @@ document.addEventListener("DOMContentLoaded", function () {
       } else box.textContent = "No image yet";
       w.appendChild(box);
 
-      // Description (you write it in EGG_INFO)
-      w.appendChild(section("Description", document.createTextNode(info.desc || "")));
-
       // Stats
       var biome = /^Rift:/.test(island) ? "The Rift" : island;
       var grow = typeof info.grow === "number" ? info.grow : (e ? GROW_BY_RARITY[e[1]] : null);
@@ -2255,7 +2441,13 @@ document.addEventListener("DOMContentLoaded", function () {
       grid.appendChild(statBox("Biome", biome, "#f0932b"));
       grid.appendChild(statBox("MPS", e ? "$" + compact(e[2]) + "/s" : "Unknown"));  
       grid.appendChild(statBox("Grow Time", fmtTime(grow)));
-      w.appendChild(section("Stats", grid));
+      var st = section("Stats", grid); st.classList.add("st"); w.appendChild(st);
+      Array.prototype.forEach.call(grid.children, function (c, i) { c.style.animationDelay = (0.45 + i * 0.1) + "s"; });
+
+      // Description comes after the stats; its text is typed in (Description is last, so nothing jumps while it grows)
+      var ds = section("Description", document.createTextNode(""));
+      ds.classList.add("ds"); w.appendChild(ds);
+      typeText(ds.querySelector(".sbody"), info.desc || "");
 
       det.appendChild(w);
     }
@@ -2271,7 +2463,10 @@ document.addEventListener("DOMContentLoaded", function () {
       d.open = true;                       // shown right away, click the title to hide
       var s = document.createElement("summary");
       s.appendChild(line("span", isl[0]));
-      s.appendChild(line("span", names.length + " eggs", "cnt"));
+      var cntEl = line("span", names.length + " eggs", "cnt");
+      s.appendChild(cntEl);
+      var group = { d: d, cnt: cntEl, title: isl[0], btns: [] };
+      groups.push(group);
       d.appendChild(s);
 
       names.forEach(function (name, i) {
@@ -2294,15 +2489,49 @@ document.addEventListener("DOMContentLoaded", function () {
           showEgg(name, isl[0], e);
         });
         d.appendChild(b);
+        group.btns.push({ b: b, name: name, rar: e ? e[1] : "" });
       });
       root.appendChild(d);
+    });
+
+    // ---- Search Egg/Pet: matches the name, the biome or the rarity ----
+    var wkIn = $("wkSearch"), wkCount = $("wkCount"), wkNone = $("wkNone");
+    function wkFilter() {
+      var q = norm(wkIn.value), hits = 0, n = 0;
+      groups.forEach(function (g) {
+        var gm = q && norm(g.title).indexOf(q) >= 0, c = 0;
+        g.btns.forEach(function (x) {
+          var ok = !q || gm || norm(x.name).indexOf(q) >= 0 || norm(x.rar).indexOf(q) >= 0;
+          x.b.hidden = !ok;
+          if (!ok) return;
+          c++;
+          if (q && !reduced()) {
+            x.b.style.animation = "none"; void x.b.offsetWidth;
+            x.b.style.animation = "slideInR .35s cubic-bezier(.2,.8,.2,1) " + Math.min(n++ * 25, 400) + "ms backwards";
+          }
+        });
+        g.d.hidden = !c;
+        if (q && c) g.d.open = true;
+        g.cnt.textContent = (q ? c + " / " : "") + g.btns.length + " eggs";
+        hits += c;
+      });
+      wkNone.hidden = !q || hits > 0;
+      wkCount.textContent = q ? hits + " found" : "";
+    }
+    wkIn.addEventListener("input", wkFilter);
+    wkIn.addEventListener("keydown", function (ev) {   // Enter opens the first result
+      if (ev.key !== "Enter") return;
+      var f = root.querySelector(".vegg:not([hidden])");
+      if (f) { f.click(); f.scrollIntoView({ block: "nearest" }); }
     });
   })();
 
   // ---------- channel wallpapers ----------
   function isImage(v) { return /^https?:\/\//i.test(v) || /\.(png|jpe?g|gif|webp|avif|svg)$/i.test(v); }
+  function isVideo(v) { return /\.(mp4|webm)(\?|$)/i.test(v); }
   function setWallpaper(n) {
     var v = WALLPAPERS[n] || "";
+    if (isVideo(v)) v = CALC_BG_IMG;   // PC plays the video in #calcBg; phones get the still image
     // Egg Notifiers before the password: plain brown, and the wallpaper is not even requested
     var locked = n === 1 && +$("pgSel").value === 1 && !unlocked;
     var ok = isImage(v) && !locked;
@@ -2314,7 +2543,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ---------- channels and pages ----------
   var PAGES = {
-    1: [[1, "Egg Notifiers"], [2, "Egg Values"], [3, "Egg Calculator"], [4, "Join"]],
+    1: [[1, "Egg Notifiers"], [2, "Egg Wiki"], [3, "Egg Calculator"], [4, "Join"]],
     2: [[1, "Verification", "verification"], [2, "Roles", "roles"], [3, "Server Stuff", "server-stuff"]],
     3: []
   };
@@ -2342,6 +2571,7 @@ document.addEventListener("DOMContentLoaded", function () {
     $("valDetail").hidden = !(live && pg === 2);
     $("valuesPage").hidden = !(live && pg === 2);
     $("calcPage").hidden = !(live && pg === 3);
+    calcBgShow(live && (pg >= 2 || unlocked));   // Wiki, Calculator, Join share ONE video that keeps playing when you switch between them; not on Egg Notifiers
     $("blank").hidden = live || ch === 2;
     $("verifyPage").hidden = !(ch === 2 && pg === 1);
     $("soonPage").hidden = !(ch === 2 && pg >= 2);
