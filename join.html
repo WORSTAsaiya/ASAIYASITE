@@ -632,7 +632,7 @@
   <p id="vpServer"></p>
   <a id="vpLogin" class="btn" href="#">Login with Discord</a>
   <a id="vpOpen" class="btn discord" href="https://discord.com/channels/@me" target="_blank" rel="noopener noreferrer" hidden>Open Discord</a>
-  <small class="note">THIS IS TO VERIFY YOU ARE A REAL PERSON.</small>
+  <small class="note">To block ban evasion we store a hashed copy of your IP address.</small>
 </div>
 <div class="card" id="soonPage" hidden>
   <h1 id="soonTitle">Coming soon</h1>
@@ -661,6 +661,684 @@
   <div class="slash"></div>
 </div>
 
+<script>
+/* guest.js - guest layout (password keys) + owner "Manage passwords" panel.
+   Put this file next to join.html and load it BEFORE the main <script> (see the edits list). */
+var LAYOUT = "";                       // "", "owner" or "guest" (set by checkAuth after login)
+var guestStart, guestStop, layoutHook; // filled in below
+
+(function () {
+  "use strict";
+  var W = window;
+  function $(id) { return document.getElementById(id); }
+  function mk(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  // ---------------- look of each alert (same as the Discord embeds) ----------------
+  var META = {
+    Secret:  { color: "#E74C3C", icon: "\uD83D\uDD2E", title: "SECRET EGG SPAWNED",  tag: "A Hidden Egg has appeared!" },
+    Eternal: { color: "#9B59B6", icon: "\u267E\uFE0F", title: "ETERNAL EGG SPAWNED", tag: "An Immortal Egg has awakened!" },
+    Divine:  { color: "#F1C40F", icon: "\u2728",       title: "DIVINE EGG SPAWNED",  tag: "A Heavenly Egg has descended!" }
+  };
+  var EVENTS = {
+    butterfly: { color: "#FF69B4", icon: "\uD83E\uDD8B", title: "BUTTERFLY BLOOM ACTIVE", tag: "A swarm of butterflies roam the servers", name: "Butterfly Bloom", status: "Active" },
+    race:      { color: "#23A55A", icon: "\uD83C\uDFC1", title: "RACING EVENT TIME",      tag: "The race is open, jump in!",             name: "Racing",          status: "Race Open" }
+  };
+  var BASE_CHIPS = [
+    ["tier:Secret", "Secret"], ["tier:Eternal", "Eternal"], ["tier:Divine", "Divine"],
+    ["event:butterfly", "Butterfly Bloom"], ["event:race", "Racing"]
+  ];
+  // every egg the rare egg script can alert for: [name, rarity]
+  var GEGGS = [
+    ["RazorFang", "Secret"], ["Gargoyle", "Secret"], ["Centaur", "Secret"], ["Pure Jellyfish", "Secret"], ["Mutant Shark", "Secret"],
+    ["Cosmic Skeleton", "Secret"], ["Cosmic Dragon", "Secret"], ["Cerberus", "Secret"], ["Kraken", "Secret"], ["Yeti", "Secret"],
+    ["Tralaledon", "Secret"], ["T-Rex", "Secret"], ["Stag", "Secret"], ["Starry Fox", "Secret"], ["King Snake", "Secret"],
+    ["Skeleton Horse", "Eternal"], ["Pegasus", "Eternal"], ["Oni Tiger", "Eternal"], ["Gorilla King", "Eternal"], ["Ice Dragon", "Eternal"],
+    ["Mosasaurus", "Eternal"], ["El Maja", "Eternal"], ["Phoenix", "Eternal"], ["Lava Dragon", "Eternal"],
+    ["Eternal Lunar Dragon", "Eternal"], ["Celestial Sunlion", "Eternal"],
+    ["World Burner", "Divine"], ["ArchAngel", "Divine"], ["Nightflame", "Divine"], ["Kitsune", "Divine"], ["Unicorn", "Divine"], ["Royal Skywhale", "Divine"]
+  ];
+
+  function keyOf(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "").replace(/egg$/, ""); }
+  var DISP = {};
+  GEGGS.forEach(function (e) { DISP[keyOf(e[0])] = e[0]; });
+
+  function selLabel(s) {
+    if (s === "all") return "Everything";
+    var i = s.indexOf(":"), k = s.slice(0, i), v = s.slice(i + 1);
+    if (k === "tier") return v;
+    if (k === "event") return v === "race" ? "Racing" : "Butterfly Bloom";
+    return DISP[v] || v;
+  }
+  function selMatch(s, a) {
+    if (s === "all") return true;
+    var i = s.indexOf(":"), k = s.slice(0, i), v = s.slice(i + 1);
+    if (k === "tier") return a.type === "egg" && a.rarity === v;
+    if (k === "event") return a.type === v;
+    if (k === "egg") return a.type === "egg" && keyOf(a.egg) === v;
+    return false;
+  }
+
+  // ---------------- styles ----------------
+  var css = [
+    "#guestWrap{grid-column:1 / -1;display:grid;grid-template-columns:340px minmax(0,560px) 300px;justify-content:center;gap:14px;align-items:start;width:100%;max-width:1300px;justify-self:center;align-self:start;margin-top:8px;position:relative;z-index:5}",
+    "#guestWrap .panel{margin-top:0}",
+    "@media (max-width:1200px){#guestWrap{grid-column:1}}",
+    "@media (max-width:1000px){#guestWrap{grid-template-columns:minmax(0,1fr)}}",
+    "body.enter #gLeft{animation:inL .6s .35s cubic-bezier(.2,.8,.2,1) both}",
+    "body.enter #gMid{animation:inU .6s .5s cubic-bezier(.2,.8,.2,1) both}",
+    "body.enter #gRight{animation:inR .6s .65s cubic-bezier(.2,.8,.2,1) both}",
+    "#gLeft{display:flex;flex-direction:column;gap:12px;min-width:0;position:relative;z-index:6}",
+    ".g-row{display:flex;gap:10px;align-items:flex-start}",
+    ".g-row details.panel{flex:1 1 0;min-width:0;box-sizing:border-box}",
+    "#gLeft details.panel > .drop{min-width:230px}",
+    "#gNotif > .drop{left:auto;right:0}",
+    ".gnrow{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}",
+    ".gnrow:last-child{margin-bottom:0}",
+    ".gnrow i{width:10px;height:10px;border-radius:50%;flex:none;margin-top:4px}",
+    ".gnrow b{display:block;font-size:13px}",
+    ".gnrow small{font-size:11px;color:#b5bac1}",
+    "#gCount{font-size:12px;color:#b5bac1;margin-bottom:8px}",
+    "#gFeed{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto}",
+    ".gcard{display:flex;background:#2b2d31;border-radius:8px;overflow:hidden}",
+    ".gbar{width:4px;flex:none}",
+    ".gbd{flex:1;min-width:0;padding:10px 12px}",
+    ".gtitle{font-size:13px;font-weight:700}",
+    ".gtag{font-size:12px;font-style:italic;color:#b5bac1;margin:2px 0 6px}",
+    ".gloc{font-size:12px;font-weight:700;margin-bottom:8px}",
+    ".ggrid{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px}",
+    ".ggrid div{font-size:11px;color:#b5bac1}",
+    ".ggrid b{display:block;font-size:12px;color:#f2f3f5;margin-top:2px}",
+    ".gvl{font-size:11px;color:#b5bac1;margin-bottom:3px}",
+    ".gval{background:#1e1f22;border:1px solid #3a3c42;border-radius:6px;padding:6px 10px;font-family:Consolas,monospace;font-size:12px}",
+    ".gth{width:64px;height:64px;border-radius:8px;background:#1e1f22;flex:none;margin:10px 10px 0 0;overflow:hidden}",
+    ".gth img{width:100%;height:100%;object-fit:contain;display:block}",
+    "#gForm h2{margin-bottom:10px}",
+    ".gslots{display:flex;gap:6px;margin-bottom:10px}",
+    ".gslot{flex:1;position:relative;padding:8px 4px;background:#2b2d31;color:#b5bac1;border:1px solid #4e5058;border-radius:8px;font-size:12px;cursor:pointer}",
+    ".gslot.sel{background:#3498db;border-color:#3498db;color:#fff}",
+    ".gslot.on::after{content:'';position:absolute;top:5px;right:6px;width:7px;height:7px;border-radius:50%;background:#43b581}",
+    ".g-in{width:100%;box-sizing:border-box;padding:10px 12px;background:#1e1f22;color:#f2f3f5;border:1px solid #4e5058;border-radius:8px;font-size:13px}",
+    ".g-in:focus{outline:2px solid #3498db;border-color:transparent}",
+    "#gEggBox{margin-top:8px}",
+    "#gEggGrid{max-height:150px;overflow-y:auto;margin-top:8px}",
+    ".grole{display:flex;gap:6px;margin-bottom:6px}",
+    ".grole input{flex:1 1 0;min-width:0}",
+    ".grole select{flex:1 1 0;min-width:0;padding:10px 8px;background:#1e1f22;color:#f2f3f5;border:1px solid #4e5058;border-radius:8px;font-size:13px}",
+    ".grole button{flex:none;width:34px;background:#4e5058;color:#fff;border:0;border-radius:8px;cursor:pointer}",
+    "#gStatus{margin-top:10px;font-size:12px;color:#7bd88f;min-height:16px;word-break:break-word}",
+    "#gStatus.bad{color:#ff7b72}",
+    "#gSaved h2 span{font-size:12px;color:#b5bac1;font-weight:400}",
+    ".gsv{background:#2b2d31;border-radius:8px;padding:10px 12px;margin-bottom:8px}",
+    ".gsv b{font-size:13px}",
+    ".gsv div{font-size:12px;color:#b5bac1;margin-top:4px;word-break:break-word}",
+    ".gsv .gbtns{display:flex;gap:6px;margin-top:10px}",
+    ".gsv .gbtns button{flex:1;padding:7px;border:0;border-radius:8px;font-weight:700;font-size:12px;color:#fff;background:#4e5058;cursor:pointer}",
+    ".gsv .gbtns .del{background:transparent;border:1px solid #ff7b72;color:#ff7b72}",
+    ".gsv .gbtns .del:hover{background:#ff7b72;color:#1e1f22}",
+    "#keysBtn{padding:8px 12px;background:#2b2d31;color:#f2f3f5;border:1px solid #4e5058;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}",
+    "#keysBtn:hover{background:#34363c}",
+    "#keysDlg{max-width:640px;width:94%;text-align:left;max-height:86vh;overflow-y:auto}",
+    "#keysDlg h3{margin:0 0 4px}",
+    "#keysDlg .ksub{font-size:12px;color:#b5bac1;margin:0 0 14px}",
+    ".kform{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}",
+    ".kform input{flex:1 1 150px;min-width:0}",
+    ".kform button{flex:none;padding:0 16px;min-height:38px;border:0;border-radius:8px;background:#3498db;color:#fff;font-weight:700;cursor:pointer}",
+    "#kReveal{background:#1d4a2c;border:1px solid #2ee06a;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:13px}",
+    "#kReveal code{display:block;margin:6px 0;padding:8px;background:#0a111d;border-radius:6px;font-size:15px;letter-spacing:.06em;word-break:break-all;color:#fff}",
+    "#kReveal small{display:block;color:#b5bac1;font-size:11px;margin-top:4px}",
+    "#kReveal button{padding:6px 12px;border:0;border-radius:6px;background:#3498db;color:#fff;font-weight:700;cursor:pointer;font-size:12px}",
+    "#kErr{font-size:12px;color:#ff7b72;min-height:16px;margin-bottom:6px}",
+    ".krow{background:#1e1f22;border-radius:8px;padding:10px 12px;margin-bottom:8px}",
+    ".krow b{font-size:14px}",
+    ".krow .kmeta{display:block;font-size:12px;color:#b5bac1;margin-top:2px}",
+    ".krow .kmeta.off{color:#ff7b72}",
+    ".krow .kbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}",
+    ".krow .kbtns button{padding:6px 10px;border:0;border-radius:6px;background:#4e5058;color:#fff;font-size:12px;font-weight:700;cursor:pointer}",
+    ".krow .kbtns .del{background:transparent;border:1px solid #ff7b72;color:#ff7b72}",
+    ".krow .kbtns .del:hover{background:#ff7b72;color:#1e1f22}",
+    "#kClose{margin-top:6px;padding:10px 18px;border:0;border-radius:8px;background:#4e5058;color:#fff;font-weight:700;cursor:pointer}"
+  ].join("\n");
+  var st = document.createElement("style");
+  st.textContent = css;
+  document.head.appendChild(st);
+
+  // ---------------- page skeleton (static, no user data inside) ----------------
+  var wrap = document.createElement("section");
+  wrap.id = "guestWrap";
+  wrap.hidden = true;
+  wrap.innerHTML =
+    '<div id="gLeft">' +
+      '<div class="g-row">' +
+        '<details class="panel" id="gOpts"><summary>Egg Options</summary><div class="drop"><p class="sub">Show these in the list</p><div class="chips" id="gViewChips"></div><div class="resetrow"><button class="reset" id="gViewReset" type="button">Show all</button></div></div></details>' +
+        '<details class="panel" id="gNotif"><summary><span>All Notifications <span id="gNotifCount">(5)</span></span></summary><div class="drop" id="gNotifList"></div></details>' +
+      '</div>' +
+      '<aside class="panel" id="gFeedPanel"><div id="gCount"></div><div id="gFeed"><div class="empty">Waiting for the first alert...</div></div></aside>' +
+    '</div>' +
+    '<div id="gMid"><section class="panel" id="gForm">' +
+      '<h2>Roles and Webhook</h2>' +
+      '<div class="gslots" id="gSlots"></div>' +
+      '<input class="g-in" id="gHook" type="text" placeholder="Webhook" autocomplete="off" spellcheck="false">' +
+      '<label class="pinglabel">Alerts to send to this webhook</label>' +
+      '<div class="chips" id="gAlertChips"></div>' +
+      '<button class="reset" id="gEggToggle" type="button">Pick specific eggs (0)</button>' +
+      '<div id="gEggBox" hidden><input class="g-in" id="gEggSearch" type="text" placeholder="Search eggs..." autocomplete="off" spellcheck="false"><div class="chips" id="gEggGrid"></div></div>' +
+      '<label class="pinglabel">Roles to ping: Role ID, then what it gets pinged for</label>' +
+      '<div id="gRoles"></div>' +
+      '<button class="reset" id="gRoleAdd" type="button">+ Add another role</button>' +
+      '<div class="hookbtns"><button id="gSave" class="save" type="button">Save</button><button id="gTest" class="ghostbtn" type="button">Test</button></div>' +
+      '<div id="gStatus"></div>' +
+      '<small class="note">Up to 3 webhooks. Each one has its own alerts and roles. A role is only pinged when an alert matches what you picked for it.</small>' +
+    '</section></div>' +
+    '<div id="gRight"><section class="panel" id="gSaved" hidden><h2>Saved Webhooks <span id="gSavedCount"></span></h2><div id="gSavedList"></div></section></div>';
+  document.body.appendChild(wrap);
+
+  // owner: button in the top bar + dialog
+  var keysBtn = mk("button", "", "Manage passwords");
+  keysBtn.id = "keysBtn"; keysBtn.type = "button"; keysBtn.hidden = true;
+  var nav = $("pages");
+  if (nav) nav.appendChild(keysBtn);
+
+  var dlg = document.createElement("dialog");
+  dlg.id = "keysDlg";
+  dlg.innerHTML =
+    '<h3>Manage passwords</h3>' +
+    '<p class="ksub">One password per person. Each one locks to the first network that uses it.</p>' +
+    '<div class="kform"><input class="g-in" id="kLabel" type="text" placeholder="Label, for example Voysae" maxlength="40" autocomplete="off"><input class="g-in" id="kPass" type="text" placeholder="Password (empty = generate one)" maxlength="64" autocomplete="off" spellcheck="false"><button id="kCreate" type="button">Create</button></div>' +
+    '<div id="kReveal" hidden></div><div id="kErr"></div><div id="kList"></div>' +
+    '<button id="kClose" type="button">Close</button>';
+  document.body.appendChild(dlg);
+
+  // ---------------- shared helpers ----------------
+  function nowMs() { return Date.now() + gOff; }
+  var gOff = 0;
+
+  function agoText(t) {
+    var s = Math.max(0, Math.floor((nowMs() - t) / 1000));
+    if (s < 60) return "just now";
+    var m = Math.floor(s / 60);
+    if (m < 60) return m + (m === 1 ? " minute ago" : " minutes ago");
+    var h = Math.floor(m / 60);
+    if (h < 24) return h + (h === 1 ? " hour ago" : " hours ago");
+    var d = Math.floor(h / 24);
+    return d + (d === 1 ? " day ago" : " days ago");
+  }
+
+  function kicked(text) {   // wrong or taken key: back to the password box with the server's message
+    if (typeof W.relock === "function") W.relock();
+    var e = $("pwErr");
+    if (e) e.textContent = text === "locked" ? "" : (text || "");
+  }
+
+  function post(path, body) {
+    return fetch(W.API + path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-pass": encodeURIComponent(W.passMem || "") },
+      body: JSON.stringify(body || {})
+    }).then(function (r) {
+      return r.text().then(function (t) {
+        if (r.status === 401 || (r.status === 403 && /not meant/i.test(t))) kicked(t);
+        return { ok: r.ok, status: r.status, t: t };
+      });
+    });
+  }
+  function parse(res, fallback) { try { return JSON.parse(res.t); } catch (e) { return fallback; } }
+
+  // ================= GUEST: last 100 alerts =================
+  var gItems = [], gView = {}, gSig = "", gBusy = false, gTimer = 0;
+  var feed = $("gFeed");
+
+  function viewPass(a) {
+    var keys = Object.keys(gView);
+    if (!keys.length) return true;
+    return keys.some(function (k) { return selMatch(k, a); });
+  }
+
+  function eggImgFor(a, display) {
+    if (typeof a.image === "string" && /^https:\/\//i.test(a.image)) return a.image;
+    try { var u = W.eggImg && W.eggImg(display); if (u) return u; } catch (e) {}
+    return "";
+  }
+
+  function card(a) {
+    var isEgg = a.type === "egg";
+    var m = isEgg ? (META[a.rarity] || { color: "#3498DB", icon: "\u2B50", title: "WATCHED EGG SPAWNED", tag: "An egg you are watching is out!" })
+                  : (EVENTS[a.type] || EVENTS.butterfly);
+    var c = mk("div", "gcard");
+    var bar = mk("div", "gbar"); bar.style.background = m.color;
+    var bd = mk("div", "gbd");
+    bd.appendChild(mk("div", "gtitle", m.icon + "  " + m.title + "  " + m.icon));
+    bd.appendChild(mk("div", "gtag", m.tag));
+    if (a.location) bd.appendChild(mk("div", "gloc", "\uD83D\uDCCD " + a.location));
+
+    var grid = mk("div", "ggrid");
+    function field(k, v, time) {
+      var d = document.createElement("div");
+      d.appendChild(document.createTextNode(k));
+      var b = mk("b", time ? "gt" : "", v);
+      if (time) b.dataset.t = a.t;
+      d.appendChild(b);
+      grid.appendChild(d);
+    }
+    var display = "";
+    if (isEgg) {
+      display = DISP[keyOf(a.egg)] || String(a.egg || "").replace(/ Egg$/i, "");
+      field("\uD83E\uDD5A Egg", display + " Egg");
+      field("\uD83D\uDC8E Rarity", a.rarity);
+    } else {
+      field("Event", m.name);
+      field("Status", a.status || m.status);
+    }
+    field("\u23F1\uFE0F Spotted", agoText(a.t), true);
+    bd.appendChild(grid);
+    if (isEgg && a.value && !/not set/i.test(a.value)) {
+      bd.appendChild(mk("div", "gvl", "\uD83D\uDCB0 EGG VALUE"));
+      bd.appendChild(mk("div", "gval", a.value));
+    }
+
+    c.appendChild(bar); c.appendChild(bd);
+    var src = isEgg ? eggImgFor(a, display) : (/^https:\/\//i.test(a.image || "") ? a.image : "");
+    if (src) {
+      var th = mk("div", "gth"), im = document.createElement("img");
+      im.alt = ""; im.referrerPolicy = "no-referrer";
+      im.onerror = function () { th.remove(); };
+      im.src = src;
+      th.appendChild(im); c.appendChild(th);
+    }
+    return c;
+  }
+
+  function renderFeed() {
+    var shown = gItems.filter(viewPass);
+    feed.textContent = "";
+    $("gCount").textContent = gItems.length ? "Showing " + shown.length + " of " + gItems.length : "";
+    if (!shown.length) {
+      feed.appendChild(mk("div", "empty", gItems.length ? "No alerts match your filters." : "Waiting for the first alert..."));
+      return;
+    }
+    shown.forEach(function (a) { feed.appendChild(card(a)); });
+  }
+
+  function gPoll() {
+    if (LAYOUT !== "guest" || !W.unlocked || gBusy) return;
+    gBusy = true;
+    fetch(W.API + "/alerts", { cache: "no-store", headers: { "x-pass": encodeURIComponent(W.passMem || "") } })
+      .then(function (r) {
+        if (r.status === 401 || r.status === 403) return r.text().then(function (t) { kicked(t); throw 0; });
+        return r.json();
+      })
+      .then(function (d) {
+        gOff = (d.now || Date.now()) - Date.now();
+        var items = Array.isArray(d.items) ? d.items : [];
+        var sig = items.map(function (a) { return a.type + a.t + a.egg; }).join(",");
+        if (sig !== gSig) { gSig = sig; gItems = items; renderFeed(); }
+      })
+      .catch(function () {})
+      .then(function () { gBusy = false; });
+  }
+  function sched() {
+    clearTimeout(gTimer);
+    if (document.hidden || LAYOUT !== "guest") return;
+    gTimer = setTimeout(function () { gPoll(); sched(); }, 10000);
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && LAYOUT === "guest" && !wrap.hidden) { gPoll(); sched(); }
+  });
+  setInterval(function () {
+    if (wrap.hidden) return;
+    Array.prototype.forEach.call(feed.querySelectorAll(".gt"), function (s) { s.textContent = agoText(+s.dataset.t); });
+  }, 5000);
+
+  // view filter (Egg Options) + notification list
+  (function () {
+    var box = $("gViewChips");
+    BASE_CHIPS.forEach(function (c) {
+      var b = mk("button", "chip", c[1]);
+      b.type = "button"; b.dataset.k = c[0];
+      box.appendChild(b);
+    });
+    box.addEventListener("click", function (e) {
+      var b = e.target.closest(".chip"); if (!b) return;
+      var k = b.dataset.k;
+      if (gView[k]) delete gView[k]; else gView[k] = true;
+      b.classList.toggle("on", !!gView[k]);
+      renderFeed();
+    });
+    $("gViewReset").addEventListener("click", function () {
+      gView = {};
+      Array.prototype.forEach.call(box.children, function (b) { b.classList.remove("on"); });
+      renderFeed();
+    });
+    var list = $("gNotifList");
+    var rows = [
+      ["#E74C3C", "Secret eggs", "A Hidden Egg has appeared"],
+      ["#9B59B6", "Eternal eggs", "An Immortal Egg has awakened"],
+      ["#F1C40F", "Divine eggs", "A Heavenly Egg has descended"],
+      ["#FF69B4", "Butterfly Bloom", "The event starts"],
+      ["#23A55A", "Racing event", "The race opens"]
+    ];
+    rows.forEach(function (r) {
+      var d = mk("div", "gnrow"), dot = document.createElement("i");
+      dot.style.background = r[0];
+      var t = document.createElement("div");
+      t.appendChild(mk("b", "", r[1])); t.appendChild(mk("small", "", r[2]));
+      d.appendChild(dot); d.appendChild(t); list.appendChild(d);
+    });
+  })();
+
+  // ================= GUEST: roles and webhook form =================
+  var gSlot = 1, gSlots = {}, gSel = [], gRoles = [{ id: "", target: "" }];
+
+  function setStatus(msg, bad) { var s = $("gStatus"); s.textContent = msg || ""; s.className = bad ? "bad" : ""; }
+
+  function paintSlots() {
+    var box = $("gSlots");
+    box.textContent = "";
+    [1, 2, 3].forEach(function (n) {
+      var b = mk("button", "gslot" + (n === gSlot ? " sel" : "") + (gSlots[n] ? " on" : ""), "Webhook " + n);
+      b.type = "button"; b.dataset.n = n;
+      box.appendChild(b);
+    });
+  }
+  $("gSlots").addEventListener("click", function (e) {
+    var b = e.target.closest(".gslot"); if (b) loadSlot(+b.dataset.n);
+  });
+
+  function paintAlertChips() {
+    var box = $("gAlertChips");
+    box.textContent = "";
+    BASE_CHIPS.forEach(function (c) {
+      var b = mk("button", "chip" + (gSel.indexOf(c[0]) > -1 ? " on" : ""), c[1]);
+      b.type = "button"; b.dataset.k = c[0];
+      box.appendChild(b);
+    });
+    var n = gSel.filter(function (s) { return s.indexOf("egg:") === 0; }).length;
+    $("gEggToggle").textContent = "Pick specific eggs (" + n + ")";
+    Array.prototype.forEach.call($("gEggGrid").children, function (b) { b.classList.toggle("on", gSel.indexOf(b.dataset.k) > -1); });
+  }
+  function toggleSel(k) {
+    var i = gSel.indexOf(k);
+    if (i > -1) gSel.splice(i, 1); else gSel.push(k);
+    paintAlertChips();
+  }
+  $("gAlertChips").addEventListener("click", function (e) {
+    var b = e.target.closest(".chip"); if (b) toggleSel(b.dataset.k);
+  });
+  (function () {
+    var grid = $("gEggGrid");
+    GEGGS.forEach(function (e) {
+      var b = mk("button", "chip", e[0]);
+      b.type = "button"; b.dataset.k = "egg:" + keyOf(e[0]); b.dataset.n = keyOf(e[0]) + " " + e[1].toLowerCase();
+      grid.appendChild(b);
+    });
+    grid.addEventListener("click", function (e) {
+      var b = e.target.closest(".chip"); if (b) toggleSel(b.dataset.k);
+    });
+    $("gEggToggle").addEventListener("click", function () { $("gEggBox").hidden = !$("gEggBox").hidden; });
+    $("gEggSearch").addEventListener("input", function () {
+      var q = this.value.toLowerCase().replace(/[^a-z0-9]/g, "");
+      Array.prototype.forEach.call(grid.children, function (b) { b.hidden = !!q && b.dataset.n.indexOf(q) < 0; });
+    });
+  })();
+
+  function fillTargets(sel, value) {
+    function opt(parent, v, t) { var o = document.createElement("option"); o.value = v; o.textContent = t; parent.appendChild(o); }
+    function group(label) { var g = document.createElement("optgroup"); g.label = label; sel.appendChild(g); return g; }
+    opt(sel, "", "Select rarity / egg");
+    opt(sel, "all", "Everything");
+    var g1 = group("Rarities");
+    ["Secret", "Eternal", "Divine"].forEach(function (t) { opt(g1, "tier:" + t, t); });
+    var g2 = group("Events");
+    opt(g2, "event:butterfly", "Butterfly Bloom"); opt(g2, "event:race", "Racing");
+    var g3 = group("Eggs");
+    GEGGS.forEach(function (e) { opt(g3, "egg:" + keyOf(e[0]), e[0]); });
+    sel.value = value || "";
+  }
+  function paintRoles() {
+    var box = $("gRoles");
+    box.textContent = "";
+    gRoles.forEach(function (r, i) {
+      var row = mk("div", "grole");
+      var inp = document.createElement("input");
+      inp.className = "g-in"; inp.type = "text"; inp.placeholder = "Role ID"; inp.maxLength = 25;
+      inp.autocomplete = "off"; inp.spellcheck = false; inp.value = r.id || "";
+      inp.addEventListener("input", function () { r.id = inp.value.trim(); });
+      var sel = document.createElement("select");
+      fillTargets(sel, r.target);
+      sel.addEventListener("change", function () { r.target = sel.value; });
+      var x = mk("button", "", "\u00D7");
+      x.type = "button"; x.setAttribute("aria-label", "Remove this role");
+      x.addEventListener("click", function () {
+        gRoles.splice(i, 1);
+        if (!gRoles.length) gRoles.push({ id: "", target: "" });
+        paintRoles();
+      });
+      row.appendChild(inp); row.appendChild(sel); row.appendChild(x);
+      box.appendChild(row);
+    });
+  }
+  $("gRoleAdd").addEventListener("click", function () {
+    if (gRoles.length >= 10) { setStatus("You can add up to 10 roles.", true); return; }
+    gRoles.push({ id: "", target: "" });
+    paintRoles();
+  });
+
+  function loadSlot(n) {
+    gSlot = n;
+    var s = gSlots[n];
+    $("gHook").value = "";
+    if (s) {
+      $("gHook").placeholder = "Webhook saved (paste a new one to replace)";
+      gSel = (s.alerts || []).slice();
+      gRoles = (s.roles || []).map(function (r) { return { id: r.id, target: r.target }; });
+      if (!gRoles.length) gRoles = [{ id: "", target: "" }];
+      setStatus("Webhook " + n + " is on. Change anything, then press Save to update it.");
+    } else {
+      $("gHook").placeholder = "Webhook";
+      gSel = []; gRoles = [{ id: "", target: "" }];
+      setStatus("Webhook " + n + " is empty. Paste a webhook, pick your alerts, then press Save.");
+    }
+    paintSlots(); paintAlertChips(); paintRoles();
+  }
+
+  function savedText(s) {
+    var base = [], eggs = [];
+    (s.alerts || []).forEach(function (k) { if (k.indexOf("egg:") === 0) eggs.push(selLabel(k)); else base.push(selLabel(k)); });
+    var parts = base.slice();
+    if (eggs.length) parts.push(eggs.length > 3 ? eggs.slice(0, 3).join(", ") + " +" + (eggs.length - 3) + " more" : eggs.join(", "));
+    return parts.join(", ") || "Nothing";
+  }
+  function paintSaved() {
+    var list = $("gSavedList"), n = 0;
+    list.textContent = "";
+    [1, 2, 3].forEach(function (i) {
+      var s = gSlots[i]; if (!s) return;
+      n++;
+      var d = mk("div", "gsv");
+      d.appendChild(mk("b", "", "Webhook " + i));
+      d.appendChild(mk("div", "", "Channel: ..." + s.hookTail));
+      d.appendChild(mk("div", "", "Alerts: " + savedText(s)));
+      (s.roles || []).forEach(function (r, k) {
+        var id = String(r.id);
+        d.appendChild(mk("div", "", "Role " + (k + 1) + ": " + id.slice(0, 5) + "..." + id.slice(-4) + " pings for " + selLabel(r.target)));
+      });
+      var btns = mk("div", "gbtns");
+      var ed = mk("button", "", "Edit"), del = mk("button", "del", "Delete");
+      ed.type = del.type = "button";
+      ed.addEventListener("click", function () { loadSlot(i); $("gForm").scrollIntoView({ block: "nearest", behavior: "smooth" }); });
+      del.addEventListener("click", function () {
+        if (!confirm("Delete Webhook " + i + "? It is also removed from our server.")) return;
+        post("/g/delete", { slot: i }).then(function () {
+          return refreshSlots().then(function () { if (gSlot === i) loadSlot(i); setStatus("Webhook " + i + " deleted."); });
+        }).catch(function () { setStatus("Could not reach the server", true); });
+      });
+      btns.appendChild(ed); btns.appendChild(del);
+      d.appendChild(btns);
+      list.appendChild(d);
+    });
+    $("gSaved").hidden = n === 0;
+    $("gSavedCount").textContent = n ? n + " / 3" : "";
+  }
+
+  function refreshSlots() {
+    return post("/g/slots", {}).then(function (res) {
+      var arr = res.ok ? parse(res, []) : [];
+      gSlots = {};
+      arr.forEach(function (r) { gSlots[r.slot] = r; });
+      paintSlots(); paintSaved();
+    }).catch(function () {});
+  }
+
+  $("gSave").addEventListener("click", function () {
+    var roles = gRoles.filter(function (r) { return r.id || r.target; });
+    if (!gSel.length) { setStatus("Pick at least one rarity, egg, or event.", true); return; }
+    for (var i = 0; i < roles.length; i++) {
+      if (!roles[i].id) { setStatus("Enter the Role ID for every role row.", true); return; }
+      if (!roles[i].target) { setStatus("Pick a rarity or egg for every role.", true); return; }
+    }
+    var body = { slot: gSlot, alerts: gSel, roles: roles };
+    var hook = $("gHook").value.trim();
+    if (hook) body.webhook = hook;
+    setStatus("Saving...");
+    post("/g/save", body).then(function (res) {
+      if (!res.ok) { setStatus(res.t || "Could not save", true); return; }
+      return refreshSlots().then(function () { loadSlot(gSlot); setStatus("Saved to Webhook " + gSlot + ". Matching alerts will be sent there."); });
+    }).catch(function () { setStatus("Could not reach the server", true); });
+  });
+  $("gTest").addEventListener("click", function () {
+    setStatus("Sending test...");
+    post("/g/test", { slot: gSlot }).then(function (res) {
+      setStatus(res.ok ? "Test alert sent to Webhook " + gSlot + "." : (res.t || "Test failed"), !res.ok);
+    }).catch(function () { setStatus("Could not reach the server", true); });
+  });
+
+  // ================= OWNER: manage passwords =================
+  var kErr = $("kErr"), kReveal = $("kReveal");
+
+  function apost(path, body) {
+    kErr.textContent = "";
+    return post(path, body).then(function (res) {
+      if (!res.ok) { kErr.textContent = res.t || "Something went wrong"; return null; }
+      return res;
+    }).catch(function () { kErr.textContent = "Could not reach the server"; return null; });
+  }
+  function copyText(t, btn) {
+    function ok() { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1200); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, function () {});
+    else { var ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); ok(); } catch (e) {} ta.remove(); }
+  }
+  function reveal(label, pw) {
+    kReveal.textContent = "";
+    kReveal.appendChild(mk("div", "", "Password for " + label));
+    kReveal.appendChild(mk("code", "", pw));
+    var b = mk("button", "", "Copy"); b.type = "button";
+    b.addEventListener("click", function () { copyText(pw, b); });
+    kReveal.appendChild(b);
+    kReveal.appendChild(mk("small", "", "Shown once. It is stored hashed, so it can't be read back later."));
+    kReveal.hidden = false;
+  }
+
+  function loadKeys() {
+    return apost("/admin/keys", {}).then(function (res) {
+      var list = $("kList");
+      list.textContent = "";
+      if (!res) return;
+      var keys = parse(res, []);
+      if (!keys.length) { list.appendChild(mk("div", "empty", "No guest passwords yet. Create the first one above.")); return; }
+      keys.forEach(function (k) {
+        var row = mk("div", "krow");
+        row.appendChild(mk("b", "", k.label));
+        var meta = !k.enabled ? "Disabled" : k.bound ? "Locked to a network" : "Waiting for first login";
+        if (k.enabled && k.lastUsed) meta += " | last used " + agoText(k.lastUsed);
+        row.appendChild(mk("span", "kmeta" + (k.enabled ? "" : " off"), meta));
+        var bt = mk("div", "kbtns");
+        function btn(text, cls, fn) {
+          var b = mk("button", cls || "", text); b.type = "button";
+          b.addEventListener("click", fn); bt.appendChild(b);
+        }
+        btn("Reset IP lock", "", function () {
+          apost("/admin/resetip", { id: k.id }).then(function (r) { if (r) loadKeys(); });
+        });
+        btn("New password", "", function () {
+          var typed = prompt("New password for " + k.label + ". Leave empty to generate one. The old password stops working right away.", "");
+          if (typed === null) return;
+          apost("/admin/password", { id: k.id, password: typed }).then(function (r) {
+            if (!r) return;
+            reveal(k.label, parse(r, {}).password || "");
+            loadKeys();
+          });
+        });
+        btn(k.enabled ? "Disable" : "Enable", "", function () {
+          apost("/admin/enable", { id: k.id, enabled: !k.enabled }).then(function (r) { if (r) loadKeys(); });
+        });
+        btn("Rename", "", function () {
+          var n = prompt("New label", k.label);
+          if (!n || !n.trim()) return;
+          apost("/admin/label", { id: k.id, label: n.trim() }).then(function (r) { if (r) loadKeys(); });
+        });
+        btn("Delete", "del", function () {
+          if (!confirm("Delete the password for " + k.label + "? They are logged out and their saved webhooks are removed.")) return;
+          apost("/admin/delete", { id: k.id }).then(function (r) { if (r) loadKeys(); });
+        });
+        row.appendChild(bt);
+        list.appendChild(row);
+      });
+    });
+  }
+
+  keysBtn.addEventListener("click", function () {
+    kReveal.hidden = true; kErr.textContent = "";
+    if (!dlg.open) dlg.showModal();
+    loadKeys();
+  });
+  $("kClose").addEventListener("click", function () { dlg.close(); });
+  dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
+  $("kCreate").addEventListener("click", function () {
+    var label = $("kLabel").value.trim();
+    if (!label) { kErr.textContent = "Give this password a label first."; return; }
+    apost("/admin/create", { label: label, password: $("kPass").value.trim() }).then(function (r) {
+      if (!r) return;
+      var d = parse(r, {});
+      $("kLabel").value = ""; $("kPass").value = "";
+      reveal(d.label, d.password);
+      loadKeys();
+    });
+  });
+
+  // ================= hooks used by join.html =================
+  layoutHook = function (notifier, open) {
+    var show = !!(notifier && open && LAYOUT === "guest");
+    var was = !wrap.hidden;
+    wrap.hidden = !show;
+    keysBtn.hidden = !(open && LAYOUT === "owner");
+    if (show && !was) { gPoll(); sched(); }
+  };
+  guestStart = function () {
+    loadSlot(1);
+    refreshSlots().then(function () {
+      var first = [1, 2, 3].filter(function (n) { return gSlots[n]; })[0];
+      loadSlot(first || 1);
+    });
+    gPoll(); sched();
+  };
+  guestStop = function () {
+    clearTimeout(gTimer);
+    gItems = []; gSig = ""; gSlots = {}; gSel = []; gRoles = [{ id: "", target: "" }];
+    feed.textContent = ""; feed.appendChild(mk("div", "empty", "Waiting for the first alert..."));
+    $("gCount").textContent = "";
+    $("gSaved").hidden = true;
+    $("gHook").value = "";
+    kReveal.hidden = true;
+    if (dlg.open) dlg.close();
+  };
+  paintSlots(); paintAlertChips(); paintRoles();
+})();
+
+</script>
 <script>
   var FEED_URL = "https://eggfeed.asaiyamain.workers.dev/feed";
   var unlocked = false, authChecked = false;   // the password is checked by the Worker, it is not stored in this file
@@ -2564,8 +3242,9 @@ document.addEventListener("DOMContentLoaded", function () {
     var open = unlocked;
     $("discordTop").hidden = !(live || ch === 2);   // FOR EVERY NEW PAGE, ADD THE DISCORD BUTTON ON THE TOP RIGHT (shows on every page of channel 1 automatically)
     $("pgSel").disabled = !(live || ch === 2);
-    $("left").hidden = !(notifier && open);
-    $("right").hidden = !(notifier && open);
+    $("left").hidden = !(notifier && open && LAYOUT !== "guest");
+    $("right").hidden = !(notifier && open && LAYOUT !== "guest");
+    layoutHook(notifier, open);
     $("gate").hidden = !(notifier && authChecked && !open);
     $("joinCard").hidden = !(live && pg === 4);
     $("valDetail").hidden = !(live && pg === 2);
@@ -2583,11 +3262,14 @@ document.addEventListener("DOMContentLoaded", function () {
   function relock() {
     unlocked = false; authChecked = true;
     passMem = "";
+    LAYOUT = ""; guestStop();
     showView();
   }
   function unlock() {
     unlocked = true; authChecked = true;
-    showView(); poll(); initSlots();
+    showView();
+    if (LAYOUT === "guest") { guestStart(); return; }
+    poll(); initSlots();
     notifierLoadIn($("tear").hidden);   // the password reveal already animates the panels itself
   }
   // torn edge: both halves are full screen and clipped along the same jagged line, so the image stays in one piece
@@ -2656,14 +3338,18 @@ document.addEventListener("DOMContentLoaded", function () {
       .then(function (r) {
         done();
         if (r.ok) {
-          if (fromUser) passMem = pw;
-          $("pw").value = ""; $("pwErr").textContent = "";
-          if (fromUser) reveal(); else unlock();   // unlock() without typing only happens when no password is set
-        } else {
+          return r.json().catch(function () { return {}; }).then(function (d) {
+            LAYOUT = d.layout === "guest" ? "guest" : "owner";
+            if (fromUser) passMem = pw;
+            $("pw").value = ""; $("pwErr").textContent = "";
+            if (fromUser) reveal(); else unlock();   // unlock() without typing only happens when no password is set
+          });
+        }
+        return r.text().then(function (t) {
           if (!fromUser) passMem = "";
           authChecked = true; showView();
-          if (fromUser) { $("pwErr").textContent = "Wrong password"; shake(); }
-        }
+          if (fromUser) { $("pwErr").textContent = t === "locked" ? "Enter the password" : (t || "Wrong password"); shake(); }
+        });
       })
       .catch(function () { done(); authChecked = true; showView(); $("pwErr").textContent = "Could not reach the server"; });
   }
@@ -2672,7 +3358,7 @@ document.addEventListener("DOMContentLoaded", function () {
   $("pw").addEventListener("keydown", function (e) { if (e.key === "Enter") tryUnlock(); });
 
   // ---------- tab / channel switch animations ----------
-  var VIEW_IDS = ["left", "right", "gate", "joinCard", "valDetail", "valuesPage", "calcPage", "verifyPage", "soonPage", "blank"];
+  var VIEW_IDS = ["left", "right", "guestWrap", "gate", "joinCard", "valDetail", "valuesPage", "calcPage", "verifyPage", "soonPage", "blank"];
   var curCh, curPg, running = [], inflight = false;
   function reduced() { return window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches; }
   function canAnim() { return !reduced() && !!document.body.animate; }
@@ -2823,7 +3509,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function poll() {
     if (!FEED_URL) { feedEl.textContent = "Feed not set up yet."; return; }
-    if (!unlocked) return;
+    if (!unlocked || LAYOUT === "guest") return;
     fetch(FEED_URL, { cache: "no-store", headers: { "x-pass": encodeURIComponent(passMem) } })
       .then(function (r) { if (r.status === 401) { relock(); throw 0; } return r.json(); })
       .then(function (d) {
