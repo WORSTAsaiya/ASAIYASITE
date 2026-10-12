@@ -528,7 +528,7 @@ body.wkSearching .vdet *{ animation:none !important; }
     <option value="1">Egg Notifiers</option>
     <option value="2">Egg Wiki</option>
     <option value="3">Egg Calculator</option>
-    <option value="4">Join</option>
+    <option value="5">Egg Fusion</option>
   </select>
 </nav>
 
@@ -660,6 +660,83 @@ body.wkSearching .vdet *{ animation:none !important; }
     </div>
   </div>
   <div class="cc-hist"><h3>History <button id="calcClear" class="cc-link" type="button" hidden>Clear history</button></h3><div id="calcHist"></div></div>
+</section>
+
+<style>
+/* ---- Egg Fusion: black & white ---- */
+#fusionPage{grid-column:1/-1;justify-self:center;width:100%;max-width:1180px;align-self:start;margin-top:8px;box-sizing:border-box;padding:22px;background:transparent;border:1px solid rgba(255,255,255,.12);border-radius:16px;color:#f5f5f5}
+@media(max-width:1200px){#fusionPage{grid-column:1}}
+#fusionPage .fu-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+#fusionPage h2{display:block;margin:0;font-size:30px;font-weight:800;letter-spacing:-.02em}
+#fusionPage .fu-sub{margin:4px 0 0;color:#9a9a9a;font-size:13px}
+.fu-x2{position:relative;display:flex;align-items:center;gap:8px;font-size:13px;color:#d5d5d5;cursor:pointer}
+.fu-x2 input{position:absolute;opacity:0;pointer-events:none}
+.fu-x2 i{width:40px;height:22px;border-radius:11px;background:#2c2c2c;position:relative;transition:background .15s}
+.fu-x2 i::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s,background .15s}
+.fu-x2 input:checked+i{background:#fff}
+.fu-x2 input:checked+i::after{transform:translateX(18px);background:#0a0a0a}
+.fu-x2 input:focus-visible+i{outline:2px solid #fff;outline-offset:2px}
+#fuTabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+#fuTabs button{padding:8px 14px;border:1px solid #333;background:rgba(0,0,0,.30);color:#cfcfcf;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;transition:border-color .15s,color .15s,background .15s}
+#fuTabs button:hover{border-color:#888;color:#fff}
+#fuTabs button.on{background:#fff;color:#0a0a0a;border-color:#fff}
+#fuTabs button:focus-visible,.fu-chip:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.fu-scene{display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-start;gap:14px}
+.fu-col{flex:1 1 260px;max-width:330px;min-width:0}
+.fu-op,.fu-arrow{flex:0 0 auto;text-align:center;color:#fff}
+.fu-op{width:36px;height:36px;line-height:34px;border:1px solid #444;border-radius:50%;font-size:20px;margin-top:130px}
+.fu-arrow{margin-top:112px}
+.fu-arrow .fu-ar{display:block;font-size:36px;line-height:1}
+.fu-arrow small{display:block;max-width:110px;margin:8px auto 0;font-size:11px;color:#9a9a9a;line-height:1.35}
+.fu-card{position:relative;padding:20px 12px 14px;text-align:center;background:rgba(0,0,0,.30);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid #2c2c2c;border-radius:14px;transition:opacity .25s,border-color .25s,box-shadow .25s}
+.fu-card h3{margin:0 0 8px;font-size:17px;font-weight:700}
+.fu-pic{height:190px;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 62%,rgba(255,255,255,.17),rgba(255,255,255,0) 64%);border-radius:10px}
+.fu-pic img{max-width:78%;max-height:92%;object-fit:contain}
+.fu-rar{display:inline-block;margin-top:10px;padding:3px 12px;border:1px solid #666;border-radius:999px;font-size:12px;font-weight:700;color:#ddd}
+.r-Divine .fu-rar{background:#fff;color:#0a0a0a;border-color:#fff}
+.fu-note{display:block;margin:10px auto 0;padding:5px 8px;border:1px solid #2c2c2c;border-radius:8px;font-size:11px;color:#bdbdbd}
+.fu-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);padding:3px 12px;background:#fff;color:#0a0a0a;font-size:12px;font-weight:800;border-radius:999px;white-space:nowrap}
+.fu-created{border-color:#fff;box-shadow:0 0 0 1px #fff,0 0 44px rgba(255,255,255,.16)}
+.fu-card.win{border-color:#fff;box-shadow:0 0 0 1px #fff,0 0 28px rgba(255,255,255,.12)}
+.fu-card.lose{opacity:.5}
+.fu-stats{margin-top:12px;padding:12px 14px;background:rgba(0,0,0,.30);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid #2c2c2c;border-radius:12px}
+.fu-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:5px 0;font-size:13px;color:#9a9a9a}
+.fu-row b{color:#f5f5f5;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;word-break:break-word}
+.fu-row.sep{margin-top:6px;padding-top:11px;border-top:1px solid #2c2c2c}
+.fu-row em{font-style:normal;font-weight:700;margin-left:6px;border-radius:6px;padding:1px 6px}
+.fu-row em.up{background:#fff;color:#0a0a0a}
+.fu-row em.down{border:1px solid #777;color:#ccc}
+.fu-in{display:flex;align-items:center;gap:8px;margin:8px 0 12px}
+.fu-in input{flex:1;min-width:0;box-sizing:border-box;padding:9px 10px;background:#000;border:1px solid #3a3a3a;border-radius:8px;color:#fff;font-size:17px;font-weight:700}
+.fu-in input:focus{outline:2px solid #fff;outline-offset:1px}
+.fu-in span{font-size:13px;color:#9a9a9a}
+.fu-lbl{margin:10px 0 6px;font-size:12px;color:#9a9a9a}
+.fu-chips{display:flex;flex-wrap:wrap;gap:6px}
+.fu-chip{padding:5px 10px;border:1px solid #3a3a3a;background:transparent;color:#d5d5d5;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+.fu-chip:hover{border-color:#999}
+.fu-chip.on{background:#fff;color:#0a0a0a;border-color:#fff}
+.fu-big{padding:8px 0 12px;margin-bottom:6px;text-align:center;border-bottom:1px solid #2c2c2c}
+.fu-big small{display:block;font-size:12px;color:#9a9a9a}
+.fu-big b{display:block;font-size:34px;line-height:1.15;font-weight:800;letter-spacing:-.02em;word-break:break-word}
+.fu-big b.pop{animation:fuPop .45s cubic-bezier(.3,1.4,.5,1)}
+@keyframes fuPop{from{transform:scale(.92);opacity:.4}to{transform:none;opacity:1}}
+.fu-msg{padding:8px 10px;margin-bottom:8px;border:1px dashed #777;border-radius:8px;font-size:12px;color:#ddd}
+@media(max-width:1000px){
+  .fu-scene{flex-direction:column;align-items:center}
+  .fu-col{width:100%;max-width:420px;flex:none}
+  .fu-op,.fu-arrow{margin-top:0}
+  .fu-arrow .fu-ar{transform:rotate(90deg)}
+}
+@media(prefers-reduced-motion:reduce){.fu-big b.pop{animation:none}.fu-card,.fu-chip{transition:none}}
+</style>
+<!-- Page: Egg Fusion -->
+<section class="panel" id="fusionPage" hidden>
+  <div class="fu-top">
+    <div><h2 id="fuTitle">Egg Fusion</h2><p class="fu-sub" id="fuSub"></p></div>
+    <label class="fu-x2"><input type="checkbox" id="fuX2"><i></i>2x Money</label>
+  </div>
+  <div id="fuTabs"></div>
+  <div id="fuBody"></div>
 </section>
 
 <!-- Page: Egg Values. Details on the left, island toggles on the right (details above the list on phones) -->
@@ -1623,11 +1700,11 @@ var guestStart, guestStop, layoutHook; // filled in below
     "Void Dragon": "https://static.wikia.nocookie.net/stealanegg/images/f/fb/Void_Dragon.png/revision/latest?cb=20260907221522",
     "Ember Dragon": "https://static.wikia.nocookie.net/stealanegg/images/b/bb/Ember_Dragon.png/revision/latest?cb=20260910041425",
     // Racing Eggs
-    "Race Seahorse": "https://stealanegg.tools/images/Race_Seahorse.png",
-    "Race Lizard": "https://stealanegg.tools/images/Race_Lizard.png",
-    "Race Bird": "https://stealanegg.tools/images/Race_Bird.png",
-    "Race Cheetah": "https://stealanegg.tools/images/Race_Cheetah.png",
-    "Engine Snail": "https://stealanegg.tools/images/Engine_Snail.png",
+    "Race Seahorse": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/f/f1/Seahorse_Steal_Egg.png?width=1920",
+    "Race Lizard": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/7/78/Race_Lizard_Steal_Egg.png?width=71&format=jpg&auto=webp&quality=80",
+    "Race Bird": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/1/19/Race_Bird_Steal_Egg.png?width=71&format=jpg&auto=webp&quality=80",
+    "Race Cheetah": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/e/e6/Race_Cheetah_Steal_Egg.png?width=71&format=jpg&auto=webp&quality=80",
+    "Engine Snail": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/7/73/Engine_Snail_Steal_Egg.png?width=71&format=jpg&auto=webp&quality=80",
     // Other (not sorted yet)
     "Archdemon Dragon": "https://stealegg.com/assets/images/pets/archdemon-dragon-reviewed.webp",
     "Gigantus": "https://static.wikia.nocookie.net/stealanegg/images/0/0d/Gigantus.png/revision/latest?cb=20260927050405",
@@ -1675,6 +1752,7 @@ var guestStart, guestStop, layoutHook; // filled in below
   var placeId = q.get("placeId") || "";
   var jobId = q.get("jobId") || "";
   var valid = /^\d{1,20}$/.test(placeId) && /^[0-9a-fA-F-]{36}$/.test(jobId);
+  var FROM_LINK = !!(placeId || jobId);   // true only when the page was opened from a join link
 
   if (!placeId && !jobId) {
     $("title").textContent = "No server selected";
@@ -3457,9 +3535,189 @@ document.addEventListener("DOMContentLoaded", function () {
     $("wallLabel").textContent = (ok || locked) ? "" : v;
   }
 
+  // ---------- Egg Fusion (logic only, no styling yet) ----------
+  // Every result follows  I = B x M(W) x T
+  //   B = base income of the created pet, M(W) = weight multiplier, T = traits bonus (1 + sum of (mult - 1))
+  var FU_PETS = {                       // name: [base income, base weight in kg]
+    "Pegasus": [1.3e9, 65000], "Skeleton Horse": [1.3e9, 65000],
+    "ArchAngel": [5e9, 120000], "World Burner": [5e9, 120000],
+    "Celestial Sunlion": [2e9, 17000], "Royal Skywhale": [8e9, 190000]
+  };
+  var FU_RECIPES = [
+    { id: "peg",  label: "Pegasus (-> Equinox)",        kind: "own", pet: "Pegasus",        partner: "Skeleton Horse", result: "Equinox",  rb: 1.8e9, rw: 65000,
+      wtext: "your pet kg x 1",  wfn: function (w) { return w; } },
+    { id: "ske",  label: "Skeleton Horse (-> Equinox)", kind: "own", pet: "Skeleton Horse", partner: "Pegasus",        result: "Equinox",  rb: 1.8e9, rw: 65000,
+      wtext: "your pet kg x 1",  wfn: function (w) { return w; } },
+    { id: "arch", label: "ArchAngel (-> Aetheron)",     kind: "own", pet: "ArchAngel",      partner: "World Burner",   result: "Aetheron", rb: 6.9e9, rw: 12000,
+      wtext: "your pet kg / 10", wfn: function (w) { return w / 10; } },
+    { id: "wb",   label: "World Burner (-> Aetheron)",  kind: "own", pet: "World Burner",   partner: "ArchAngel",      result: "Aetheron", rb: 6.9e9, rw: 12000,
+      wtext: "your pet kg / 10", wfn: function (w) { return w / 10; } },
+    { id: "forest", label: "Enchanted Forest",          kind: "win", a: "Celestial Sunlion", b: "Royal Skywhale", result: "Spirit World Guardian", rb: 15e9, rw: 40000,
+      aw: function (w) { return w * 40 / 17; }, bw: function (w) { return w / 4.75; } }
+  ];
+  var FU_FUSE_LOW = 0.05;   // GUESS: below this weight ratio the steeper 5/3 curve is used. A 0.46 ratio is known to use 37/60 (Equinox at 30,000 kg = 0.6208x)
+  function fuM(ratio) {
+    if (ratio > CALC_HIGH) return Math.pow(CALC_HIGH, 37 / 60) * Math.pow(ratio / CALC_HIGH, 0.40);
+    if (ratio > FU_FUSE_LOW) return Math.pow(ratio, 37 / 60);
+    return Math.pow(ratio, 5 / 3);
+  }
+  var FU_MULT = {}; CALC_MUTS.forEach(function (m) { FU_MULT[m[0]] = m[1]; });
+  var FU_VARIANTS = ["None", "Silver", "Golden", "Rainbow"];
+  var FU_MUTS = CALC_MUTS.map(function (m) { return m[0]; }).filter(function (n) { return FU_VARIANTS.indexOf(n) < 0; });
+  var fuUid = 0, fuCur = "peg", fuPanels = {};
+
+  var FU_RAR = { "Pegasus": "Eternal", "Skeleton Horse": "Eternal", "Equinox": "Eternal", "Celestial Sunlion": "Eternal",
+                 "ArchAngel": "Divine", "World Burner": "Divine", "Aetheron": "Divine", "Royal Skywhale": "Divine", "Spirit World Guardian": "Divine" };
+
+  function fuEl(tag, text, parent) {
+    var e = document.createElement(tag);
+    if (text) e.textContent = text;
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function fuRow(parent, label) {                       // label on the left, returns the value element on the right
+    var row = fuEl("div", "", parent); row.className = "fu-row";
+    fuEl("span", label, row);
+    return fuEl("b", "", row);
+  }
+  function fuCard(parent, name, note) {                 // portrait card: name, picture, rarity, optional note
+    var c = fuEl("div", "", parent); c.className = "fu-card r-" + (FU_RAR[name] || "Eternal");
+    var badge = fuEl("span", "", c); badge.className = "fu-badge"; badge.hidden = true;
+    fuEl("h3", name, c);
+    var pic = fuEl("div", "", c); pic.className = "fu-pic";
+    var im = fuEl("img", "", pic); im.alt = name; im.src = EGG_IMAGES[name] || ""; im.onerror = function () { im.style.visibility = "hidden"; };
+    fuEl("span", FU_RAR[name] || "", c).className = "fu-rar";
+    if (note) fuEl("span", note, c).className = "fu-note";
+    return { el: c, badge: badge };
+  }
+  // one input column: card + weight + variant chip + mutation chips
+  function fuSlot(parent, petName, kgDefault, note, canWin) {
+    var col = fuEl("div", "", parent); col.className = "fu-col";
+    var card = fuCard(col, petName, note);
+    if (canWin) card.badge.textContent = "Highest $/s";
+    var st = fuEl("div", "", col); st.className = "fu-stats";
+    var wv = fuRow(st, "Weight"), ov = fuRow(st, "Offering $/s");
+    var box = fuEl("div", "", st); box.className = "fu-in";
+    var kg = fuEl("input", "", box); kg.type = "text"; kg.value = kgDefault; kg.autocomplete = "off";
+    kg.setAttribute("inputmode", "decimal"); kg.setAttribute("aria-label", petName + " weight in kg");
+    fuEl("span", "kg", box);
+    var vsel = "None", msel = {}, vb = {}, mb = {};
+    function sync() {
+      FU_VARIANTS.forEach(function (v) { vb[v].classList.toggle("on", v === vsel); vb[v].setAttribute("aria-pressed", v === vsel); });
+      FU_MUTS.forEach(function (m) { mb[m].classList.toggle("on", !!msel[m]); mb[m].setAttribute("aria-pressed", !!msel[m]); });
+    }
+    fuEl("div", "Variant (inherited)", st).className = "fu-lbl";
+    var vr = fuEl("div", "", st); vr.className = "fu-chips";
+    FU_VARIANTS.forEach(function (v) {
+      var b = fuEl("button", v, vr); b.type = "button"; b.className = "fu-chip"; vb[v] = b;
+      b.addEventListener("click", function () { vsel = v; sync(); fuRender(); });
+    });
+    fuEl("div", "Mutations (inherited)", st).className = "fu-lbl";
+    var mr = fuEl("div", "", st); mr.className = "fu-chips";
+    FU_MUTS.forEach(function (m) {
+      var b = fuEl("button", m, mr); b.type = "button"; b.className = "fu-chip"; mb[m] = b;
+      b.addEventListener("click", function () { msel[m] = !msel[m]; sync(); fuRender(); });
+    });
+    sync();
+    return {
+      name: petName, card: card, wv: wv, ov: ov,
+      read: function () {
+        var T = 1, names = [];
+        if (vsel !== "None") { T += FU_MULT[vsel] - 1; names.push(vsel); }
+        FU_MUTS.forEach(function (m) { if (msel[m]) { T += FU_MULT[m] - 1; names.push(m); } });
+        return { kg: calcParseKg(kg.value), T: T, names: names };
+      }
+    };
+  }
+  function fuMoney(n) { return calcMoney(n * ($("fuX2").checked ? 2 : 1)); }
+  function fuKg(n) { return calcFmtNum(n) + " kg"; }
+
+  function fuBuild() {
+    var tabs = $("fuTabs"), body = $("fuBody");
+    FU_RECIPES.forEach(function (r) {
+      var b = fuEl("button", r.label, tabs); b.type = "button"; b.dataset.id = r.id; r.btn = b;
+      var p = fuEl("div", "", body); p.hidden = true; r.panel = p;
+      var sc = fuEl("div", "", p); sc.className = "fu-scene";
+      if (r.kind === "own") {
+        r.slots = [fuSlot(sc, r.pet, "30000", "Partner: " + r.partner, false)];
+      } else {
+        r.slots = [fuSlot(sc, r.a, "17000", "Converts to kg \u00d7 40/17", true)];
+        fuEl("div", "+", sc).className = "fu-op";
+        r.slots.push(fuSlot(sc, r.b, "190000", "Converts to kg \u00f7 4.75", true));
+      }
+      var ar = fuEl("div", "", sc); ar.className = "fu-arrow";
+      fuEl("span", "\u2192", ar).className = "fu-ar";
+      fuEl("small", r.kind === "own" ? "Weight: " + r.wtext : "Higher $/s pet passes on weight and traits", ar);
+      var col = fuEl("div", "", sc); col.className = "fu-col";
+      r.rc = fuCard(col, r.result); r.rc.el.classList.add("fu-created");
+      r.rc.badge.textContent = "Created pet"; r.rc.badge.hidden = false;
+      var st = fuEl("div", "", col), f = r.f = {}; st.className = "fu-stats";
+      f.msg = fuEl("div", "Enter a valid weight, for example 30,000 or 2.2M.", st); f.msg.className = "fu-msg"; f.msg.hidden = true;
+      var big = fuEl("div", "", st); big.className = "fu-big";
+      fuEl("small", "Created income", big); f.inc = fuEl("b", "", big);
+      f.win = fuRow(st, "Winner (higher $/s)"); f.win.parentNode.hidden = r.kind === "own";
+      f.cw = fuRow(st, "Created weight");
+      f.tr = fuRow(st, "Inherited traits");
+      f.cmp = fuRow(st, "Offering \u2192 result");
+      f.br = fuRow(st, "Base rate"); f.br.parentNode.classList.add("sep");
+      f.wm = fuRow(st, "Weight multiplier"); f.tb = fuRow(st, "Traits bonus");
+    });
+  }
+
+  function fuRender() {
+    FU_RECIPES.forEach(function (x) {
+      x.panel.hidden = x.id !== fuCur; x.btn.classList.toggle("on", x.id === fuCur); x.btn.setAttribute("aria-pressed", x.id === fuCur);
+    });
+    var r = FU_RECIPES.filter(function (x) { return x.id === fuCur; })[0], f = r.f;
+    $("fuTitle").textContent = r.kind === "own" ? "Angels & Demons" : "Enchanted Forest";
+    $("fuSub").textContent = r.kind === "own" ? "Two players, one pet each. Only your pet sets your result."
+                                              : "Two players, each adds a Sunlion and a Skywhale. The higher $/s pet wins.";
+    var d = r.slots.map(function (s) { return s.read(); });
+    var bad = d.some(function (x) { return !(x.kg > 0); });
+    f.msg.hidden = !bad;
+    if (bad) {
+      [f.inc, f.win, f.cw, f.tr, f.cmp, f.br, f.wm, f.tb].forEach(function (e) { e.textContent = "-"; });
+      r.slots.forEach(function (s) { s.wv.textContent = "-"; s.ov.textContent = "-"; s.card.el.classList.remove("win", "lose"); s.card.badge.hidden = true; });
+      return;
+    }
+    var off, wOut, mOut, inc, T, names;
+    if (r.kind === "own") {
+      var p = FU_PETS[r.pet], x = d[0];
+      off = p[0] * fuM(x.kg / p[1]) * x.T; wOut = r.wfn(x.kg); T = x.T; names = x.names;
+      r.slots[0].wv.textContent = fuKg(x.kg); r.slots[0].ov.textContent = fuMoney(off);
+    } else {
+      var pa = FU_PETS[r.a], pb = FU_PETS[r.b], wa = r.aw(d[0].kg), wb = r.bw(d[1].kg);
+      var ia = pa[0] * fuM(d[0].kg / pa[1]) * d[0].T, ib = pb[0] * fuM(d[1].kg / pb[1]) * d[1].T, aWins = ia > ib;
+      var wd = aWins ? d[0] : d[1];
+      off = aWins ? ia : ib; wOut = aWins ? wa : wb; T = wd.T; names = wd.names;
+      r.slots.forEach(function (s, i) {
+        var win = (i === 0) === aWins;
+        s.wv.textContent = fuKg(d[i].kg); s.ov.textContent = fuMoney(i === 0 ? ia : ib);
+        s.card.el.classList.toggle("win", win); s.card.el.classList.toggle("lose", !win); s.card.badge.hidden = !win;
+      });
+      f.win.textContent = aWins ? r.a : r.b;
+    }
+    mOut = fuM(wOut / r.rw); inc = r.rb * mOut * T;
+    var incTxt = fuMoney(inc);
+    if (f.inc.textContent !== incTxt) {
+      f.inc.textContent = incTxt; f.inc.classList.remove("pop"); void f.inc.offsetWidth; f.inc.classList.add("pop");
+    }
+    f.cw.textContent = fuKg(wOut);
+    f.tr.textContent = names.join(", ") || "None";
+    f.cmp.textContent = fuMoney(off) + " \u2192 " + fuMoney(inc);
+    var dl = fuEl("em", (inc >= off ? "+" : "") + ((inc / off - 1) * 100).toFixed(1) + "%", f.cmp);
+    dl.className = inc >= off ? "up" : "down";
+    f.br.textContent = fuMoney(r.rb); f.wm.textContent = mOut.toFixed(4) + "x"; f.tb.textContent = T.toFixed(3) + "x";
+  }
+  fuBuild();
+  $("fuTabs").addEventListener("click", function (e) { var id = e.target && e.target.dataset && e.target.dataset.id; if (id) { fuCur = id; fuRender(); } });
+  $("fusionPage").addEventListener("input", fuRender);
+  $("fusionPage").addEventListener("change", fuRender);
+  fuRender();
+
     // ---------- channels and pages ----------
   var PAGES = {
-    1: [[1, "Egg Notifiers"], [2, "Egg Wiki"], [3, "Egg Calculator"], [4, "Join"]],
+    1: [[1, "Egg Notifiers"], [2, "Egg Wiki"], [3, "Egg Calculator"], [5, "Egg Fusion"]],   // "Join" (page 4) is hidden: fillPages adds it only when the site was opened from a join link
     2: [[1, "Verification", "verification"], [2, "Roles", "roles"], [3, "Server Stuff", "server-stuff"]],
     3: []
   };
@@ -3471,6 +3729,11 @@ document.addEventListener("DOMContentLoaded", function () {
       o.value = p[0]; o.textContent = p[1];
       sel.appendChild(o);
     });
+    if (ch === 1 && FROM_LINK) {   // Join page exists only for visitors who arrived through a server link
+      var j = document.createElement("option");
+      j.value = "4"; j.textContent = "Join";
+      sel.appendChild(j);
+    }
     if (list.length) sel.value = String(pg || list[0][0]);
   }
   function showView() {
@@ -3489,6 +3752,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.classList.toggle("wikiPage", live && pg === 2);
     $("valuesPage").hidden = !(live && pg === 2);
     $("calcPage").hidden = !(live && pg === 3);
+    $("fusionPage").hidden = !(live && pg === 5);
     calcBgShow(live && (pg >= 2 || unlocked));   // Wiki, Calculator, Join share ONE video that keeps playing when you switch between them; not on Egg Notifiers
     $("blank").hidden = live || ch === 2;
     $("verifyPage").hidden = !(ch === 2 && pg === 1);
@@ -3597,7 +3861,7 @@ document.addEventListener("DOMContentLoaded", function () {
   $("pw").addEventListener("keydown", function (e) { if (e.key === "Enter") tryUnlock(); });
 
   // ---------- tab / channel switch animations ----------
-  var VIEW_IDS = ["left", "right", "guestWrap", "gate", "joinCard", "valDetail", "valuesPage", "calcPage", "verifyPage", "soonPage", "blank"];
+  var VIEW_IDS = ["left", "right", "guestWrap", "gate", "joinCard", "valDetail", "valuesPage", "calcPage", "fusionPage", "verifyPage", "soonPage", "blank"];
   var curCh, curPg, running = [], inflight = false;
   function reduced() { return window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches; }
   function canAnim() { return !reduced() && !!document.body.animate; }
@@ -3673,7 +3937,7 @@ document.addEventListener("DOMContentLoaded", function () {
     $("chSel").value = "2";
     var want = PAGES[2].filter(function (p) { return p[2] === (q.get("pg") || "").toLowerCase(); })[0];
     fillPages(2, want ? want[0] : 1);
-  } else if (placeId || jobId) $("pgSel").value = "4";
+  } else if (FROM_LINK) fillPages(1, 4);
   (function () {
     var b = $("vpLogin");
     if (VERIFY_LOGIN_URL && guildId) b.href = VERIFY_LOGIN_URL + "?guild=" + guildId;
