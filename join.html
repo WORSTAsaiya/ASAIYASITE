@@ -1016,6 +1016,14 @@ var guestStart, guestStop, layoutHook; // filled in below
     ".krow .kbtns button{padding:6px 10px;border:0;border-radius:6px;background:#4e5058;color:#fff;font-size:12px;font-weight:700;cursor:pointer}",
     ".krow .kbtns .del{background:transparent;border:1px solid #ff7b72;color:#ff7b72}",
     ".krow .kbtns .del:hover{background:#ff7b72;color:#1e1f22}",
+    "#kLogBtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}",
+    "#kLogBtns button{padding:8px 12px;border:0;border-radius:7px;background:#4e5058;color:#fff;font-weight:700;cursor:pointer}",
+    "#kLogs{margin-top:12px;background:#1e1f22;border-radius:8px;padding:10px;max-height:48vh;overflow:auto}",
+    ".klog{padding:9px 2px;border-bottom:1px solid #3a3c42;font-size:12px;overflow-wrap:anywhere}",
+    ".klog:last-child{border-bottom:0}",
+    ".klog b{display:block;font-size:13px;margin-bottom:3px}",
+    ".klog span{color:#b5bac1}",
+    "#kLogsStatus{font-size:12px;color:#b5bac1;margin-top:8px;min-height:16px}",
     "#kClose{margin-top:6px;padding:10px 18px;border:0;border-radius:8px;background:#4e5058;color:#fff;font-weight:700;cursor:pointer}"
   ].join("\n");
   var st = document.createElement("style");
@@ -1065,6 +1073,8 @@ var guestStart, guestStop, layoutHook; // filled in below
     '<p class="ksub">One password per person. Each one locks to the first network that uses it.</p>' +
     '<div class="kform"><input class="g-in" id="kLabel" type="text" placeholder="Label, for example Voysae" maxlength="40" autocomplete="off"><input class="g-in" id="kPass" type="text" placeholder="Password (empty = generate one)" maxlength="64" autocomplete="off" spellcheck="false"><button id="kCreate" type="button">Create</button></div>' +
     '<div id="kReveal" hidden></div><div id="kErr"></div><div id="kList"></div>' +
+    '<div id="kLogBtns"><button id="kAdminLogs" type="button">Admin logs</button><button id="kGuestLogs" type="button">Guest logs</button></div>' +
+    '<div id="kLogs" hidden><h3 id="kLogsTitle">Logs</h3><div id="kLogsStatus"></div><div id="kLogsList"></div></div>' +
     '<button id="kClose" type="button">Close</button>';
   document.body.appendChild(dlg);
 
@@ -1505,8 +1515,29 @@ var guestStart, guestStop, layoutHook; // filled in below
     });
   }
 
+  function loadAuditLogs(scope) {
+    var panel = $("kLogs"), list = $("kLogsList"), status = $("kLogsStatus");
+    $("kLogsTitle").textContent = scope === "guest" ? "Guest logs" : "Admin logs";
+    panel.hidden = false; list.textContent = ""; status.textContent = "Loading logs...";
+    apost("/admin/logs", { scope: scope }).then(function (res) {
+      if (!res) { status.textContent = "Could not load logs. Check the Worker response and owner access."; return; }
+      var rows = parse(res, null);
+      if (!Array.isArray(rows)) { status.textContent = "Unexpected response from the server."; return; }
+      status.textContent = rows.length ? rows.length + " log entries (up to 300 most recent)." : "No log entries yet.";
+      rows.forEach(function (entry) {
+        var item = mk("div", "klog");
+        var date = entry.t ? new Date(Number(entry.t)).toLocaleString() : "Unknown time";
+        item.appendChild(mk("b", "", entry.action || "Activity"));
+        item.appendChild(mk("div", "", (entry.actor || "Unknown actor") + (entry.country ? " · " + entry.country : "")));
+        item.appendChild(mk("span", "", date + (entry.detail ? " · " + entry.detail : "")));
+        list.appendChild(item);
+      });
+    });
+  }
+  $("kAdminLogs").addEventListener("click", function () { loadAuditLogs("admin"); });
+  $("kGuestLogs").addEventListener("click", function () { loadAuditLogs("guest"); });
   keysBtn.addEventListener("click", function () {
-    kReveal.hidden = true; kErr.textContent = "";
+    kReveal.hidden = true; kErr.textContent = ""; $("kLogs").hidden = true;
     if (!dlg.open) dlg.showModal();
     loadKeys();
   });
