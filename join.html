@@ -469,6 +469,47 @@
 .hitem .hval{font-size:20px}
 .hitem .hmeta{font-size:14px}
 .hempty,.cc-none{font-size:16px}
+
+/* ===== Egg Wiki: bigger ===== */
+@media (min-width:1201px){
+  body.wikiPage{ grid-template-columns:minmax(0,1.15fr) 0 minmax(0,1fr); }
+  #valDetail{ max-width:880px; padding:28px 32px; }
+  #valuesPage{ max-width:800px; padding:28px 32px; max-height:calc(100vh - 90px); }
+}
+#valuesPage > h2{ font-size:30px; margin-bottom:14px; }
+.wk-search{ font-size:19px; padding:14px 16px; }
+.wk-count{ font-size:15px; }
+.wk-none{ font-size:18px; }
+.isl > summary{ font-size:21px; padding:16px 0; }
+.isl .cnt{ font-size:16px; }
+.vegg{ font-size:19px; padding:12px 16px; margin-bottom:8px; }
+.vthumb{ width:54px; height:54px; }
+.vhint{ font-size:20px; padding:90px 14px; }
+.vdet .vname{ font-size:40px; }
+.vdet .vrar{ font-size:20px; margin:4px 0 14px; }
+.vimg{ width:320px; height:320px; font-size:16px; }
+.sec h3{ font-size:22px; padding:14px 18px; }
+.sec .sbody{ font-size:20px; padding:18px; min-height:28px; }
+.sk{ font-size:15px; }
+.sv{ font-size:24px; margin-top:5px; }
+.sgrid{ gap:20px 16px; }
+
+/* while searching: no loading animations anywhere on the wiki */
+body.wkSearching .isl,
+body.wkSearching .vegg,
+body.wkSearching .vdet,
+body.wkSearching .vdet *{ animation:none !important; }
+.vdet.instant, .vdet.instant .vname, .vdet.instant .vrar, .vdet.instant .st, .vdet.instant .sgrid > div, .vdet.instant .ds { animation:none !important; }
+.vdet.instant .vimg{ animation:lifeBob 3.2s ease-in-out infinite !important; }
+
+/* small x2 toggles */
+.cc-tgls{ display:flex; flex-wrap:wrap; gap:6px 16px; margin-bottom:8px; }
+.cc-tgl{ display:flex; align-items:center; gap:6px; font-size:13px; font-weight:800; color:#f2f3f5; cursor:pointer; user-select:none; }
+.cc-sw{ width:28px; height:16px; border-radius:8px; border:0; padding:0; background:#4e5058; position:relative; cursor:pointer; flex:none; transition:background .15s; }
+.cc-sw::after{ content:""; position:absolute; top:2px; left:2px; width:12px; height:12px; border-radius:50%; background:#fff; transition:transform .15s; }
+.cc-sw.on{ background:#2ee06a; }
+.cc-sw.on::after{ transform:translateX(12px); }
+.cc-field:disabled { opacity:.6; cursor:not-allowed; }
 </style>
 </head>
 <body>
@@ -594,17 +635,24 @@
     <div class="cc-side">
       <div class="cc-prev" id="ccPrev"></div>
       <div class="cc-box">
-        <div class="cc-lbl">Weight (Kg)</div>
+        <div class="cc-tgls" id="ccBoosts">
+          <label class="cc-tgl"><button class="cc-sw" id="ccPass" type="button" role="switch" aria-checked="false"></button><span>x2 Money</span></label>
+          <label class="cc-tgl"><button class="cc-sw" id="ccHaste" type="button" role="switch" aria-checked="false"></button><span>x2 Hatch Speed</span></label>
+        </div>
         <div class="cc-row">
-          <input class="cc-field" id="calcKg" type="text" inputmode="decimal" placeholder="e.g. 35000 or 2.2M" autocomplete="off" spellcheck="false">
-          <div class="cc-field" id="ccHatch">-</div>
+          <div>
+            <div class="cc-lbl">Weight (Kg)</div>
+            <input class="cc-field" id="calcKg" type="text" inputmode="decimal" placeholder="e.g. 35,000 or 2.2M" autocomplete="off" spellcheck="false">
+          </div>
+          <div>
+            <div class="cc-lbl">Hatch Time</div>
+            <input class="cc-field" id="ccHatch" type="text" placeholder="e.g. 4h 35m" autocomplete="off" spellcheck="false">
+          </div>
         </div>
         <div class="cc-lbl">Variants (stack additively)</div>
         <div class="cc-chips" id="ccVariants"></div>
         <div class="cc-lbl">Mutations (stack additively)</div>
         <div class="cc-chips" id="ccMuts"></div>
-        <div class="cc-lbl">Gamepasses</div>
-        <div class="cc-chips"><button class="cc-chip gold wide" id="ccPass" type="button">2X MONEY<small>2x final value</small></button></div>
       </div>
       <div class="cc-final"><small>FINAL INCOME RATE</small><b id="ccFinal">-</b></div>
       <div><button class="cc-link" id="ccBreakBtn" type="button">+ Stat Breakdown</button><div class="cc-break" id="ccBreak" hidden></div></div>
@@ -1594,6 +1642,24 @@ var guestStart, guestStop, layoutHook; // filled in below
     "Skeletal Glyptodon": "https://stealegg.com/assets/images/pets/skeletal-glyptodon-reviewed.webp",
     "Skeletal Terrorbird": "https://stealegg.com/assets/images/pets/skeletal-terrorbird-reviewed.webp",
     "Skeletal Giant Sloth": "https://stealegg.com/assets/images/pets/skeletal-giant-sloth-reviewed.webp",
+    "Spirit World Guardian": "https://stealegg.com/assets/images/pets/spirit-world-guardian.webp",
+    "Mecha Dreadscale": "https://stealanegg.tools/images/Mecha_Dreadscale.png",
+    "Dreadscale": "https://stealanegg.tools/images/Dreadscale.png",
+    "Mecha Krakenoid": "https://stealanegg.tools/images/Mecha_Krakenoid.png",
+    "Mecha Crocodon": "https://stealanegg.tools/images/Mecha_Crocodon.png",
+    "Hazardhog": "https://stealanegg.tools/images/Hazardhog.png",
+    "Krakenoid": "https://stealanegg.tools/images/Krakenoid.png",
+    "Balrog": "https://stealanegg.tools/images/Balrog.png",
+    "Strawberry Elephant": "https://stealanegg.tools/images/Strawberry_Elephant.png",
+    "Toxic Crocodile": "https://stealanegg.tools/images/Toxic_Crocodile.png",
+    "Mecha Crawler": "https://stealanegg.tools/images/Mecha_Crawler.png",
+    "Jitterbug": "https://stealanegg.tools/images/Jitterbug.png",
+    "Mecha Froggo": "https://stealanegg.tools/images/Mecha_Froggo.png",
+    "Mecha Scorpio": "https://stealanegg.tools/images/Mecha_Scorpio.png",
+    "Crocodon": "https://stealanegg.tools/images/Crocodon.png",
+    "Bombo Croco": "https://stealanegg.tools/images/Bombo_Croco.png",
+    "Ostrich": "https://stealanegg.tools/images/Ostrich.png",
+    "Amethyst Runebear": "https://stealanegg.tools/images/Amethyst_Runebear.png",
     // Need an egg that is not listed? Add a line: "Egg Name": "https://link",
     // Need an egg that is not listed? Add a line like:  "Egg Name": "https://link",
   };
@@ -2280,7 +2346,32 @@ var guestStart, guestStop, layoutHook; // filled in below
     ["Dog", "Common", 2, 25, false],
     ["Frog", "Common", 3, 3, false],
     ["Duckling", "Common", 4, 3, false],
-    ["Jerboa", "Common", 6, 2, false]
+    ["Jerboa", "Common", 6, 2, false],
+    ["Mecha Dreadscale", "Divine", 4000000000, 35, false],
+    ["Dreadscale", "Divine", 2000000000, 35, false],
+    ["Mecha Krakenoid", "Eternal", 1000000000, 35, false],
+    ["Mecha Crocodon", "Eternal", 680000000, 35, false],
+    ["Hazardhog", "Eternal", 500000000, 35, false],
+    ["Krakenoid", "Eternal", 500000000, 35, false],
+    ["Balrog", "Eternal", 200000000, 65000, false],
+    ["Strawberry Elephant", "Eternal", 110000000, 35000, false],
+    ["Toxic Crocodile", "Secret", 600000000, 1234, false],
+    ["Mecha Crawler", "Secret", 320000000, 35, false],
+    ["Jitterbug", "Secret", 155000000, 35, false],
+    ["Mecha Froggo", "Secret", 155000000, 35, false],
+    ["Mecha Scorpio", "Secret", 45000000, 35, false],
+    ["Crocodon", "Secret", 30000000, 35, false],
+    ["Bombo Croco", "Secret", 20000000, 7000, false],
+    ["Ostrich", "Secret", 148500000, 8500, false],
+    ["Ostrich", "Secret", 2150000, 8500, false],
+    ["Amethyst Runebear", "Secret", 135000000, 8500, false],
+    ["Amethyst Runebear", "Secret", 1950000, 8500, false],
+    ["Spirit World Guardian", "Divine", 15000000000, 40000, true],
+    ["Engine Snail", "Eternal", 3000000000, 400, false],
+    ["Race Cheetah", "Secret", 250000000, 400, false],
+    ["Race Bird", "Cosmic", 16000000, 400, false],
+    ["Race Lizard", "Mythic", 800000, 400, false],
+    ["Race Seahorse", "Legendary", 140000, 400, false]
   ];
   // name, multiplier. Mutations add together: 1 + sum(multiplier - 1)
   var CALC_MUTS = [
@@ -2327,6 +2418,125 @@ function calcShowFinal(v) {
 }
 var calcPicked = {}, calcSel = -1, calcTier = "All", calcQuery = "", calcPass = false, calcLast = null;
 var CALC_VARIANTS = ["Silver", "Golden", "Rainbow"];
+var calcHaste = false;   // x2 hatch speed: hatch time is halved
+// ---- hatch time grows with weight ----
+// Base hatch time (seconds) at the pet's base weight. Pets not listed here use their rarity time (GROW_BY_RARITY).
+var CALC_BASE_GROW = {
+  "Engine Snail": 36000,
+  "Race Cheetah": 12600,
+  "Race Bird": 1200,
+  "Race Lizard": 480,
+  "Spirit World Guardian": 64800,
+  "67": 900,
+  "Balrog": 86400,
+  "Strawberry Elephant": 14400,
+  "Toxic Crocodile": 900,
+  "Bombo Croco": 5400,
+  "Ostrich": 900,
+  "Amethyst Runebear": 900
+};
+// shop eggs that always hatch in 10s (only used for the Grow Time shown in the wiki)
+var CALC_WIKI_GROW = { "Mecha Dreadscale": 10, "Dreadscale": 10, "Mecha Krakenoid": 10, "Mecha Crocodon": 10, "Hazardhog": 10, "Krakenoid": 10,
+  "Mecha Crawler": 10, "Jitterbug": 10, "Mecha Froggo": 10, "Mecha Scorpio": 10, "Crocodon": 10 };
+var CALC_SHOP_GROW = 10;   // shop eggs always hatch in 10s, whatever the weight (unless listed in CALC_BASE_GROW)
+var CALC_SCALE = { FLAT_MAX: 2.0, STEEP_MAX: 6.0, STEEP_POW: 1.389, TAIL_COEFF: 4.6, TAIL_POW: 0.72, TAIL_CAP: 20.0 };
+// Regular eggs are the ones listed under the islands from "Forest" to "Enchanted Forest" in ISLANDS.
+// Every other egg (Rift, Dr. Scramble, Event, Store, Racing, unsorted...) counts as a shop egg.
+var calcRegularSet = null;
+function calcIsShop(name) {
+  if (!calcRegularSet) {
+    calcRegularSet = {};
+    if (typeof ISLANDS !== "undefined") {
+      for (var i = 0; i < ISLANDS.length; i++) {
+        ISLANDS[i][1].split("|").forEach(function (n) { calcRegularSet[n] = true; });
+        if (ISLANDS[i][0] === "Enchanted Forest") break;
+      }
+    }
+  }
+  return !calcRegularSet[name];
+}
+function calcScaleMult(scale) {
+  var B = CALC_SCALE;
+  if (scale <= B.FLAT_MAX) return 1;
+  if (scale <= B.STEEP_MAX) return Math.pow(scale / B.FLAT_MAX, B.STEEP_POW);
+  return Math.min(B.TAIL_COEFF * Math.pow(scale / B.STEEP_MAX, B.TAIL_POW), B.TAIL_CAP);
+}
+function calcBaseGrow(egg) {
+  var base = CALC_BASE_GROW[egg[0]];
+  if (base === undefined) base = (typeof GROW_BY_RARITY !== "undefined" && GROW_BY_RARITY) ? GROW_BY_RARITY[egg[1]] : null;
+  return typeof base === "number" ? base : null;
+}
+// true when the hatch time cannot change with weight (shop eggs, or no known base weight)
+function calcHatchLocked(egg) {
+  if (egg[3] === null) return true;
+  return CALC_BASE_GROW[egg[0]] === undefined && calcIsShop(egg[0]);
+}
+function calcHatchSeconds(egg, kg) {
+  var base = CALC_BASE_GROW[egg[0]];
+  if (base === undefined && calcIsShop(egg[0])) return CALC_SHOP_GROW;   // pets listed in CALC_BASE_GROW keep their own time
+  base = calcBaseGrow(egg);
+  if (base === null) return null;
+  if (egg[3] === null || !(kg > 0)) return base;          // unknown base weight or no weight typed: base time
+  return Math.round(base * calcScaleMult(Math.cbrt(kg / egg[3])));
+}
+// reverse: hatch time (seconds) -> weight (kg)
+function calcWeightFromSeconds(seconds, baseWeight, baseGrow) {
+  if (!(seconds > 0)) return 0;
+  var mult = seconds / baseGrow;
+  if (mult <= 1) return baseWeight;
+  var B = CALC_SCALE, steepMaxMult = Math.pow(B.STEEP_MAX / B.FLAT_MAX, B.STEEP_POW), scale;
+  if (mult <= steepMaxMult) scale = B.FLAT_MAX * Math.pow(mult, 1 / B.STEEP_POW);
+  else scale = B.STEEP_MAX * Math.pow(Math.min(mult, B.TAIL_CAP) / B.TAIL_COEFF, 1 / B.TAIL_POW);
+  return Math.round(baseWeight * Math.pow(scale, 3) * 100) / 100;
+}
+// "4h 35m", "1d 2h", "90m", "45s" or a bare number of seconds -> seconds (NaN if it makes no sense)
+function calcParseTime(str) {
+  str = String(str || "").trim().toLowerCase();
+  if (!str) return NaN;
+  if (/^\d*\.?\d+$/.test(str)) return parseFloat(str);
+  var re = /(\d*\.?\d+)\s*([wdhms])/g, m, total = 0, n = 0, U = { w: 604800, d: 86400, h: 3600, m: 60, s: 1 };
+  while ((m = re.exec(str))) { total += parseFloat(m[1]) * U[m[2]]; n++; }
+  if (!n || str.replace(re, "").replace(/[\s,]/g, "") !== "") return NaN;
+  return total;
+}
+// 200000 -> "200,000", 1234.5 -> "1,234.5"
+function calcFmtNum(n) {
+  if (typeof n !== "number" || !isFinite(n)) return "";
+  var parts = String(Math.round(n * 100) / 100).split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return parts.join(".");
+}
+// drops any character that is not allowed in the box (typing or pasting) and keeps the cursor in place
+function calcSanitizeInput(el, allowed, fixCase) {
+  var v = el.value, caret = el.selectionStart, out = "", newCaret = null;
+  for (var i = 0; i < v.length; i++) {
+    if (caret !== null && i === caret) newCaret = out.length;
+    var ch = v.charAt(i);
+    if (allowed.test(ch)) out += fixCase(ch);
+  }
+  if (out === v) return;
+  if (newCaret === null) newCaret = out.length;
+  el.value = out;
+  try { el.setSelectionRange(newCaret, newCaret); } catch (e) {}
+}
+function calcKgChars(el) { calcSanitizeInput(el, /[0-9.,kmbtq]/i, function (c) { return c.toUpperCase(); }); }
+function calcTimeChars(el) { calcSanitizeInput(el, /[0-9.\swdhms]/i, function (c) { return c.toLowerCase(); }); }
+// adds commas to the weight box while typing and keeps the cursor in place
+function calcFormatKgInput(el) {
+  var v = el.value, raw = v.replace(/,/g, "");
+  if (!/^\d*\.?\d*$/.test(raw)) return;                   // e.g. "2.2M": leave as typed
+  var caret = el.selectionStart, before = v.slice(0, caret === null ? v.length : caret).replace(/[^0-9.]/g, "").length;
+  var parts = raw.split("."), out = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  if (parts.length > 1) out += "." + parts[1];
+  if (out === v) return;
+  el.value = out;
+  var pos = 0, count = 0;
+  while (pos < out.length && count < before) { if (/[0-9.]/.test(out.charAt(pos))) count++; pos++; }
+  try { el.setSelectionRange(pos, pos); } catch (e) {}
+}
+var calcHatchEditing = false;   // true while the person is typing in the hatch box
+// long times like "1d 18h 10m 10s" get a smaller font so they fit the box
+function calcFitHatch() { var b = $("ccHatch"), n = b.value.length; b.style.fontSize = n > 14 ? "13px" : n > 11 ? "16px" : n > 8 ? "20px" : ""; }
 
 function calcParseKg(s) {
   var m = String(s || "").replace(/[,\s]/g, "").match(/^(\d*\.?\d+)([kmbt]?)$/i);
@@ -2358,6 +2568,8 @@ function calcCompute() {
 
 function calcUpdate() {
   var r = calcCompute(), out = $("ccFinal"), br = $("ccBreak");
+  var hEgg = CALC_EGGS[calcSel];
+  if (hEgg && !calcHatchEditing) { var hs = calcHatchSeconds(hEgg, calcParseKg($("calcKg").value)); if (hs !== null && calcHaste) hs = Math.round(hs / 2); $("ccHatch").value = hs === null ? "" : fmtTime(hs); $("ccHatch").classList.remove("bad"); calcFitHatch(); }
   calcLast = r && !r.bad ? r : null;
   $("calcKg").classList.toggle("bad", !!(r && r.bad));
   calcShowFinal(calcLast ? r.final : null);
@@ -2367,7 +2579,8 @@ function calcUpdate() {
   if (r.ratio) br.appendChild(line("div", r.ratio.toFixed(r.ratio < 10 ? 3 : 1) + "x base weight (" + r.egg[3].toLocaleString("en-US") + " Kg), weight multiplier x" + r.wm.toFixed(3)));
   br.appendChild(line("div", "Base income: " + calcMoney(r.base)));
   if (r.names.length) br.appendChild(line("div", r.names.join(" + ") + ": x" + r.mult.toFixed(2).replace(/\.?0+$/, "")));
-  if (calcPass) br.appendChild(line("div", "2X Money: x2"));
+  if (calcPass) br.appendChild(line("div", "x2 Money: x2"));
+  if (calcHaste) br.appendChild(line("div", "x2 Hatch Speed: hatch time halved"));
   r.notes.forEach(function (n) { br.appendChild(line("div", n, "warn")); });
 }
 
@@ -2382,10 +2595,10 @@ function calcShowEgg() {
   p.appendChild(line("b", egg[0]));
   var r = line("div", egg[1], "r"); r.style.color = col; p.appendChild(r);
   p.appendChild(line("div", calcMoney(egg[2]), "m"));
-  $("calcKg").value = egg[3] === null ? "" : String(egg[3]);
+  calcHatchEditing = false;
+  $("calcKg").value = egg[3] === null ? "" : calcFmtNum(egg[3]);
   $("calcKg").disabled = egg[3] === null;
-  var g = (typeof GROW_BY_RARITY !== "undefined" && GROW_BY_RARITY) ? GROW_BY_RARITY[egg[1]] : null;
-  $("ccHatch").textContent = g ? fmtTime(g) : "-";
+  $("ccHatch").disabled = calcHatchLocked(egg);
   calcUpdate();
 }
 
@@ -2436,7 +2649,8 @@ function calcSyncChips() {
     if (c.dataset.none) c.classList.toggle("on", !CALC_VARIANTS.some(function (v) { return calcPicked[v]; }));
     else c.classList.toggle("on", !!calcPicked[c.dataset.name]);
   });
-  $("ccPass").classList.toggle("on", calcPass);
+  $("ccPass").classList.toggle("on", calcPass); $("ccPass").setAttribute("aria-checked", calcPass);
+  $("ccHaste").classList.toggle("on", calcHaste); $("ccHaste").setAttribute("aria-checked", calcHaste);
 }
 
 // ---- history (saved in this browser, newest 100) ----
@@ -2503,7 +2717,22 @@ document.addEventListener("DOMContentLoaded", function () {
   $("ccVariants").addEventListener("click", chipClick);
   $("ccMuts").addEventListener("click", chipClick);
   $("ccPass").addEventListener("click", function () { calcPass = !calcPass; calcSyncChips(); calcUpdate(); });
-  $("calcKg").addEventListener("input", calcUpdate);
+  $("ccHaste").addEventListener("click", function () { calcHaste = !calcHaste; calcHatchEditing = false; calcSyncChips(); calcUpdate(); });
+  $("calcKg").addEventListener("input", function () { calcHatchEditing = false; calcKgChars(this); calcFormatKgInput(this); calcUpdate(); });
+  // typing a hatch time sets the weight that gives that time
+  $("ccHatch").addEventListener("input", function () {
+    var egg = CALC_EGGS[calcSel], box = this;
+    if (!egg || calcHatchLocked(egg)) return;
+    calcTimeChars(box); calcFitHatch();
+    var secs = calcParseTime(box.value), base = calcBaseGrow(egg);
+    if (calcHaste && secs > 0) secs *= 2;   // shown time is halved, so the real time is double
+    box.classList.toggle("bad", box.value.trim() !== "" && !(secs > 0));
+    if (!(secs > 0) || base === null) return;
+    $("calcKg").value = calcFmtNum(calcWeightFromSeconds(secs, egg[3], base));
+    calcHatchEditing = true;
+    calcUpdate();
+  });
+  $("ccHatch").addEventListener("blur", function () { calcHatchEditing = false; calcUpdate(); });
   $("calcBtn").addEventListener("click", calcSave);
   $("calcClear").addEventListener("click", function () { histSave([]); renderHistory(); });
   $("ccBreakBtn").addEventListener("click", function () {
@@ -2532,7 +2761,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ["Cherry Blossom", "Crane|Salamander|Red Panda|Snowy Owl|Koi|Stag|Oni Tiger|Kitsune"],
     ["Titan Temple", "Spideron|Crustacia|Bladehide|Mantaris|Rhinotaur|Gorilla King|Nightflame|Mutant Shark"],
     ["Angels & Demons", "Flame Sprite|Light Dove|Winged Lamb|Toro|Imp|Sacred Moth|Holy Peacock|Demon Hound|Gargoyle|Pure Jellyfish|Centaur|RazorFang|Pegasus|Skeleton Horse|Equinox|ArchAngel|World Burner|Aetheron"],
-    ["Enchanted Forest", "Prism Gecko|Petal Beetle|Enchanted Bluejay|Astral Jackalope|Spirit Panda|Starry Fox|Celestial Sunlion|Royal Skywhale"],
+    ["Enchanted Forest", "Prism Gecko|Petal Beetle|Enchanted Bluejay|Astral Jackalope|Spirit Panda|Starry Fox|Celestial Sunlion|Royal Skywhale|Spirit World Guardian"],
     ["Rift: Riftborn Egg", "Rift Eye|Voidmaw|Ventinal|Wendigo|Abyss Overlord|World Eater"],
     ["Rift: Riftbeasts Egg", "Void Angler|Riftwing|Dreadclaw|Mawbreaker|Void Serpent"],
     ["Rift: Shattered Rift Egg", "Shardling|Shattered Ram|Shardwing|Shattered Drake|Shattered Colossus"],
@@ -2546,7 +2775,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ["Store: Extinction Egg", "Glyptodon|Sabertooth"],
     ["Store: Dragon Egg", "Baby Aurora Dragon|Shadow Dragon|Scorched Dragon|Drilla|Void Dragon|Ember Dragon"],
     ["Racing Eggs", "Race Seahorse|Race Lizard|Race Bird|Race Cheetah|Engine Snail"],
-    ["Other (not sorted yet)", "Archdemon Dragon|Gigantus|Dunkleosteus|Giant Sloth|Terrorbird|Ring Guard|Ringlord|Skeletal Sabertooth|Skeletal Gigantus|Skeletal Dunkleosteus|Skeletal Glyptodon|Skeletal Terrorbird|Skeletal Giant Sloth"]
+    ["Other (not sorted yet)", "Archdemon Dragon|Gigantus|Dunkleosteus|Giant Sloth|Terrorbird|Ring Guard|Ringlord|Skeletal Sabertooth|Skeletal Gigantus|Skeletal Dunkleosteus|Skeletal Glyptodon|Skeletal Terrorbird|Skeletal Giant Sloth|Mecha Dreadscale|Dreadscale|Mecha Krakenoid|Mecha Crocodon|Hazardhog|Krakenoid|Balrog|Strawberry Elephant|Toxic Crocodile|Mecha Crawler|Jitterbug|Mecha Froggo|Mecha Scorpio|Bombo Croco|Crocodon|Ostrich|Amethyst Runebear"]
   ];
 
   // ---------- egg stats (shown on the Egg Values page) ----------
@@ -3023,6 +3252,10 @@ document.addEventListener("DOMContentLoaded", function () {
       "",
       "Big ass whale"
     ],
+    "Spirit World Guardian": [
+      "",
+      "Spirit World Guardian description here"
+    ],
     // ===== Chicken and Raccoon (your existing entries) =====
     "Chicken": [
       "https://static.wikia.nocookie.net/stealanegg/images/a/a3/Chicken.png/revision/latest?cb=20260901193312",
@@ -3035,25 +3268,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function fmtTime(s) {
     if (typeof s !== "number" || !(s >= 0)) return "Unknown";
-    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60, out = [];
-    if (h) out.push(h + "h");
-    if (m) out.push(m + "m");
-    if (r || !out.length) out.push(r + "s");
+    s = Math.round(s);
+    var units = [["w", 604800], ["d", 86400], ["h", 3600], ["m", 60]], out = [];
+    units.forEach(function (u) { var n = Math.floor(s / u[1]); if (n) { out.push(n + u[0]); s -= n * u[1]; } });
+    if (s || !out.length) out.push(s + "s");
     return out.join(" ");
   }
 
   (function setupValues() {
     var byName = {};
-    CALC_EGGS.forEach(function (e) { byName[e[0]] = e; });
+    CALC_EGGS.forEach(function (e) { if (!byName[e[0]]) byName[e[0]] = e; });
     var root = $("valIslands"), det = $("valDetailBody"), selBtn = null;
-    var typeId = 0, typeTimer = 0, typeRaf = 0, groups = [];
+    var typeId = 0, typeTimer = 0, typeRaf = 0, groups = [], wkIn = null;
 
     // Description types itself out at 20 letters per second. Click it to skip.
-    function typeText(el, text) {
+    function typeText(el, text, instant) {
       var id = ++typeId;
       clearTimeout(typeTimer); cancelAnimationFrame(typeRaf);
       if (!text) { el.textContent = "No description yet."; el.style.fontStyle = "italic"; return; }
-      if (reduced()) { el.textContent = text; return; }
+      if (instant || reduced()) { el.textContent = text; return; }
       var node = document.createTextNode(""), t0 = 0, shown = 0;
       el.appendChild(node); el.classList.add("typing");
       el.onclick = function () { if (id === typeId) { cancelAnimationFrame(typeRaf); node.nodeValue = text; el.classList.remove("typing"); } };
@@ -3090,7 +3323,8 @@ document.addEventListener("DOMContentLoaded", function () {
     function showEgg(name, island, e) {
       det.textContent = "";
       var w = document.createElement("div");
-      w.className = "vdet";
+      var instant = !!(wkIn && wkIn.value.trim());
+      w.className = "vdet" + (instant ? " instant" : "");
       var raw = EGG_INFO[name] || [];
       var info = { image: raw[0] || "", desc: raw[1] || "" };
       var rarity = e ? e[1] : "";
@@ -3112,7 +3346,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Stats
       var biome = /^Rift:/.test(island) ? "The Rift" : island;
-      var grow = typeof info.grow === "number" ? info.grow : (e ? GROW_BY_RARITY[e[1]] : null);
+      var grow = typeof info.grow === "number" ? info.grow : (e ? (CALC_BASE_GROW[name] !== undefined ? CALC_BASE_GROW[name] : CALC_WIKI_GROW[name] !== undefined ? CALC_WIKI_GROW[name] : GROW_BY_RARITY[e[1]]) : null);
       var grid = document.createElement("div");
       grid.className = "sgrid";
       grid.appendChild(statBox("Rarity", rarity || "Unknown", RARITY_COLORS[rarity]));
@@ -3125,7 +3359,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Description comes after the stats; its text is typed in (Description is last, so nothing jumps while it grows)
       var ds = section("Description", document.createTextNode(""));
       ds.classList.add("ds"); w.appendChild(ds);
-      typeText(ds.querySelector(".sbody"), info.desc || "");
+      typeText(ds.querySelector(".sbody"), info.desc || "", instant);
 
       det.appendChild(w);
     }
@@ -3173,21 +3407,19 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // ---- Search Egg/Pet: matches the name, the biome or the rarity ----
-    var wkIn = $("wkSearch"), wkCount = $("wkCount"), wkNone = $("wkNone");
+    wkIn = $("wkSearch"); var wkCount = $("wkCount"), wkNone = $("wkNone");
     function wkFilter() {
-      var q = norm(wkIn.value), hits = 0, n = 0;
+      var q = norm(wkIn.value), hits = 0;
+      document.body.classList.toggle("wkSearching", !!q);   // kills all entrance animations
       groups.forEach(function (g) {
         var gm = q && norm(g.title).indexOf(q) >= 0, c = 0;
         g.btns.forEach(function (x) {
           var ok = !q || gm || norm(x.name).indexOf(q) >= 0 || norm(x.rar).indexOf(q) >= 0;
           x.b.hidden = !ok;
-          if (!ok) return;
-          c++;
-          if (q && !reduced()) {
-            x.b.style.animation = "none"; void x.b.offsetWidth;
-            x.b.style.animation = "slideInR .35s cubic-bezier(.2,.8,.2,1) " + Math.min(n++ * 25, 400) + "ms backwards";
-          }
+          if (ok) c++;
         });
+        g.d.style.animation = "none";
+        g.btns.forEach(function (x) { x.b.style.animation = "none"; });
         g.d.hidden = !c;
         if (q && c) g.d.open = true;
         g.cnt.textContent = (q ? c + " / " : "") + g.btns.length + " eggs";
@@ -3195,11 +3427,17 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       wkNone.hidden = !q || hits > 0;
       wkCount.textContent = q ? hits + " found" : "";
+
+      // fully load the top result right away (stats + description, no typing effect)
+      if (q) {
+        var first = root.querySelector(".isl:not([hidden]) .vegg:not([hidden])");
+        if (first && first !== selBtn) first.click();
+      }
     }
     wkIn.addEventListener("input", wkFilter);
-    wkIn.addEventListener("keydown", function (ev) {   // Enter opens the first result
+    wkIn.addEventListener("keydown", function (ev) {
       if (ev.key !== "Enter") return;
-      var f = root.querySelector(".vegg:not([hidden])");
+      var f = root.querySelector(".isl:not([hidden]) .vegg:not([hidden])");
       if (f) { f.click(); f.scrollIntoView({ block: "nearest" }); }
     });
   })();
@@ -3248,6 +3486,7 @@ document.addEventListener("DOMContentLoaded", function () {
     $("gate").hidden = !(notifier && authChecked && !open);
     $("joinCard").hidden = !(live && pg === 4);
     $("valDetail").hidden = !(live && pg === 2);
+    document.body.classList.toggle("wikiPage", live && pg === 2);
     $("valuesPage").hidden = !(live && pg === 2);
     $("calcPage").hidden = !(live && pg === 3);
     calcBgShow(live && (pg >= 2 || unlocked));   // Wiki, Calculator, Join share ONE video that keeps playing when you switch between them; not on Egg Notifiers
