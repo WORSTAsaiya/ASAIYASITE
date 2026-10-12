@@ -4141,5 +4141,172 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   schedule();
 </script>
+<style>
+/* ---- Egg Calculator: match Egg Wiki + Egg Fusion dark glass ---- */
+#calcPage{
+  max-width:1500px;
+  padding:22px;
+  box-sizing:border-box;
+  overflow:visible;
+  color:#f5f5f5;
+  background:rgba(0,0,0,.30);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;
+  box-shadow:0 12px 36px rgba(0,0,0,.16);
+}
+#calcPage::before{display:none}
+#calcPage > *{position:relative;z-index:1}
+#calcPage .cc-title{
+  margin:0 0 16px;
+  padding:0 0 14px;
+  text-align:left;
+  color:#fff;
+  background:none;
+  background-image:none;
+  border-bottom:1px solid rgba(255,255,255,.12);
+  font-size:30px;
+  font-weight:800;
+  letter-spacing:-.02em;
+  text-shadow:none;
+  animation:none;
+}
+#calcPage .cc-main{padding:0;gap:16px}
+#calcPage .cc-search,
+#calcPage .cc-field,
+#calcPage .cc-in,
+#calcPage input[type="text"]{
+  background:rgba(0,0,0,.38);
+  color:#f5f5f5;
+  border:1px solid #333;
+  border-radius:10px;
+  box-shadow:none;
+}
+#calcPage .cc-search{font-size:16px;padding:12px 14px}
+#calcPage .cc-search:focus,
+#calcPage .cc-field:focus{outline:2px solid rgba(255,255,255,.65);outline-offset:1px;border-color:#888;box-shadow:0 0 0 3px rgba(255,255,255,.06)}
+#calcPage .cc-tabs{gap:8px;margin:12px 0}
+#calcPage .cc-tab{
+  padding:8px 14px;
+  color:#ccc;
+  background:rgba(0,0,0,.30);
+  border:1px solid #333;
+  border-radius:999px;
+  font-size:13px;
+  transition:background .15s,border-color .15s,color .15s;
+  box-shadow:none;
+}
+#calcPage .cc-tab:hover{transform:none;border-color:#888;color:#fff}
+#calcPage .cc-tab.on{background:#fff;color:#0a0a0a;border-color:#fff;box-shadow:0 0 18px rgba(255,255,255,.10)}
+#calcPage .cc-grid{
+  grid-template-columns:repeat(auto-fill,minmax(125px,1fr));
+  gap:9px;
+  min-height:360px;
+  max-height:calc(100vh - 300px);
+  padding:10px;
+  background:rgba(0,0,0,.22);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+}
+#calcPage .cc-tile{
+  background:rgba(12,12,12,.68);
+  border:1px solid #303030;
+  border-radius:10px;
+  box-shadow:none;
+  animation:none;
+  transition:transform .16s,border-color .16s,background .16s,box-shadow .16s;
+}
+#calcPage .cc-tile:hover{transform:translateY(-2px);background:rgba(255,255,255,.07);border-color:#777;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+#calcPage .cc-tile:hover img{animation:none}
+#calcPage .cc-tile.sel{border-color:#fff;box-shadow:0 0 0 1px #fff,0 0 20px rgba(255,255,255,.10);animation:none}
+#calcPage .cc-tile span{text-shadow:0 1px 3px #000;color:#fff}
+#calcPage .cc-tile img{filter:drop-shadow(0 5px 8px rgba(0,0,0,.45))}
+#calcPage .cc-side{gap:12px}
+#calcPage .cc-prev{
+  padding:18px 14px;
+  background:rgba(0,0,0,.30);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  border:1px solid #2c2c2c;
+  border-radius:14px;
+}
+#calcPage .cc-prev::before{background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%);opacity:.8;animation:none}
+#calcPage .cc-prev img{width:170px;height:170px;animation:none}
+#calcPage .cc-prev b{font-size:28px;text-shadow:none}
+#calcPage .cc-prev .r{color:#bbb}
+#calcPage .cc-prev .m{font-size:22px;color:#fff;text-shadow:none}
+#calcPage .cc-box{
+  padding:14px;
+  background:rgba(0,0,0,.28);
+  border:1px solid #2c2c2c;
+  border-radius:12px;
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+}
+#calcPage .cc-lbl{color:#aaa;font-size:12px;letter-spacing:.06em}
+#calcPage .cc-field{font-size:21px;padding:10px;text-shadow:none}
+#calcPage .cc-tgl{color:#eee}
+#calcPage .cc-sw{background:#333;border:1px solid #555}
+#calcPage .cc-sw.on{background:#fff}
+#calcPage .cc-sw.on::after{background:#111}
+#calcPage .cc-chips{gap:7px}
+#calcPage .cc-chip{
+  padding:8px 5px;
+  color:#ddd;
+  background:rgba(0,0,0,.28);
+  border:1px solid #333;
+  border-radius:9px;
+  font-size:14px;
+  box-shadow:none;
+  transition:background .15s,border-color .15s,color .15s;
+}
+#calcPage .cc-chip:hover{transform:none;border-color:#888}
+#calcPage .cc-chip:active{transform:none}
+#calcPage .cc-chip.on,
+#calcPage .cc-chip.gold.on{color:#0a0a0a;background:#fff;border-color:#fff;box-shadow:none;animation:none}
+#calcPage .cc-chip small{color:inherit;text-shadow:none;opacity:.72}
+#calcPage .cc-final{
+  padding:14px;
+  color:#f5f5f5;
+  background:rgba(0,0,0,.32);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:12px;
+  box-shadow:none;
+  animation:none;
+}
+#calcPage .cc-final::after{display:none}
+#calcPage .cc-final small{color:#aaa}
+#calcPage .cc-final b{font-size:34px;color:#fff;text-shadow:none}
+#calcPage .cc-link{color:#ddd;text-decoration:none;border-bottom:1px solid #555}
+#calcPage .cc-link:hover{color:#fff;border-color:#fff}
+#calcPage .cc-break{color:#ccc}
+#calcPage .cc-btns button{
+  color:#111;
+  background:#fff;
+  border:1px solid #fff;
+  border-radius:9px;
+  font-weight:800;
+}
+#calcPage .cc-btns button:hover{transform:translateY(-1px);filter:brightness(.92)}
+#calcPage .cc-btns .ghost{color:#eee;background:rgba(0,0,0,.25);border-color:#444}
+#calcPage .cc-hist{padding:18px 0 0;margin-top:16px;border-top:1px solid rgba(255,255,255,.12)}
+#calcPage .cc-hist h3{color:#ddd;font-size:14px}
+#calcPage .hitem{background:rgba(0,0,0,.30);border:1px solid #292929;border-radius:10px;animation:none}
+#calcPage .hitem:hover{transform:none;border-color:#666}
+#calcPage .hitem .hval,#calcPage .hitem .hmeta{text-shadow:none}
+@media(max-width:760px){
+  #calcPage{padding:16px 12px}
+  #calcPage .cc-title{font-size:26px}
+  #calcPage .cc-grid{grid-template-columns:repeat(auto-fill,minmax(105px,1fr));min-height:300px;max-height:55vh}
+  #calcPage .cc-main{gap:14px}
+  #calcPage .cc-prev img{width:140px;height:140px}
+}
+@media(prefers-reduced-motion:reduce){
+  #calcPage *,#calcPage *::before,#calcPage *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
 </body>
 </html>
