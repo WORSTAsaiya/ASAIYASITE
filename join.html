@@ -510,6 +510,96 @@ body.wkSearching .vdet *{ animation:none !important; }
 .cc-sw.on{ background:#2ee06a; }
 .cc-sw.on::after{ transform:translateX(12px); }
 .cc-field:disabled { opacity:.6; cursor:not-allowed; }
+/* ---- Egg Wiki: match Egg Fusion's monochrome glass / minimal style ---- */
+#valDetail,
+#valuesPage{
+  background:rgba(0,0,0,.30);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;
+  color:#f5f5f5;
+  box-shadow:0 12px 36px rgba(0,0,0,.16);
+}
+#valuesPage > h2{
+  font-size:30px;
+  font-weight:800;
+  letter-spacing:-.02em;
+  color:#fff;
+}
+.wk-bar{background:transparent}
+.wk-search{
+  background:rgba(0,0,0,.38);
+  color:#f5f5f5;
+  border:1px solid #333;
+  border-radius:10px;
+}
+.wk-search:focus{
+  border-color:#888;
+  box-shadow:0 0 0 3px rgba(255,255,255,.08);
+}
+.wk-count{color:#aaa}
+.isl{
+  background:rgba(0,0,0,.26);
+  border:1px solid #292929;
+  border-radius:12px;
+  padding:0 14px;
+}
+.isl > summary{color:#f5f5f5}
+.isl > summary::after{color:#aaa}
+.isl .cnt{color:#aaa}
+.vegg{
+  background:rgba(0,0,0,.32);
+  border:1px solid #292929;
+  color:#eee;
+  border-radius:10px;
+  transition:background .18s,border-color .18s,transform .18s,box-shadow .18s;
+}
+.vegg:hover{
+  background:rgba(255,255,255,.07);
+  border-color:#666;
+  box-shadow:0 5px 18px rgba(0,0,0,.25);
+}
+.vegg.sel{
+  background:#fff;
+  color:#0a0a0a;
+  border-color:#fff;
+  box-shadow:0 0 18px rgba(255,255,255,.12);
+}
+.vegg.sel:hover{background:#eee;border-color:#eee}
+.vthumb{background:#151515;border-radius:8px}
+.vhint{color:#aaa}
+.vdet .vname{color:#fff;font-weight:800;letter-spacing:-.02em}
+.vdet .vrar{color:#aaa}
+.vimg{
+  background:radial-gradient(ellipse at 50% 60%,rgba(255,255,255,.09),rgba(0,0,0,.42) 70%);
+  border:1px solid #292929;
+  border-radius:14px;
+}
+.sec{
+  background:rgba(0,0,0,.26);
+  border:1px solid #292929;
+  border-radius:10px;
+}
+.sec h3{
+  background:rgba(255,255,255,.055);
+  color:#f5f5f5;
+  border-bottom:1px solid #292929;
+}
+.sec .sbody{color:#d0d0d0}
+.sk{color:#c7c7c7}
+.sv{color:#fff}
+.wk-none{color:#aaa}
+#valDetail .vdet .vimg img,
+.vthumb{filter:drop-shadow(0 5px 8px rgba(0,0,0,.45))}
+@media(hover:hover){
+  .isl{transition:border-color .18s,background .18s}
+  .isl:hover{border-color:#444}
+}
+@media(prefers-reduced-motion:reduce){
+  #valDetail *,#valuesPage *,#valDetail .vimg{animation:none !important;transition:none !important}
+}
+
 </style>
 </head>
 <body>
@@ -3339,7 +3429,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "https://static.wikia.nocookie.net/stealanegg/images/a/a3/Chicken.png/revision/latest?cb=20260901193312",
       "A familiar farmyard bird with a lively cluck and a humble, dependable presence."
     ],
-    "Raccoon": { desc: "", reward: "+620 Speed, $4500" }
+    "Raccoon": { desc: "A curious masked forager with nimble paws, always ready to investigate anything left unattended.", reward: "+620 Speed, $4500" }
   };
 
   
@@ -3424,7 +3514,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Stats
       var biome = /^Rift:/.test(island) ? "The Rift" : island;
-      var grow = typeof info.grow === "number" ? info.grow : (e ? (CALC_BASE_GROW[name] !== undefined ? CALC_BASE_GROW[name] : CALC_WIKI_GROW[name] !== undefined ? CALC_WIKI_GROW[name] : GROW_BY_RARITY[e[1]]) : null);
+      // Keep Egg Wiki's base Grow Time aligned with Egg Calculator: named overrides win; regular biome eggs use rarity time; shop/event/rift/etc. eggs default to 10s.
+      var grow = typeof info.grow === "number" ? info.grow : (e ? (CALC_BASE_GROW[name] !== undefined ? CALC_BASE_GROW[name] : (calcIsShop(name) ? CALC_SHOP_GROW : GROW_BY_RARITY[e[1]])) : null);
       var grid = document.createElement("div");
       grid.className = "sgrid";
       grid.appendChild(statBox("Rarity", rarity || "Unknown", RARITY_COLORS[rarity]));
