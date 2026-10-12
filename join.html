@@ -728,6 +728,96 @@ body.wkSearching .vdet *{ animation:none !important; }
   .fu-arrow .fu-ar{transform:rotate(90deg)}
 }
 @media(prefers-reduced-motion:reduce){.fu-big b.pop{animation:none}.fu-card,.fu-chip{transition:none}}
+
+/* ---- Egg Wiki: match Egg Fusion's monochrome glass / minimal style ---- */
+#valDetail,
+#valuesPage{
+  background:rgba(0,0,0,.30);
+  -webkit-backdrop-filter:blur(8px);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;
+  color:#f5f5f5;
+  box-shadow:0 12px 36px rgba(0,0,0,.16);
+}
+#valuesPage > h2{
+  font-size:30px;
+  font-weight:800;
+  letter-spacing:-.02em;
+  color:#fff;
+}
+.wk-bar{background:transparent}
+.wk-search{
+  background:rgba(0,0,0,.38);
+  color:#f5f5f5;
+  border:1px solid #333;
+  border-radius:10px;
+}
+.wk-search:focus{
+  border-color:#888;
+  box-shadow:0 0 0 3px rgba(255,255,255,.08);
+}
+.wk-count{color:#aaa}
+.isl{
+  background:rgba(0,0,0,.26);
+  border:1px solid #292929;
+  border-radius:12px;
+  padding:0 14px;
+}
+.isl > summary{color:#f5f5f5}
+.isl > summary::after{color:#aaa}
+.isl .cnt{color:#aaa}
+.vegg{
+  background:rgba(0,0,0,.32);
+  border:1px solid #292929;
+  color:#eee;
+  border-radius:10px;
+  transition:background .18s,border-color .18s,transform .18s,box-shadow .18s;
+}
+.vegg:hover{
+  background:rgba(255,255,255,.07);
+  border-color:#666;
+  box-shadow:0 5px 18px rgba(0,0,0,.25);
+}
+.vegg.sel{
+  background:#fff;
+  color:#0a0a0a;
+  border-color:#fff;
+  box-shadow:0 0 18px rgba(255,255,255,.12);
+}
+.vegg.sel:hover{background:#eee;border-color:#eee}
+.vthumb{background:#151515;border-radius:8px}
+.vhint{color:#aaa}
+.vdet .vname{color:#fff;font-weight:800;letter-spacing:-.02em}
+.vdet .vrar{color:#aaa}
+.vimg{
+  background:radial-gradient(ellipse at 50% 60%,rgba(255,255,255,.09),rgba(0,0,0,.42) 70%);
+  border:1px solid #292929;
+  border-radius:14px;
+}
+.sec{
+  background:rgba(0,0,0,.26);
+  border:1px solid #292929;
+  border-radius:10px;
+}
+.sec h3{
+  background:rgba(255,255,255,.055);
+  color:#f5f5f5;
+  border-bottom:1px solid #292929;
+}
+.sec .sbody{color:#d0d0d0}
+.sk{color:#c7c7c7}
+.sv{color:#fff}
+.wk-none{color:#aaa}
+#valDetail .vdet .vimg img,
+.vthumb{filter:drop-shadow(0 5px 8px rgba(0,0,0,.45))}
+@media(hover:hover){
+  .isl{transition:border-color .18s,background .18s}
+  .isl:hover{border-color:#444}
+}
+@media(prefers-reduced-motion:reduce){
+  #valDetail *,#valuesPage *,#valDetail .vimg{animation:none !important;transition:none !important}
+}
 </style>
 <!-- Page: Egg Fusion -->
 <section class="panel" id="fusionPage" hidden>
@@ -926,7 +1016,39 @@ var guestStart, guestStop, layoutHook; // filled in below
     ".krow .kbtns button{padding:6px 10px;border:0;border-radius:6px;background:#4e5058;color:#fff;font-size:12px;font-weight:700;cursor:pointer}",
     ".krow .kbtns .del{background:transparent;border:1px solid #ff7b72;color:#ff7b72}",
     ".krow .kbtns .del:hover{background:#ff7b72;color:#1e1f22}",
-    "#kClose{margin-top:6px;padding:10px 18px;border:0;border-radius:8px;background:#4e5058;color:#fff;font-weight:700;cursor:pointer}"
+    "#kClose{margin-top:6px;padding:10px 18px;border:0;border-radius:8px;background:#4e5058;color:#fff;font-weight:700;cursor:pointer}",
+    /* Egg Fusion monochrome treatment — scoped only to the guest notifier */
+    "#guestWrap .panel{background:rgba(5,5,5,.88);border:1px solid rgba(255,255,255,.2);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.28);backdrop-filter:blur(12px)}",
+    "#guestWrap .panel h2,#guestWrap .panel summary{color:#fff;letter-spacing:.015em}",
+    "#guestWrap .panel summary{font-weight:800}",
+    "#guestWrap .gcard{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.12);border-radius:8px}",
+    "#guestWrap .gtitle,#guestWrap .ggrid b{color:#fff}",
+    "#guestWrap .gtag,#guestWrap .gnrow small,#guestWrap .ggrid div,#guestWrap .gvl,#guestWrap #gCount{color:#bdbdbd}",
+    "#guestWrap .gval{background:#050505;border:1px solid #3a3a3a;color:#f5f5f5;border-radius:5px}",
+    "#guestWrap .g-in,#guestWrap .grole select{background:#050505;color:#fff;border:1px solid #555;border-radius:6px}",
+    "#guestWrap .g-in:focus{outline:1px solid #fff;border-color:#fff}",
+    "#guestWrap .gslot{background:#0a0a0a;color:#ccc;border:1px solid #484848;border-radius:6px}",
+    "#guestWrap .gslot.sel{background:#fff;color:#050505;border-color:#fff}",
+    "#guestWrap .gslot.on::after{background:#fff;box-shadow:0 0 0 2px #111}",
+    "#guestWrap .grole button{background:#242424;color:#fff;border:1px solid #555}",
+    "#guestWrap .gsv{background:#0b0b0b;border:1px solid #333;border-radius:7px}",
+    "#guestWrap .gsv .gbtns button,#guestWrap #keysBtn{background:#151515;color:#fff;border:1px solid #555;border-radius:6px}",
+    "#guestWrap .gsv .gbtns .del{border-color:#888;color:#eee}",
+    "#guestWrap .gsv .gbtns .del:hover{background:#fff;color:#000}",
+    "#guestWrap .reset,#guestWrap .ghostbtn{background:#0a0a0a!important;color:#fff!important;border:1px solid #555!important;border-radius:6px!important}",
+    "#guestWrap .save{background:#fff!important;color:#050505!important;border:1px solid #fff!important;border-radius:6px!important}",
+    "#guestWrap .chips .chip,#guestWrap .chips button{background:#101010!important;color:#e8e8e8!important;border:1px solid #414141!important;border-radius:5px!important}",
+    "#guestWrap .chips .chip.active,#guestWrap .chips button.active,#guestWrap .chips .selected{background:#fff!important;color:#000!important;border-color:#fff!important}",
+    "#guestWrap #gTutorial{position:sticky;top:14px}",
+    "#guestWrap #gTutorial .tutorial-kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#aaa;font-weight:800;margin-bottom:7px}",
+    "#guestWrap #gTutorial h2{margin-bottom:6px}",
+    "#guestWrap #gTutorial .tutorial-intro{font-size:12px;line-height:1.55;color:#c8c8c8;margin:0 0 14px}",
+    "#guestWrap .tut-step{display:grid;grid-template-columns:25px minmax(0,1fr);gap:9px;padding:11px 0;border-top:1px solid #303030}",
+    "#guestWrap .tut-num{width:23px;height:23px;display:grid;place-items:center;border:1px solid #777;border-radius:50%;font-size:11px;font-weight:800;color:#fff}",
+    "#guestWrap .tut-step b{display:block;font-size:12px;color:#fff;margin-bottom:3px}",
+    "#guestWrap .tut-step p{font-size:11px;line-height:1.5;color:#bdbdbd;margin:0}",
+    "#guestWrap .tut-note{border:1px solid #3d3d3d;background:#101010;border-radius:6px;padding:10px;font-size:11px;line-height:1.5;color:#ddd;margin-top:10px}",
+    "@media(max-width:1000px){#guestWrap #gTutorial{position:static}}"
   ].join("\n");
   var st = document.createElement("style");
   st.textContent = css;
@@ -959,7 +1081,21 @@ var guestStart, guestStop, layoutHook; // filled in below
       '<div id="gStatus"></div>' +
       '<small class="note">Up to 3 webhooks. Each one has its own alerts and roles. A role is only pinged when an alert matches what you picked for it.</small>' +
     '</section></div>' +
-    '<div id="gRight"><section class="panel" id="gSaved" hidden><h2>Saved Webhooks <span id="gSavedCount"></span></h2><div id="gSavedList"></div></section></div>';
+    '<div id="gRight">' +
+      '<section class="panel" id="gTutorial">' +
+        '<div class="tutorial-kicker">Quick start / 01</div>' +
+        '<h2>How to use the notifier</h2>' +
+        '<p class="tutorial-intro">Set up a webhook once, choose the alerts you care about, then let the live feed show what appears.</p>' +
+        '<div class="tut-step"><span class="tut-num">1</span><div><b>Choose a slot</b><p>Select slot 1, 2, or 3 above the webhook field. Each slot saves its own settings.</p></div></div>' +
+        '<div class="tut-step"><span class="tut-num">2</span><div><b>Add your Discord webhook</b><p>Paste a webhook URL for a channel you manage or have permission to use. Keep the URL private.</p></div></div>' +
+        '<div class="tut-step"><span class="tut-num">3</span><div><b>Pick alert types</b><p>Choose Secret, Eternal, Divine, Butterfly Bloom, or Racing. Use “Pick specific eggs” if you only want certain eggs.</p></div></div>' +
+        '<div class="tut-step"><span class="tut-num">4</span><div><b>Set role pings (optional)</b><p>Enter a Discord role ID, then choose which selected alert should ping that role. Add another row for more roles.</p></div></div>' +
+        '<div class="tut-step"><span class="tut-num">5</span><div><b>Save and test</b><p>Press Save first, then Test to check that the webhook receives a message. Repeat for other slots if needed.</p></div></div>' +
+        '<div class="tut-note"><b>Tip:</b> “Egg Options” filters what you see in the live feed; it does not replace the alert choices saved for a webhook.</div>' +
+        '<div class="tut-note"><b>Privacy:</b> Only paste webhook URLs you trust. Anyone with the URL may be able to post to that channel.</div>' +
+      '</section>' +
+      '<section class="panel" id="gSaved" hidden><h2>Saved Webhooks <span id="gSavedCount"></span></h2><div id="gSavedList"></div></section>' +
+    '</div>';
   document.body.appendChild(wrap);
 
   // owner: button in the top bar + dialog
@@ -2862,7 +2998,8 @@ document.addEventListener("DOMContentLoaded", function () {
   var GROW_BY_RARITY = { Common: 10, Uncommon: 25, Rare: 40, Epic: 90, Legendary: 300, Mythic: 240, Cosmic: 1800, Secret: 10800, Eternal: 32400, Divine: 57600 };
   var RARITY_COLORS = { Common: "#aab0b8", Uncommon: "#5ac85a", Rare: "#4aa3ff", Epic: "#b06cff", Legendary: "#ffa534", Mythic: "#ff5a8a", Cosmic: "#6ee7ff", Secret: "#E74C3C", Eternal: "#9B59B6", Divine: "#F1C40F" };
 
-  // YOUR TEXT GOES HERE. For each egg you can set:
+  // Original wiki flavor descriptions below are written from each pet name and biome theme; they are not official in-game lore.
+  // For each egg you can set:
   //   desc:   the Description text
   //   reward: for example "+420 Speed, $100"
   //   grow:   grow time in seconds (only needed to override or fill a missing one)
@@ -2872,474 +3009,861 @@ document.addEventListener("DOMContentLoaded", function () {
     // ===== Forest =====
     "Dog": [
       "",
-      "Dog description here"
+      "A loyal companion with a sharp nose and an eager spirit, always ready to follow its owner on the next adventure."
     ],
     "Bird": [
       "",
-      "Bird description here"
+      "A lively little flyer whose quick movements and cheerful presence brighten the forest canopy."
     ],
     "Burrowing Owl": [
       "",
-      "Burrowing Owl description here"
+      "A watchful, ground-dwelling owl that keeps close to the earth and spots movement long before others do."
     ],
     "Fox": [
       "",
-      "Fox description here"
+      "A clever woodland wanderer known for quick thinking, nimble steps, and a bright, curious gaze."
     ],
     "Bear": [
       "",
-      "Bear description here"
+      "A powerful forest giant with a calm presence until something threatens its territory."
     ],
     "Brr Brr Patapim": [
       "",
-      "Brr Brr Patapim description here"
+      "A bizarre forest oddity with unmistakable brainrot energy—strange, memorable, and impossible to mistake for an ordinary pet."
     ],
     // ===== Lake =====
     "Frog": [
       "",
-      "Frog description here"
+      "A small pond-dweller built for quick hops and quiet ambushes among the reeds."
     ],
     "Duckling": [
       "",
-      "Duckling description here"
+      "A tiny water-loving companion that paddles after its group and brings a playful splash to the lakeside."
     ],
     "Catfish": [
       "",
-      "Catfish description here"
+      "A whiskered bottom-feeder that glides through murky water, searching the lakebed for its next meal."
     ],
     "Turtle": [
       "",
-      "Turtle description here"
+      "A steady swimmer protected by a sturdy shell, happy to take the slow and reliable route."
     ],
     "Trulimero Trulicina": [
       "",
-      "Trulimero Trulicina description here"
+      "A surreal lake creature with a rhythmic, nonsense-name charm that makes it stand out from the ordinary pond life."
     ],
     "Swan": [
       "",
-      "Swan description here"
+      "An elegant lake bird with a graceful glide and a surprisingly commanding presence on the water."
     ],
     "Axolotl": [
       "",
-      "Axolotl description here"
+      "A curious aquatic salamander with feathery external gills and a permanently friendly expression."
     ],
     "Leviathan": [
       "",
-      "Leviathan description here"
+      "A colossal legendary presence from the deep, imagined as a creature whose silhouette can dominate an entire stretch of water."
     ],
     // ===== Desert =====
     "Jerboa": [
       "",
-      "Jerboa description here"
+      "A tiny desert hopper with long hind legs, darting across hot sand in quick, springy bursts."
     ],
     "Fennec": [
       "",
-      "Fennec description here"
+      "A small desert fox with oversized ears that help it sense the world across the quiet dunes."
     ],
     "Camel": [
       "",
-      "Camel description here"
+      "A hardy desert traveler built for long journeys beneath the scorching sun."
     ],
     "Tob Tobi Tob Tob": [
       "",
-      "Tob Tobi Tob Tob description here"
+      "A wonderfully absurd desert character whose repeating name gives it the feel of a walking meme from the dunes."
     ],
     "Snake": [
       "",
-      "Snake description here"
+      "A silent, flexible hunter that slips through sand and stone with barely a sound."
     ],
     "Sand Spider": [
       "",
-      "Sand Spider description here"
+      "A desert ambusher that blends into the terrain and waits patiently for the right moment to move."
     ],
     "Scorpion": [
       "",
-      "Scorpion description here"
+      "An armored desert crawler with raised pincers and a tail held ready as it patrols the sand."
     ],
     "Royal Sphinx": [
       "",
-      "Royal Sphinx description here"
+      "A regal desert mystery inspired by ancient guardians, with a commanding look worthy of a buried palace."
     ],
     // ===== Jungle =====
     "Chimpanzee": [
       "",
-      "Chimpanzee description here"
+      "An energetic, intelligent climber that explores the jungle canopy with quick hands and curious eyes."
     ],
     "Toucan": [
       "",
-      "Toucan description here"
+      "A colorful tropical bird recognized by its oversized beak and bold silhouette among the treetops."
     ],
     "Crocodile": [
       "",
-      "Crocodile description here"
+      "A patient river predator with armored scales and a powerful jaw, perfectly suited to the jungle waterways."
     ],
     "Gorilla": [
       "",
-      "Gorilla description here"
+      "A broad-shouldered jungle powerhouse whose strength is matched by a steady, imposing presence."
     ],
     "Orangutini Ananassini": [
       "",
-      "Orangutini Ananassini description here"
+      "A playful, surreal jungle character with a tropical twist and a name that sounds straight out of brainrot folklore."
     ],
     "Spider": [
       "",
-      "Spider description here"
+      "An eight-legged crawler that moves quietly through the undergrowth and spins its way through the jungle."
     ],
     "Tiger": [
       "",
-      "Tiger description here"
+      "A striped jungle hunter with a confident stride and a gaze that makes the forest feel smaller."
     ],
     "King Snake": [
       "",
-      "King Snake description here"
+      "A commanding serpent that seems to rule the jungle floor, moving with smooth and deliberate confidence."
     ],
     // ===== Snow =====
     "Penguin": [
       "",
-      "Penguin description here"
+      "A compact, tuxedo-feathered swimmer that waddles over ice before diving into frigid water."
     ],
     "Walrus": [
       "",
-      "Walrus description here"
+      "A heavyset Arctic swimmer with long tusks, thick whiskers, and a fondness for icy coastlines."
     ],
     "Polar Bear": [
       "",
-      "Polar Bear description here"
+      "A formidable white-coated wanderer made for the frozen north, equally at home on ice and snow."
     ],
     "Sabertooth Tiger": [
       "",
-      "Sabertooth Tiger description here"
+      "A prehistoric feline with oversized fangs and a powerful build, evoking an age of icy wilderness."
     ],
     "Mammoth": [
       "",
-      "Mammoth description here"
+      "A shaggy ice-age giant with curved tusks and a thick coat suited to ancient cold landscapes."
     ],
     "King Mammoth": [
       "",
-      "King Mammoth description here"
+      "A majestic mammoth with an especially regal presence, like the undisputed ruler of a frozen herd."
     ],
     "Yeti": [
       "",
-      "Yeti description here"
+      "A legendary snow-dweller wrapped in mystery, leaving huge tracks across remote mountain passes."
     ],
     "Ice Dragon": [
       "",
-      "Ice Dragon description here"
+      "A mythical dragon associated with frost and frozen skies, bringing a chilling presence to the snowfields."
     ],
     // ===== Volcano =====
     "Lava Gecko": [
       "",
-      "Lava Gecko description here"
+      "A heat-loving gecko imagined with volcanic markings, clinging to dark rock near glowing lava."
     ],
     "Lava Frog": [
       "",
-      "Lava Frog description here"
+      "A squat amphibian with a fiery theme, leaping between warm stones around volcanic pools."
     ],
     "Flaming Bull": [
       "",
-      "Flaming Bull description here"
+      "A powerful bull surrounded by a fiery motif, charging with the force of a volcanic eruption."
     ],
     "Lava Iguana": [
       "",
-      "Lava Iguana description here"
+      "A rugged reptile with a lava-forged look, basking on hot stone where other creatures would flee."
     ],
     "Chillin Chilli": [
       "",
-      "Chillin Chilli description here"
+      "A fiery little oddball with a chilli-inspired look and a name that mixes heat with a laid-back attitude."
     ],
     "Cerberus": [
       "",
-      "Cerberus description here"
+      "A fearsome mythic guardian inspired by the three-headed hound of the underworld."
     ],
     "Phoenix": [
       "",
-      "Phoenix description here"
+      "A legendary bird linked to flame and rebirth, imagined rising brilliantly from its own ashes."
     ],
     "Lava Dragon": [
       "",
-      "Lava Dragon description here"
+      "A mighty dragon with a molten theme, as if its scales were forged in the heart of a volcano."
     ],
     // ===== Abyss Ocean =====
     "Parrotfish": [
       "",
-      "Parrotfish description here"
+      "A bright reef fish with a beak-like mouth, moving through the underwater world in flashes of color."
     ],
     "Swordfish": [
       "",
-      "Swordfish description here"
+      "A fast ocean hunter known for its long, sword-like bill and streamlined shape."
     ],
     "Shark": [
       "",
-      "Shark description here"
+      "A sleek marine predator built for steady cruising through open water."
     ],
     "Orca": [
       "",
-      "Orca description here"
+      "A striking black-and-white ocean hunter known for intelligence, teamwork, and powerful swimming."
     ],
     "Whale Shark": [
       "",
-      "Whale Shark description here"
+      "A gentle giant of the sea, recognized by its enormous size and distinctive spotted pattern."
     ],
     "Beluga Whale": [
       "",
-      "Beluga Whale description here"
+      "A pale Arctic whale with a rounded forehead and a curious, expressive appearance."
     ],
     "Kraken": [
       "",
-      "Kraken description here"
+      "A legendary deep-sea monster said to lurk beneath the waves, vast enough to inspire sailors’ tales."
     ],
     "El Maja": [
       "",
-      "El Maja description here"
+      "An enigmatic ocean oddity with a distinctive name and a deep-sea aura that feels larger than life."
     ],
     // ===== Prehistoric =====
     "Dodo": [
       "",
-      "Dodo description here"
+      "A stout, flightless bird from a lost age, remembered for its distinctive shape and gentle appearance."
     ],
     "Pterodactyl": [
       "",
-      "Pterodactyl description here"
+      "An ancient flying reptile with broad wings, built to glide above prehistoric landscapes."
     ],
     "Ankylosaurus": [
       "",
-      "Ankylosaurus description here"
+      "A heavily armored dinosaur with a protective body and a club-like tail for defense."
     ],
     "Triceratops": [
       "",
-      "Triceratops description here"
+      "A sturdy horned dinosaur with a broad frill and three prominent facial horns."
     ],
     "Bronto": [
       "",
-      "Bronto description here"
+      "A towering long-necked dinosaur whose size and reach make it a prehistoric standout."
     ],
     "T-Rex": [
       "",
-      "T-Rex description here"
+      "A powerful apex dinosaur with a massive head, strong legs, and the unmistakable silhouette of a prehistoric king."
     ],
     "Tralaledon": [
       "",
-      "Tralaledon description here"
+      "A strange prehistoric character with a deliberately absurd name and a larger-than-life dinosaur vibe."
     ],
     "Mosasaurus": [
       "",
-      "Mosasaurus description here"
+      "A giant marine reptile from the prehistoric seas, streamlined for life beneath the waves."
     ],
     // ===== Cosmic =====
     "Centapede": [
       "",
-      "Centapede description here"
+      "A many-legged cosmic crawler with an eerie, endless silhouette that seems to ripple through space."
     ],
     "Cosmic Gecko": [
       "",
-      "Cosmic Gecko description here"
+      "A gecko reimagined with a celestial look, as though its scales caught the light of distant stars."
     ],
     "Cosmic Gorilla": [
       "",
-      "Cosmic Gorilla description here"
+      "A massive ape with a cosmic theme, combining brute presence with the mystery of deep space."
     ],
     "La Vacca Saturno Saturnita": [
       "",
-      "La Vacca Saturno Saturnita description here"
+      "A surreal, space-themed bovine oddity with a deliberately ridiculous name and unmistakable cosmic energy."
     ],
     "Cosmic Skeleton Boss": [
       "",
-      "Cosmic Skeleton Boss description here"
+      "A skeletal cosmic figure with a boss-like presence, dressed in the visual language of distant galaxies."
     ],
     "Cosmic Dragon": [
       "",
-      "Cosmic Dragon description here"
+      "A mythical dragon imagined among stars and nebulae, with a presence that feels otherworldly."
     ],
     "Eternal Lunar Dragon": [
       "",
-      "Eternal Lunar Dragon description here"
+      "A moon-themed dragon with an ancient, timeless aura and a silhouette tied to the night sky."
     ],
     "Unicorn": [
       "",
-      "Unicorn description here"
+      "A mythical horse with a single horn, symbolizing wonder and magic in a celestial setting."
     ],
     // ===== Cherry Blossom =====
     "Crane": [
       "",
-      "Crane description here"
+      "An elegant long-legged bird associated with calm wetlands and graceful movement."
     ],
     "Salamander": [
       "",
-      "Salamander description here"
+      "A small amphibian-like creature with a smooth body, suited to damp places and hidden garden corners."
     ],
     "Red Panda": [
       "",
-      "Red Panda description here"
+      "A nimble, russet-coated climber with a ringed tail and a curious, gentle demeanor."
     ],
     "Snowy Owl": [
       "",
-      "Snowy Owl description here"
+      "A pale owl with piercing eyes, perfectly camouflaged against snowy branches and winter skies."
     ],
     "Koi": [
       "",
-      "Koi description here"
+      "A graceful ornamental fish known for flowing fins and striking patterns as it glides through still water."
     ],
     "Stag": [
       "",
-      "Stag description here"
+      "A proud forest deer with branching antlers, carrying itself like a guardian of the blossom groves."
     ],
     "Oni Tiger": [
       "",
-      "Oni Tiger description here"
+      "A fearsome tiger with an oni-inspired identity, blending feline power with Japanese folklore imagery."
     ],
     "Kitsune": [
       "",
-      "Kitsune description here"
+      "A legendary fox spirit from Japanese folklore, associated with cleverness, mystery, and magical transformations."
     ],
     // ===== Titan Temple =====
     "Spideron": [
       "",
-      "Spideron description here"
+      "An armored, spider-like temple creature with a formidable silhouette and an ancient-guardian feel."
     ],
     "Crustacia": [
       "",
-      "Crustacia description here"
+      "A crustacean-inspired creature with a hard-shelled look, built to feel at home among temple ruins."
     ],
     "Bladehide": [
       "",
-      "Bladehide description here"
+      "A tough, blade-themed creature whose name suggests a protective hide and sharp-edged features."
     ],
     "Mantaris": [
       "",
-      "Mantaris description here"
+      "A mantis-like creature with an imposing profile, evoking the precise movements of a temple sentinel."
     ],
     "Rhinotaur": [
       "",
-      "Rhinotaur description here"
+      "A horned powerhouse that blends rhinoceros toughness with the mythic stature of a minotaur."
     ],
     "Gorilla King": [
       "",
-      "Gorilla King description here"
+      "A regal ape with a commanding build, presented as the monarch of the Titan Temple."
     ],
     "Nightflame": [
       "",
-      "Nightflame description here"
+      "A mysterious creature wrapped in the imagery of darkness and fire, glowing like a flame after sunset."
     ],
     "Mutant Shark": [
       "",
-      "Mutant Shark description here"
+      "A strange altered shark with an unusual, formidable look that sets it apart from ordinary ocean predators."
     ],
     // ===== Angels & Demons =====
     "Flame Sprite": [
       "",
-      "Flame Sprite description here"
+      "A tiny magical being associated with flickering fire and bright, restless energy."
     ],
     "Light Dove": [
       "",
-      "Light Dove description here"
+      "A gentle dove with a radiant theme, representing calm and brightness in the celestial realm."
     ],
     "Winged Lamb": [
       "",
-      "Winged Lamb description here"
+      "A peaceful lamb with wings, combining a soft appearance with an angelic, airborne twist."
     ],
     "Toro": [
       "",
-      "Toro description here"
+      "A bold bull-inspired creature with a sturdy stance and a strong, unmistakable silhouette."
     ],
     "Imp": [
       "",
-      "Imp description here"
+      "A mischievous little demon-like being, known more for its impish attitude than its size."
     ],
     "Sacred Moth": [
       "",
-      "Sacred Moth description here"
+      "A delicate moth with a sacred, mystical theme and wings that suggest a quiet celestial glow."
     ],
     "Holy Peacock": [
       "",
-      "Holy Peacock description here"
+      "A regal peacock with a divine theme, imagined displaying a radiant fan of ornamental feathers."
     ],
     "Demon Hound": [
       "",
-      "Demon Hound description here"
+      "A shadowy hound with a demonic theme, giving off the impression of a tireless underworld tracker."
     ],
     "Gargoyle": [
       "",
-      "Gargoyle description here"
+      "A stone-like guardian creature inspired by the figures perched on ancient rooftops and temples."
     ],
     "Pure Jellyfish": [
       "",
-      "Pure Jellyfish description here"
+      "A translucent jellyfish with a luminous, otherworldly appearance, drifting as if suspended in light."
     ],
     "Centaur": [
       "",
-      "Centaur description here"
+      "A legendary being with a human upper body and horse lower body, combining speed with a heroic presence."
     ],
     "RazorFang": [
       "",
-      "RazorFang description here"
+      "A sharp-featured creature with a name that suggests dangerous-looking fangs and a fierce, secretive nature."
     ],
     "Pegasus": [
       "",
-      "Pegasus description here"
+      "A mythical winged horse associated with the sky, freedom, and legendary journeys."
     ],
     "Skeleton Horse": [
       "",
-      "Skeleton Horse description here"
+      "A spectral-looking horse with a skeletal theme, giving a familiar steed an eerie fantasy twist."
     ],
     "Equinox": [
       "",
-      "Equinox description here"
+      "A rare fusion-themed creature whose name evokes the balance between day and night."
     ],
     "ArchAngel": [
       "",
-      "ArchAngel description here"
+      "A powerful celestial figure associated with radiant wings, protection, and heavenly grandeur."
     ],
     "World Burner": [
       "",
-      "World Burner description here"
+      "A colossal fire-themed entity whose name suggests overwhelming, world-shaking heat."
     ],
     "Aetheron": [
       "",
-      "Aetheron description here"
+      "An enigmatic celestial creature with an ethereal name and a presence that feels beyond the ordinary world."
     ],
     // ===== Enchanted Forest =====
     "Prism Gecko": [
       "",
-      "Prism Gecko description here"
+      "A colorful gecko whose prism theme suggests shifting hues and light-catching scales."
     ],
     "Petal Beetle": [
       "",
-      "Petal Beetle description here"
+      "A small beetle with a floral theme, as if its shell were decorated with petals from an enchanted garden."
     ],
     "Enchanted Bluejay": [
       "",
-      "Enchanted Bluejay description here"
+      "A bright blue jay touched by magic, bringing a lively flash of color to the enchanted woods."
     ],
     "Astral Jackalope": [
       "",
-      "Astral Jackalope description here"
+      "A mythical jackalope with a starry, astral theme, blending woodland charm with cosmic wonder."
     ],
     "Spirit Panda": [
       "",
-      "Spirit Panda description here"
+      "A calm panda with a spiritual, mystical identity, as though it belongs partly to another realm."
     ],
     "Starry Fox": [
       "",
-      "Starry Fox description here"
+      "A clever fox with a star-themed look, like the night sky has been scattered across its coat."
     ],
     "Celestial Sunlion": [
       "",
-      "Celestial Sunlion description here"
+      "A majestic lion infused with solar imagery, radiating warmth and regal celestial energy."
     ],
     "Royal Skywhale": [
       "",
-      "Big ass whale"
+      "A majestic whale-like creature associated with the open sky, imagined drifting above the world like a living cloud."
     ],
     "Spirit World Guardian": [
       "",
-      "Spirit World Guardian description here"
+      "A powerful guardian from the spirit realm, carrying an ancient and mysterious presence."
     ],
+
+    // ===== Rift, event, store, racing, and other catalog eggs =====
+    "67": [
+      "",
+      "A surreal internet-meme character whose entire identity is built around the number 67 and its instantly recognizable joke energy."
+    ],
+    "Abyss Overlord": [
+      "",
+      "A commanding deep-realm creature with an immense, ominous presence, as if it rules the darkest reaches of the ocean."
+    ],
+    "Abyss Shark": [
+      "",
+      "A shark with a deep-sea theme, carrying a shadowy silhouette suited to the ocean’s most mysterious depths."
+    ],
+    "Amethyst Runebear": [
+      "",
+      "A powerful bear marked by amethyst and ancient-rune imagery, blending wilderness strength with magical mystery."
+    ],
+    "Archdemon Dragon": [
+      "",
+      "A formidable dragon with an archdemonic theme, combining infernal imagery with an imposing, otherworldly form."
+    ],
+    "Baby Aurora Dragon": [
+      "",
+      "A young dragon whose name evokes colorful aurora lights rippling across a cold night sky."
+    ],
+    "Balrog": [
+      "",
+      "A towering fantasy monster associated with shadow and flame, with a presence that feels ancient and formidable."
+    ],
+    "Bombo Croco": [
+      "",
+      "A cartoonish crocodile character with explosive, absurd meme energy and a name made to stand out."
+    ],
+    "Citadel Snail #007": [
+      "",
+      "A small snail with a citadel-inspired identity, turning a slow-moving creature into an oddly imposing little character."
+    ],
+    "Crocodon": [
+      "",
+      "A prehistoric-looking crocodilian creature with a heavy build and a name that blends crocodile and dinosaur imagery."
+    ],
+    "Cthulhu": [
+      "",
+      "A cosmic-horror-inspired entity with tentacled, ancient-sea imagery and a presence shrouded in mystery."
+    ],
+    "Dreadclaw": [
+      "",
+      "A menacing creature whose name suggests oversized claws and a fierce, predatory silhouette."
+    ],
+    "Dreadscale": [
+      "",
+      "A heavily scaled fantasy beast with a dark, intimidating look and a name that suggests armor-like skin."
+    ],
+    "Dreadstinger": [
+      "",
+      "A formidable insect-like creature whose name evokes a dangerous-looking stinger and a dark, armored form."
+    ],
+    "Drilla": [
+      "",
+      "A strange dragon-like character with a bold, memorable silhouette and an unusual name that sets it apart."
+    ],
+    "Dunkleosteus": [
+      "",
+      "An armored prehistoric fish with a powerful jaw, recalling one of the most imposing hunters of ancient seas."
+    ],
+    "Electric Eel": [
+      "",
+      "An eel with an electric theme, imagined crackling with energy as it winds through the water."
+    ],
+    "Ember Dragon": [
+      "",
+      "A dragon with a warm ember glow, as if tiny sparks linger between its scales."
+    ],
+    "Engine Snail": [
+      "",
+      "A quirky snail with an engine-inspired twist, mixing a slow creature’s shape with racing-machine energy."
+    ],
+    "Experiment #001": [
+      "",
+      "A mysterious numbered experiment whose identity feels classified, unusual, and deliberately hard to explain."
+    ],
+    "Eye Bat #021": [
+      "",
+      "A bat-like character identified by its watchful eye motif, giving it a strange laboratory-creature feel."
+    ],
+    "Eyeball Crab": [
+      "",
+      "A crab-like oddity with an oversized eyeball theme, blending seaside creature features with surreal laboratory design."
+    ],
+    "Frogfly": [
+      "",
+      "A hybrid-looking creature that mixes the feel of a frog with the light, fluttering presence of a fly."
+    ],
+    "Giant Sloth": [
+      "",
+      "A huge prehistoric sloth with a bulky frame and a slow, ancient-world presence."
+    ],
+    "Gigantus": [
+      "",
+      "A colossal creature whose name emphasizes its enormous scale and larger-than-life silhouette."
+    ],
+    "Glyptodon": [
+      "",
+      "An ancient armored mammal with a domed shell, resembling a heavily protected prehistoric tank."
+    ],
+    "Hazardhog": [
+      "",
+      "A hedgehog-inspired creature with a hazardous, industrial look and a prickly silhouette."
+    ],
+    "Jitterbug": [
+      "",
+      "A lively, bug-like character whose name evokes twitchy movement and energetic, dance-like personality."
+    ],
+    "Krakenoid": [
+      "",
+      "A kraken-inspired sea creature with a monstrous, tentacled identity and a deep-ocean feel."
+    ],
+    "Luminous Abyss Shark": [
+      "",
+      "A radiant variant of the Abyss Shark, combining deep-sea menace with a bright, luminous visual theme."
+    ],
+    "Luminous Cthulhu": [
+      "",
+      "A glowing, light-themed version of the tentacled cosmic entity, contrasting radiance with eerie mystery."
+    ],
+    "Luminous Electric Eel": [
+      "",
+      "A bright, glowing eel-themed creature that pairs electric imagery with an unmistakably luminous appearance."
+    ],
+    "Luminous Spike": [
+      "",
+      "A radiant variant of Spike, emphasizing a luminous look while keeping its sharp, distinctive identity."
+    ],
+    "Luminous Spirit Manta": [
+      "",
+      "A glowing manta-inspired creature with a graceful, spectral silhouette drifting through the water."
+    ],
+    "Luminous Terra Snapper": [
+      "",
+      "A luminous version of Terra Snapper, combining an earthy, shelled-creature theme with a radiant finish."
+    ],
+    "Mawbreaker": [
+      "",
+      "A powerful fantasy creature whose name suggests a massive jaw and a rugged, intimidating profile."
+    ],
+    "Mecha Chompa": [
+      "",
+      "A mechanical creature with a chomping, monster-like design, blending machinery with playful menace."
+    ],
+    "Mecha Crawler": [
+      "",
+      "A robotic crawler with a hard-surface, machine-built look and a low, creeping silhouette."
+    ],
+    "Mecha Crocodon": [
+      "",
+      "A mechanical crocodilian beast with armored plating and a prehistoric-inspired machine design."
+    ],
+    "Mecha Dreadscale": [
+      "",
+      "A robotic, heavily plated beast whose dark mechanical scales give it a formidable silhouette."
+    ],
+    "Mecha Froggo": [
+      "",
+      "A mechanical take on Froggo, mixing a rounded amphibian-inspired form with a machine-like finish."
+    ],
+    "Mecha Krakenoid": [
+      "",
+      "A mechanical kraken-inspired creature, pairing tentacled sea-monster imagery with robotic construction."
+    ],
+    "Mecha Scorpio": [
+      "",
+      "A robotic scorpion-like creature with a segmented shell and a distinctly mechanical appearance."
+    ],
+    "Mecha Scrambler": [
+      "",
+      "A powerful machine-themed creature with an experimental design and a name that suggests chaotic energy."
+    ],
+    "Nibbles #013": [
+      "",
+      "A small, numbered experiment with a playful name that makes the mysterious lab subject sound deceptively harmless."
+    ],
+    "Nuceodile": [
+      "",
+      "A mutant crocodile-inspired creature with a strange, experimental identity and a rugged reptilian look."
+    ],
+    "Nuclear Mantis": [
+      "",
+      "A mantis-like experiment with nuclear-themed styling, combining insect proportions with a hazardous sci-fi mood."
+    ],
+    "Octophant": [
+      "",
+      "An unusual hybrid-inspired creature whose name blends octopus and elephant imagery into one memorable design."
+    ],
+    "Ostrich": [
+      "",
+      "A tall, flightless bird with long legs and a quick-running silhouette suited to open ground."
+    ],
+    "Pink Dragon Experiment #010": [
+      "",
+      "A pink dragon-like lab experiment with a numbered identity and a striking, unusual appearance."
+    ],
+    "Race Bird": [
+      "",
+      "A bird-themed racing character with a streamlined, energetic feel made for a fast-paced setting."
+    ],
+    "Race Cheetah": [
+      "",
+      "A cheetah-inspired racing creature whose design evokes acceleration, agility, and speed."
+    ],
+    "Race Lizard": [
+      "",
+      "A lizard-themed racing character with a nimble silhouette and a sporty twist."
+    ],
+    "Race Seahorse": [
+      "",
+      "A seahorse-inspired racing creature, giving a delicate aquatic shape a playful competitive identity."
+    ],
+    "Radcoon": [
+      "",
+      "A raccoon-like character with a radioactive or mutant-inspired theme and a curious masked face."
+    ],
+    "Rhinobear": [
+      "",
+      "A hybrid-style creature that combines bear-like bulk with rhinoceros-inspired toughness."
+    ],
+    "Rift Eye": [
+      "",
+      "A mysterious eye-like entity tied to the Rift, giving the impression of something watching from beyond reality."
+    ],
+    "Riftwing": [
+      "",
+      "A winged Rift creature with an otherworldly silhouette, as though it can cross strange gaps between worlds."
+    ],
+    "Ring Guard": [
+      "",
+      "A sturdy guardian-like figure associated with rings and ancient, ceremonial protection."
+    ],
+    "Ringlord": [
+      "",
+      "A regal, ring-themed entity with a commanding fantasy presence and an air of ancient authority."
+    ],
+    "Sabertooth": [
+      "",
+      "A powerful prehistoric feline with long canine teeth and a muscular build suited to an ancient wilderness."
+    ],
+    "Scorched Dragon": [
+      "",
+      "A dragon with a scorched, fire-marked appearance, as if it has emerged from intense heat."
+    ],
+    "Shadow Dragon": [
+      "",
+      "A dark dragon-themed creature with a mysterious silhouette that seems to blend into dim surroundings."
+    ],
+    "Shardling": [
+      "",
+      "A small shard-themed creature that looks as though it formed from fragments of a broken crystal or rift."
+    ],
+    "Shardwing": [
+      "",
+      "A winged shard creature with a crystalline, fragmented look and an otherworldly outline."
+    ],
+    "Sharkodile": [
+      "",
+      "A hybrid-style predator combining shark and crocodile imagery into a formidable aquatic creature."
+    ],
+    "Shattered Colossus": [
+      "",
+      "A gigantic entity with a fractured, broken-stone theme, giving its massive form a dramatic, ancient look."
+    ],
+    "Shattered Drake": [
+      "",
+      "A dragon-like creature with a shattered, fragment-covered theme and a weathered fantasy silhouette."
+    ],
+    "Shattered Ram": [
+      "",
+      "A sturdy ram-themed creature with a fractured, shard-like appearance and a powerful stance."
+    ],
+    "Skeletal Dunkleosteus": [
+      "",
+      "A skeletal version of the armored prehistoric fish, emphasizing its heavy jaw and ancient marine form."
+    ],
+    "Skeletal Giant Sloth": [
+      "",
+      "A skeletal take on the giant sloth, retaining its bulky prehistoric outline with an eerie bone-themed look."
+    ],
+    "Skeletal Gigantus": [
+      "",
+      "A gigantic skeletal creature whose enormous frame gives its bony silhouette a dramatic presence."
+    ],
+    "Skeletal Glyptodon": [
+      "",
+      "A skeletal armored mammal with a shell-like outline, blending prehistoric defense with a bone-themed design."
+    ],
+    "Skeletal Sabertooth": [
+      "",
+      "A skeletal prehistoric feline with long fangs and a striking, ancient-predator silhouette."
+    ],
+    "Skeletal Terrorbird": [
+      "",
+      "A skeletal flightless bird with a tall, imposing outline and a distinctly prehistoric menace."
+    ],
+    "Spiderpig": [
+      "",
+      "A surreal hybrid character that combines pig-like features with spider imagery for an unusual, memorable look."
+    ],
+    "Spike": [
+      "",
+      "A sharp-featured creature whose name suggests prominent spikes and a bold, distinctive outline."
+    ],
+    "Spirit Manta": [
+      "",
+      "A manta-inspired spirit creature with broad, flowing fins and a calm, otherworldly presence."
+    ],
+    "Stacked Turtle": [
+      "",
+      "A quirky turtle-themed character whose name suggests a stacked or layered shell design."
+    ],
+    "Strawberry Elephant": [
+      "",
+      "A surreal elephant character with a strawberry-inspired theme, combining a huge familiar animal with playful fruit imagery."
+    ],
+    "Terra Snapper": [
+      "",
+      "A sturdy, land-themed shelled creature with a grounded, rocky feel and a strong defensive silhouette."
+    ],
+    "Terrorbird": [
+      "",
+      "A large prehistoric flightless bird with long legs and a powerful, intimidating profile."
+    ],
+    "Three Headed Chicken": [
+      "",
+      "A bizarre three-headed farm bird that turns an ordinary chicken into a wonderfully strange creature."
+    ],
+    "Toucax": [
+      "",
+      "A toucan-inspired character with an unusual name and a bold tropical-bird silhouette."
+    ],
+    "Toxic Crocodile": [
+      "",
+      "A crocodile-themed creature with toxic styling, giving its armored reptilian form a hazardous, mutant look."
+    ],
+    "Toxic Hedgehog": [
+      "",
+      "A hedgehog-inspired creature with toxic-themed styling and a prickly silhouette."
+    ],
+    "Toxic Rat": [
+      "",
+      "A rat-like experiment with toxic imagery and a scrappy, unsettling laboratory-creature vibe."
+    ],
+    "Uncoiled Armadillo": [
+      "",
+      "An armadillo-themed creature shown with an uncoiled identity, highlighting its armored body and unusual shape."
+    ],
+    "Ventinal": [
+      "",
+      "A mysterious Rift creature with an unfamiliar name and an eerie, otherworldly presence."
+    ],
+    "Void Angler": [
+      "",
+      "A deep-water angler creature associated with the Void, evoking a strange lure in a lightless place."
+    ],
+    "Void Dragon": [
+      "",
+      "A dragon with a void-themed appearance, suggesting a creature shaped by darkness and empty space."
+    ],
+    "Void Serpent": [
+      "",
+      "A long serpent-like creature with a void-inspired identity and a mysterious, shadowy outline."
+    ],
+    "Voidmaw": [
+      "",
+      "A dark Rift creature whose name evokes a vast, gaping maw hidden in the unknown."
+    ],
+    "Wendigo": [
+      "",
+      "A folklore-inspired wilderness creature with a haunting, mysterious presence and an eerie silhouette."
+    ],
+    "Wheel Hamster": [
+      "",
+      "A hamster-themed experiment whose name evokes a wheel and constant, energetic movement."
+    ],
+    "World Eater": [
+      "",
+      "A colossal cosmic entity whose name suggests a scale far beyond ordinary creatures."
+    ],
+
     // ===== Chicken and Raccoon (your existing entries) =====
     "Chicken": [
       "https://static.wikia.nocookie.net/stealanegg/images/a/a3/Chicken.png/revision/latest?cb=20260901193312",
-      "Chicken go tok togaok"
+      "A familiar farmyard bird with a lively cluck and a humble, dependable presence."
     ],
-    "Raccoon": { desc: "", reward: "+620 Speed, $4500" }
+    "Raccoon": { desc: "A curious masked forager with nimble paws, always ready to investigate anything left unattended.", reward: "+620 Speed, $4500" }
   };
 
   
@@ -3424,7 +3948,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Stats
       var biome = /^Rift:/.test(island) ? "The Rift" : island;
-      var grow = typeof info.grow === "number" ? info.grow : (e ? (CALC_BASE_GROW[name] !== undefined ? CALC_BASE_GROW[name] : CALC_WIKI_GROW[name] !== undefined ? CALC_WIKI_GROW[name] : GROW_BY_RARITY[e[1]]) : null);
+      // Keep Egg Wiki's base Grow Time aligned with Egg Calculator:
+      // named overrides win; regular biome eggs use rarity time; shop/event/rift/etc. eggs default to 10s.
+      var grow = typeof info.grow === "number" ? info.grow : (e ? (CALC_BASE_GROW[name] !== undefined ? CALC_BASE_GROW[name] : (calcIsShop(name) ? CALC_SHOP_GROW : GROW_BY_RARITY[e[1]])) : null);
       var grid = document.createElement("div");
       grid.className = "sgrid";
       grid.appendChild(statBox("Rarity", rarity || "Unknown", RARITY_COLORS[rarity]));
