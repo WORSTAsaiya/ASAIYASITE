@@ -338,7 +338,25 @@
   }
 /* Discord button: top right of every page on the Steal an egg channel */
 #discordTop { position:absolute; top:14px; right:16px; z-index:50; font-size:13px; padding:9px 14px; }
-@media (max-width:960px) { body { padding-top:64px; } }
+/* Donate button: top left of every page on the Steal an egg channel */
+#donateTop { position:absolute; top:14px; left:16px; z-index:50; display:inline-flex; align-items:center; gap:7px;
+             background:#ec4899; color:#fff; border:0; cursor:pointer; font-family:inherit; font-size:13px; font-weight:700;
+             padding:9px 14px; border-radius:8px; }
+#donateTop:hover { filter:brightness(1.1); }
+#donateTop svg { width:16px; height:16px; fill:currentColor; flex:none; }
+#donateDlg h3 { color:#ec4899; }
+@media (max-width:1200px) { body { padding-top:64px; } }
+
+/* Key box in the top bar: "Input key" -> "Welcome Admin" / "Welcome <name>" */
+#keyBox { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+#keyIn { width:150px; box-sizing:border-box; padding:8px 12px; background:#2b2d31; color:#f2f3f5; border:1px solid #4e5058; border-radius:8px; font-size:13px; font-weight:700; }
+#keyIn:focus { outline:2px solid #3498db; border-color:transparent; }
+#keyGo { padding:8px 12px; background:#3498db; color:#fff; border:0; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; }
+#keyGo:disabled { opacity:.6; cursor:wait; }
+#keyWelcome { padding:8px 12px; background:#2b2d31; color:#f2f3f5; border:1px solid #4e5058; border-radius:8px; font-size:13px; font-weight:700; }
+#keyErr { font-size:12px; color:#ff7b72; }
+#keyErr:empty { display:none; }
+#keyBox.shake { animation:shake .4s; }
 #verifyPage, #soonPage { grid-column:2; }
 @media (max-width:1200px) { #verifyPage, #soonPage { grid-column:1; } }
 .btn.off { opacity:.5; pointer-events:none; }
@@ -605,6 +623,8 @@ body.wkSearching .vdet *{ animation:none !important; }
 <body>
 <!-- FOR EVERY NEW PAGE, ADD THE DISCORD BUTTON ON THE TOP RIGHT -->
 <a id="discordTop" class="discord" href="https://discord.gg/W0RST" target="_blank" rel="noopener noreferrer">Join Our Discord Server</a>
+<!-- FOR EVERY NEW PAGE, ADD THE DONATE BUTTON ON THE TOP LEFT (showView shows it on every page of channel 1 automatically) -->
+<button id="donateTop" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>Donate</button>
 
 <nav class="pages" id="pages">
   <label for="chSel">Channels</label>
@@ -667,14 +687,6 @@ body.wkSearching .vdet *{ animation:none !important; }
     <div id="feed"><div class="empty">Waiting for the first alert...</div></div>
   </aside>
 </section>
-
-<div class="card" id="gate" hidden>
-  <h1>Egg Notifiers</h1>
-  <p>Enter the password to view this page.</p>
-  <input id="pw" type="password" placeholder="Password" autocomplete="off" spellcheck="false">
-  <button id="pwBtn" class="btn" type="button">Unlock</button>
-  <div id="pwErr"></div>
-</div>
 
 <div class="card" id="joinCard">
   <div id="eggbox" hidden></div>
@@ -861,6 +873,12 @@ body.wkSearching .vdet *{ animation:none !important; }
   <p id="dlgEgg"></p>
   <div class="dlgbtns"><button id="dlgNo" class="no" type="button">Cancel</button><button id="dlgYes" class="yes" type="button">Join</button></div>
   <label class="never"><input type="checkbox" id="never"> Never remind again</label>
+</dialog>
+
+<dialog id="donateDlg">
+  <h3>Support the site</h3>
+  <p>Donation details will go here.</p>
+  <div class="dlgbtns"><button id="donateClose" class="no" type="button">Close</button></div>
 </dialog>
 
 <div id="wallImpact" aria-hidden="true">
@@ -1060,11 +1078,38 @@ var guestStart, guestStop, layoutHook; // filled in below
     '<div id="gRight"><section class="panel" id="gSaved" hidden><h2>Saved Webhooks <span id="gSavedCount"></span></h2><div id="gSavedList"></div></section></div>';
   document.body.appendChild(wrap);
 
-  // owner: button in the top bar + dialog
+  // top bar, same spot as the old Manage passwords button:
+  //   "Input key" -> admin key = "Welcome Admin" (+ Manage passwords), guest key = "Welcome <name>" (plain text)
   var keysBtn = mk("button", "", "Manage passwords");
   keysBtn.id = "keysBtn"; keysBtn.type = "button"; keysBtn.hidden = true;
+  var keyBox = mk("div"); keyBox.id = "keyBox";
+  var keyIn = document.createElement("input");
+  keyIn.id = "keyIn"; keyIn.type = "password"; keyIn.placeholder = "Input key";
+  keyIn.autocomplete = "off"; keyIn.spellcheck = false;
+  var keyGo = mk("button", "", "Enter"); keyGo.id = "keyGo"; keyGo.type = "button";
+  var keyWelcome = mk("span", "", ""); keyWelcome.id = "keyWelcome"; keyWelcome.hidden = true;
+  var keyErr = mk("span", "", ""); keyErr.id = "keyErr";
+  keyBox.appendChild(keyIn); keyBox.appendChild(keyGo); keyBox.appendChild(keyWelcome); keyBox.appendChild(keyErr);
   var nav = $("pages");
-  if (nav) nav.appendChild(keysBtn);
+  if (nav) { nav.appendChild(keyBox); nav.appendChild(keysBtn); }
+
+  // role: "" (visitor), "admin" or "guest"
+  W.setKeyState = function (role, label, err) {
+    var signedIn = role === "admin" || role === "guest";
+    keyIn.hidden = signedIn; keyGo.hidden = signedIn;
+    keyWelcome.hidden = !signedIn;
+    keyWelcome.textContent = role === "admin" ? "Welcome Admin" : role === "guest" ? "Welcome " + (label || "Guest") : "";
+    keysBtn.hidden = role !== "admin";   // only the admin gets Manage passwords (create / delete keys, admin + guest logs)
+    keyIn.value = "";
+    keyErr.textContent = err || "";
+  };
+  function submitKey() {
+    var v = keyIn.value.trim();
+    if (!v) { keyErr.textContent = "Enter a key first"; return; }
+    if (typeof W.checkAuth === "function") W.checkAuth(v, true);
+  }
+  keyGo.addEventListener("click", submitKey);
+  keyIn.addEventListener("keydown", function (e) { if (e.key === "Enter") submitKey(); });
 
   var dlg = document.createElement("dialog");
   dlg.id = "keysDlg";
@@ -1093,10 +1138,9 @@ var guestStart, guestStop, layoutHook; // filled in below
     return d + (d === 1 ? " day ago" : " days ago");
   }
 
-  function kicked(text) {   // wrong or taken key: back to the password box with the server's message
+  function kicked(text) {   // wrong, taken or removed key: back to "Input key" with the server's message
     if (typeof W.relock === "function") W.relock();
-    var e = $("pwErr");
-    if (e) e.textContent = text === "locked" ? "" : (text || "");
+    keyErr.textContent = text === "locked" ? "" : (text || "");
   }
 
   function post(path, body) {
@@ -1106,7 +1150,7 @@ var guestStart, guestStop, layoutHook; // filled in below
       body: JSON.stringify(body || {})
     }).then(function (r) {
       return r.text().then(function (t) {
-        if (r.status === 401 || (r.status === 403 && /not meant/i.test(t))) kicked(t);
+        if ((r.status === 401 && W.passMem) || (r.status === 403 && /not meant/i.test(t))) kicked(t);
         return { ok: r.ok, status: r.status, t: t };
       });
     });
@@ -1193,7 +1237,7 @@ var guestStart, guestStop, layoutHook; // filled in below
     gBusy = true;
     fetch(W.API + "/alerts", { cache: "no-store", headers: { "x-pass": encodeURIComponent(W.passMem || "") } })
       .then(function (r) {
-        if (r.status === 401 || r.status === 403) return r.text().then(function (t) { kicked(t); throw 0; });
+        if (r.status === 401 || r.status === 403) return r.text().then(function (t) { if (W.passMem) kicked(t); throw 0; });
         return r.json();
       })
       .then(function (d) {
@@ -1560,7 +1604,7 @@ var guestStart, guestStop, layoutHook; // filled in below
     var show = !!(notifier && open && LAYOUT === "guest");
     var was = !wrap.hidden;
     wrap.hidden = !show;
-    keysBtn.hidden = !(open && LAYOUT === "owner");
+    keysBtn.hidden = !(open && LAYOUT === "owner" && W.isAdmin === true);
     if (show && !was) { gPoll(); sched(); }
   };
   guestStart = function () {
@@ -2278,7 +2322,7 @@ var guestStart, guestStop, layoutHook; // filled in below
   function post(path, body) {
     return fetch(API + path, { method: "POST", headers: { "Content-Type": "application/json", "x-pass": encodeURIComponent(passMem) }, body: JSON.stringify(body) })
       .then(function (r) {
-        if (r.status === 401) relock();
+        if (r.status === 401 && passMem) relock();   // only a typed key can be "kicked"; a plain visitor just gets the message
         return r.text().then(function (t) { return { ok: r.ok, t: t }; });
       });
   }
@@ -3871,11 +3915,11 @@ document.addEventListener("DOMContentLoaded", function () {
     var notifier = live && pg === 1;
     var open = unlocked;
     $("discordTop").hidden = !(live || ch === 2);   // FOR EVERY NEW PAGE, ADD THE DISCORD BUTTON ON THE TOP RIGHT (shows on every page of channel 1 automatically)
+    $("donateTop").hidden = !live;                  // FOR EVERY NEW PAGE, ADD THE DONATE BUTTON ON THE TOP LEFT (Steal an egg channel only)
     $("pgSel").disabled = !(live || ch === 2);
     $("left").hidden = !(notifier && open && LAYOUT !== "guest");
     $("right").hidden = !(notifier && open && LAYOUT !== "guest");
     layoutHook(notifier, open);
-    $("gate").hidden = !(notifier && authChecked && !open);
     $("joinCard").hidden = !(live && pg === 4);
     $("valDetail").hidden = !(live && pg === 2);
     document.body.classList.toggle("wikiPage", live && pg === 2);
@@ -3891,16 +3935,18 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // the Worker checks the password, so it never appears in this file
-  function relock() {
-    unlocked = false; authChecked = true;
+  function relock() {   // a typed key stopped working: back to the plain visitor view with "Input key"
+    var wasIn = !!passMem;
+    window.isAdmin = false;
     passMem = "";
     LAYOUT = ""; guestStop();
+    if (wasIn) setKeyState("", "", "");
     showView();
+    poll(); initSlots();
   }
-  function unlock() {
+  function unlock() {   // the page opens straight away, no password screen
     unlocked = true; authChecked = true;
     showView();
-    if (LAYOUT === "guest") { guestStart(); return; }
     poll(); initSlots();
     notifierLoadIn($("tear").hidden);   // the password reveal already animates the panels itself
   }
@@ -3958,39 +4004,49 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 1100);
   }
   function shake() {
-    var g = $("gate");
+    var g = $("keyBox");
     g.classList.remove("shake"); void g.offsetWidth; g.classList.add("shake");
     setTimeout(function () { g.classList.remove("shake"); }, 500);
   }
+  // Input key: the Worker decides if it is the admin key or a guest key (the key itself is never stored in this file)
   function checkAuth(pw, fromUser) {
-    var btn = $("pwBtn");
-    function done() { if (fromUser) { btn.disabled = false; btn.textContent = "Unlock"; } }
-    if (fromUser) { btn.disabled = true; btn.textContent = "Checking..."; $("pwErr").textContent = ""; }
+    var btn = $("keyGo");
+    function done() { btn.disabled = false; btn.textContent = "Enter"; }
+    btn.disabled = true; btn.textContent = "Checking...";
+    $("keyErr").textContent = "";
     fetch(API + "/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: pw }) })
       .then(function (r) {
         done();
         if (r.ok) {
           return r.json().catch(function () { return {}; }).then(function (d) {
-            LAYOUT = d.layout === "guest" ? "guest" : "owner";
-            if (fromUser) passMem = pw;
-            $("pw").value = ""; $("pwErr").textContent = "";
-            if (fromUser) reveal(); else unlock();   // unlock() without typing only happens when no password is set
+            var admin = d.layout !== "guest";
+            var label = String(d.label || d.name || d.owner || "").trim();   // key owner name, sent by the Worker for guest keys
+            passMem = pw;
+            LAYOUT = "owner";            // admin AND guest keys both get the full owner layout
+            window.isAdmin = admin;           // ...but only the admin gets "Manage passwords"
+            setKeyState(admin ? "admin" : "guest", label, "");
+            showView();
+            poll(); initSlots();   // reload the webhook slots for this key
           });
         }
         return r.text().then(function (t) {
-          if (!fromUser) passMem = "";
-          authChecked = true; showView();
-          if (fromUser) { $("pwErr").textContent = t === "locked" ? "Enter the password" : (t || "Wrong password"); shake(); }
+          setKeyState("", "", t === "locked" ? "Enter a key" : (t || "Wrong key"));
+          shake();
         });
       })
-      .catch(function () { done(); authChecked = true; showView(); $("pwErr").textContent = "Could not reach the server"; });
+      .catch(function () { done(); setKeyState("", "", "Could not reach the server"); });
   }
-  function tryUnlock() { checkAuth($("pw").value, true); }
-  $("pwBtn").addEventListener("click", tryUnlock);
-  $("pw").addEventListener("keydown", function (e) { if (e.key === "Enter") tryUnlock(); });
+
+  // ---------- donate button (top left, every page of the Steal an egg channel) ----------
+  (function () {
+    var d = $("donateDlg");
+    $("donateTop").addEventListener("click", function () { if (!d.open) d.showModal(); });
+    $("donateClose").addEventListener("click", function () { d.close(); });
+    d.addEventListener("click", function (e) { if (e.target === d) d.close(); });
+  })();
 
   // ---------- tab / channel switch animations ----------
-  var VIEW_IDS = ["left", "right", "guestWrap", "gate", "joinCard", "valDetail", "valuesPage", "calcPage", "fusionPage", "verifyPage", "soonPage", "blank"];
+  var VIEW_IDS = ["left", "right", "guestWrap", "joinCard", "valDetail", "valuesPage", "calcPage", "fusionPage", "verifyPage", "soonPage", "blank"];
   var curCh, curPg, running = [], inflight = false;
   function reduced() { return window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches; }
   function canAnim() { return !reduced() && !!document.body.animate; }
@@ -4121,7 +4177,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   loadInviteCard();
   try { localStorage.removeItem("eggPw"); } catch (e) {}   // clean up the password older versions saved
-  checkAuth("", false);
+  setTimeout(unlock, 0);   // no password screen: open the webhook page right away (a key is typed in the top bar)
 
   // ---------- polling ----------
   // ---------- egg countdown (4:50 from the first alert of a round) ----------
@@ -4143,7 +4199,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!FEED_URL) { feedEl.textContent = "Feed not set up yet."; return; }
     if (!unlocked || LAYOUT === "guest") return;
     fetch(FEED_URL, { cache: "no-store", headers: { "x-pass": encodeURIComponent(passMem) } })
-      .then(function (r) { if (r.status === 401) { relock(); throw 0; } return r.json(); })
+      .then(function (r) {
+        if (r.status === 401) { if (passMem) relock(); throw 0; }
+        if (!r.ok) {   // e.g. 403: the Worker refused this key for /feed. Say so instead of silently showing "Waiting..."
+          return r.text().then(function (t) {
+            if (passMem && !allItems.length) { feedEl.textContent = ""; feedEl.appendChild(line("div", "Feed refused for this key (HTTP " + r.status + "): " + String(t).slice(0, 120), "empty")); }
+            throw 0;
+          });
+        }
+        return r.json();
+      })
       .then(function (d) {
         var items = Array.isArray(d) ? d : (d && d.items);
         if (d && d.cycle) {
