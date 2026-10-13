@@ -3684,7 +3684,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return Math.pow(ratio, 5 / 3);
   }
   var FU_MULT = {}; CALC_MUTS.forEach(function (m) { FU_MULT[m[0]] = m[1]; });
-  var FU_VARIANTS = ["None", "Silver", "Golden", "Rainbow"];
+  var FU_VARIANTS = ["None", "Silver", "Golden", "Rainbow", "Parasite"];   // None clears the rest; the others can be combined
   var FU_MUTS = CALC_MUTS.map(function (m) { return m[0]; }).filter(function (n) { return FU_VARIANTS.indexOf(n) < 0; });
   var fuUid = 0, fuCur = "peg", fuPanels = {};
 
@@ -3723,16 +3723,23 @@ document.addEventListener("DOMContentLoaded", function () {
     var kg = fuEl("input", "", box); kg.type = "text"; kg.value = kgDefault; kg.autocomplete = "off";
     kg.setAttribute("inputmode", "decimal"); kg.setAttribute("aria-label", petName + " weight in kg");
     fuEl("span", "kg", box);
-    var vsel = "None", msel = {}, vb = {}, mb = {};
+    var vsel = {}, msel = {}, vb = {}, mb = {};
     function sync() {
-      FU_VARIANTS.forEach(function (v) { vb[v].classList.toggle("on", v === vsel); vb[v].setAttribute("aria-pressed", v === vsel); });
+      var anyV = FU_VARIANTS.some(function (v) { return v !== "None" && vsel[v]; });
+      FU_VARIANTS.forEach(function (v) {
+        var on = v === "None" ? !anyV : !!vsel[v];
+        vb[v].classList.toggle("on", on); vb[v].setAttribute("aria-pressed", on);
+      });
       FU_MUTS.forEach(function (m) { mb[m].classList.toggle("on", !!msel[m]); mb[m].setAttribute("aria-pressed", !!msel[m]); });
     }
-    fuEl("div", "Variant (inherited)", st).className = "fu-lbl";
+    fuEl("div", "Variants (inherited, pick any)", st).className = "fu-lbl";
     var vr = fuEl("div", "", st); vr.className = "fu-chips";
     FU_VARIANTS.forEach(function (v) {
       var b = fuEl("button", v, vr); b.type = "button"; b.className = "fu-chip"; vb[v] = b;
-      b.addEventListener("click", function () { vsel = v; sync(); fuRender(); });
+      b.addEventListener("click", function () {
+        if (v === "None") vsel = {}; else vsel[v] = !vsel[v];
+        sync(); fuRender();
+      });
     });
     fuEl("div", "Mutations (inherited)", st).className = "fu-lbl";
     var mr = fuEl("div", "", st); mr.className = "fu-chips";
@@ -3745,7 +3752,7 @@ document.addEventListener("DOMContentLoaded", function () {
       name: petName, card: card, wv: wv, ov: ov,
       read: function () {
         var T = 1, names = [];
-        if (vsel !== "None") { T += FU_MULT[vsel] - 1; names.push(vsel); }
+        FU_VARIANTS.forEach(function (v) { if (v !== "None" && vsel[v]) { T += FU_MULT[v] - 1; names.push(v); } });
         FU_MUTS.forEach(function (m) { if (msel[m]) { T += FU_MULT[m] - 1; names.push(m); } });
         return { kg: calcParseKg(kg.value), T: T, names: names };
       }
