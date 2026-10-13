@@ -2191,7 +2191,65 @@ var guestStart, guestStop, layoutHook; // filled in below
     render();
   }
 
+  // ---------- public feed (no key): rare egg alerts from /alerts ----------
+  var pubItems = [], pubSig = "";
+  function pollPublic() {
+    fetch(API + "/alerts", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || !Array.isArray(d.items)) return;
+        cycleStart = null; paintCycle();
+        var sig = d.items.map(function (a) { return a.type + a.t + a.egg; }).join(",");
+        if (sig === pubSig) return;
+        pubSig = sig; pubItems = d.items;
+        renderPublic();
+      })
+      .catch(function () {});
+  }
+  function renderPublic() {
+    var shown = pubItems.filter(function (a) {
+      return F.all || (a.type === "egg" && F.tiers[a.rarity]);
+    });
+    feedEl.textContent = "";
+    $("count").textContent = pubItems.length ? "Showing " + shown.length + " of " + pubItems.length : "";
+    if (!shown.length) {
+      feedEl.appendChild(line("div", pubItems.length ? "No alerts match your filters." : "Waiting for the first alert...", "empty"));
+      return;
+    }
+    var EV = { butterfly: ["Butterfly Bloom", "#FF69B4"], race: ["Racing Event", "#23A55A"] };
+    shown.forEach(function (a) {
+      var isEgg = a.type === "egg", d = document.createElement("div");
+      d.className = "item" + (isEgg ? " " + String(a.rarity).replace(/[^A-Za-z]/g, "") : "");
+      if (!isEgg && EV[a.type]) d.style.borderLeftColor = EV[a.type][1];
+
+      var pic = document.createElement("div"); pic.className = "pic";
+      var src = safeImg(a.image) || (isEgg ? eggImg(String(a.egg).replace(/ Egg$/i, "")) : "");
+      if (src) {
+        var img = document.createElement("img");
+        img.alt = ""; img.referrerPolicy = "no-referrer";
+        img.onerror = function () { img.remove(); };
+        img.src = src; pic.appendChild(img);
+      }
+
+      var info = document.createElement("div"); info.className = "info";
+      info.appendChild(line("b", isEgg ? a.egg : (EV[a.type] ? EV[a.type][0] : "Event")));
+      if (isEgg) {
+        info.appendChild(line("span", "Rarity: " + a.rarity));
+        if (a.location) info.appendChild(line("span", "Location: " + a.location));
+        if (a.value && !/not set/i.test(a.value)) info.appendChild(line("span", "Value: " + a.value));
+      } else {
+        info.appendChild(line("span", "Status: " + (a.status || "Active")));
+        if (a.location) info.appendChild(line("span", "Location: " + a.location));
+      }
+      var t = line("span", ago(a.t), "time"); t.dataset.t = a.t; info.appendChild(t);
+
+      d.appendChild(pic); d.appendChild(info);
+      feedEl.appendChild(d);
+    });
+  }
+
   function render() {
+    if (!passMem) { renderPublic(); return; }
     var shown = allItems.filter(passes);
     feedEl.textContent = "";
     $("count").textContent = allItems.length ? "Showing " + shown.length + " of " + allItems.length : "";
@@ -2241,7 +2299,7 @@ var guestStart, guestStop, layoutHook; // filled in below
   // Clear the currently displayed batch locally. The same batch stays cleared
   // on subsequent polls; a changed feed signature (new batch) appears normally.
   $("feedClear").addEventListener("click", function () {
-    allItems = [];
+    allItems = []; pubItems = [];
     newKeys = {};
     render();
   });
@@ -4198,6 +4256,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function poll() {
     if (!FEED_URL) { feedEl.textContent = "Feed not set up yet."; return; }
     if (!unlocked || LAYOUT === "guest") return;
+    if (!passMem) { pollPublic(); return; }
     fetch(FEED_URL, { cache: "no-store", headers: { "x-pass": encodeURIComponent(passMem) } })
       .then(function (r) {
         if (r.status === 401) { if (passMem) relock(); throw 0; }
