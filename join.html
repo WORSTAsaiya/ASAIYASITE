@@ -730,7 +730,10 @@ body.wkSearching .vdet *{ animation:none !important; }
   <h2 class="cc-title">Value Calculator</h2>
   <div class="cc-main">
     <div>
-      <input class="cc-search" id="ccSearch" type="text" placeholder="Search eggs by name..." autocomplete="off" spellcheck="false">
+      <div class="cc-searchrow">
+        <input class="cc-search" id="ccSearch" type="text" placeholder="Search eggs by name..." autocomplete="off" spellcheck="false">
+        <div class="cc-art" id="ccArt" role="group" aria-label="Picture style"><button type="button" data-m="egg" class="on" aria-pressed="true">Egg</button><button type="button" data-m="pet" aria-pressed="false">Pet</button></div>
+      </div>
       <div class="cc-tabs" id="ccTabs"></div>
       <div class="cc-grid" id="ccGrid"></div>
     </div>
@@ -1761,7 +1764,7 @@ var guestStart, guestStop, layoutHook; // filled in below
     "Oni Tiger": "https://asaiya2.github.io/steal-an-egg/Oni_Tiger.png",
     "Kitsune": "https://asaiya2.github.io/steal-an-egg/Kitsune.png",
     // Enchanted Forest
-    "Prism Gecko": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/6/69/Scorpio_Icon.png?width=75&format=jpg&auto=webp&quality=80",
+    "Prism Gecko": "https://stealanegg.tools/images/Prism_Gecko.png",
     "Petal Beetle": "https://stealegg.com/assets/images/pets/petal-beetle-enchanted.webp",
     "Enchanted Bluejay": "https://stealegg.com/assets/images/pets/enchanted-bluejay-enchanted.webp",
     "Astral Jackalope": "https://stealegg.com/assets/images/pets/astral-jackalope-enchanted.webp",
@@ -1790,7 +1793,7 @@ var guestStart, guestStop, layoutHook; // filled in below
     "Gargoyle": "https://asaiya2.github.io/steal-an-egg/Gargoyle_Demon.png",
     "Pure Jellyfish": "https://stealegg.com/assets/images/pets/pure-jellyfish-reviewed.webp",
     "Centaur": "https://stealegg.com/assets/images/pets/centaur-reviewed.webp",
-    "RazorFang": "https://asaiya2.github.io/steal-an-egg/Rock_Demon.png",
+    "RazorFang": "https://stealanegg.tools/images/RazorFang.png",
     "Pegasus": "https://stealanegg.tools/images/Pegasus.png",
     "Skeleton Horse": "https://stealanegg.tools/images/Skeleton_Horse.png",
     "Equinox": "https://static.wikia.nocookie.net/stealanegg/images/e/e7/Equinox.png/revision/latest?cb=20260913045536",
@@ -1874,7 +1877,7 @@ var guestStart, guestStop, layoutHook; // filled in below
     "Archdemon Dragon": "https://stealegg.com/assets/images/pets/archdemon-dragon-reviewed.webp",
     "Gigantus": "https://static.wikia.nocookie.net/stealanegg/images/0/0d/Gigantus.png/revision/latest?cb=20260927050405",
     "Dunkleosteus": "https://static.wikia.nocookie.net/stealanegg/images/e/e5/Dunkleosteus.png/revision/latest?cb=20260927050221",
-    "Giant Sloth": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/d/db/Giant_Sloth_Steal_Egg.png?width=110&format=jpg&auto=webp&quality=80",
+    "Giant Sloth": "https://stealanegg.tools/images/Giant_Sloth.png",
     "Terrorbird": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/steal-an-egg-roblox/3/3d/Terrorbird_Steal_Egg.png?width=116&format=jpg&auto=webp&quality=80",
     "Ring Guard": "https://static.wikia.nocookie.net/stealanegg/images/c/c7/Ring_Guard.png/revision/latest?cb=20260913045444",
     "Ringlord": "https://static.wikia.nocookie.net/stealanegg/images/e/e8/Ringlord.png/revision/latest?cb=20260913045506",
@@ -1910,6 +1913,78 @@ var guestStart, guestStop, layoutHook; // filled in below
     var i = EGG_INFO && EGG_INFO[name];
     var u = (i && typeof i[0] === "string" && /^https:\/\//i.test(i[0])) ? i[0] : EGG_IMAGES[name];
     return typeof u === "string" && /^https:\/\//i.test(u) ? u : "";
+  }
+
+  // ---------- EGG ART: the egg each pet hatches from ----------
+  // Rule: https://stealanegg.tools/images/Pet_Name_Egg.png   (spaces become underscores)
+  var EGG_ART_BASE = "https://stealanegg.tools/images/";
+  // Lookup order for a pet's egg picture: SPECIAL, then GROUPS, then name starts-with, then the rule above.
+  // 1) One pet with its own egg file (or a full https link). "???" = egg not known yet, shows a ??? picture:  "Pet Name": "File_Name.png",
+  var EGG_ART_SPECIAL = {
+    "Engine Snail": "Race_Lizard_Egg.png",
+    "Pink Dragon Experiment #010": "Pink_Dragon_Experiment_Egg.png",
+    "Mecha Chompa": "Mecha_Chompa_Egg.png",
+    "Ostrich": "Dodo_Egg.png",
+    "Toxic Hedgehog": "Hazardhog_Egg.png",
+    "Citadel Snail #007": "Citadel_Snail_Egg.png",
+    "Lava Frog": "Lava_frog_Egg.png",
+    "Balrog": "???",
+    "Race Cheetah": "???",
+    "Race Bird": "???",
+    // these eggs are only on the Fandom wiki
+    "Ice Dragon": "https://static.wikia.nocookie.net/stealanegg/images/2/2c/Ice_Dragon_Egg.png/revision/latest/scale-to-width-down/340?cb=20260902163726",
+    "Lava Dragon": "https://static.wikia.nocookie.net/stealanegg/images/4/41/Lava_Dragon_Egg.png/revision/latest/scale-to-width-down/340?cb=20260902163828",
+    "Cerberus": "https://static.wikia.nocookie.net/stealanegg/images/4/44/Cerberus_Egg.png/revision/latest/scale-to-width-down/340?cb=20260902163812",
+    "Beluga Whale": "https://static.wikia.nocookie.net/stealanegg/images/3/3a/Beluga_Whale_Egg.png/revision/latest/scale-to-width-down/340?cb=20260902163922",
+    "Mammoth": "https://static.wikia.nocookie.net/stealanegg/images/3/3f/Mammoth_Egg.png/revision/latest/scale-to-width-down/340?cb=20260902163620",
+    "King Mammoth": "https://static.wikia.nocookie.net/stealanegg/images/e/e5/King_Mammoth_Egg.png/revision/latest/scale-to-width-down/340?cb=20260902163630",
+    "Tob Tobi Tob Tob": "https://static.wikia.nocookie.net/stealanegg/images/e/e8/Tob_Tobi_Tob_Tob_Egg.png/revision/latest/scale-to-width-down/340?cb=20260902163333",
+    "Frog": "https://static.wikia.nocookie.net/stealanegg/images/c/cf/Frog_Egg.png/revision/latest/scale-to-width-down/340?cb=20260902163202",
+    "Equinox": "https://static.wikia.nocookie.net/stealanegg/images/b/be/Equinox_Egg.png/revision/latest/scale-to-width-down/985?cb=20260913045528",
+    "Snowy Owl": "https://static.wikia.nocookie.net/stealanegg/images/7/72/Snowy_Owl_Egg.png/revision/latest/scale-to-width-down/985?cb=20260904031817",
+    "Brr Brr Patapim": "https://static.wikia.nocookie.net/stealanegg/images/1/1e/Brr_Brr_Patapim_Egg.png/revision/latest/scale-to-width-down/340?cb=20260902163150",
+    // TEMPORARY: Google image-search thumbnails. These can stop working any time, replace with files you host
+    "Stag": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLKPExP7jRduWyglC-__A_sdH_-wlknEshBWTMFj5MVQ&s=10",
+    "Scorched Dragon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZ2HLU6Vt--0o7tKFQcWzz8iyKfmQmjSpYiJ2JWOH6OA&s=10",
+    "Salamander": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXIbefJs8ErVgbwzxuiFX4OnF-Pab5_SHAXpewAJqw7Q&s",
+    "Crane": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTiB46fXb10ljTXAvMW9-UmzVppVXax5fGMsL83CbknPg&s=10"
+  };
+  // 2) Pets that hatch from the same egg:  "Egg_File.png": "Pet|Pet|Pet",
+  var EGG_ART_GROUPS = {
+    "Extinction_Egg.png":     "Glyptodon|Sabertooth",
+    "Dragon_Egg.png":         "Baby Aurora Dragon|Shadow Dragon|Ember Dragon",
+    "Monster_Egg.png":        "Dreadscale|Crocodon|Krakenoid",
+    "Skeletal_Egg.png":       "Dunkleosteus|Giant Sloth|Terrorbird",
+    "Riftborn_Egg.png":       "Rift Eye|Voidmaw|Ventinal|Wendigo|Abyss Overlord|World Eater",
+    "Riftbeasts_Egg.png":     "Void Angler|Riftwing|Dreadclaw|Mawbreaker|Void Serpent",
+    "Shattered_Rift_Egg.png": "Shardling|Shattered Ram|Shardwing|Shattered Drake|Shattered Colossus",
+    "Biohazard_Egg.png":      "Toxic Rat|Radcoon|Toucax|Nuceodile|Nuclear Mantis",
+    "Experimental_Egg.png":   "Wheel Hamster|Stacked Turtle|Three Headed Chicken|Eyeball Crab|Dreadstinger",
+    "Unstable_Egg.png":       "Frogfly|Spiderpig|Sharkodile|Rhinobear|Octophant"
+  };
+  var EGG_ART_BY_NAME = {};
+  Object.keys(EGG_ART_GROUPS).forEach(function (file) {
+    EGG_ART_GROUPS[file].split("|").forEach(function (n) { EGG_ART_BY_NAME[n] = file; });
+  });
+  // 3) Every pet whose name starts with this shares one egg:  [name starts with, file name]
+  var EGG_ART_SHARED = [
+    ["Skeletal ", "Skeletal_Egg.png"],
+    ["Mecha ", "Mecha_Egg.png"],
+    ["Luminous ", "Luminous_Egg.png"]
+  ];
+  // picture shown for an egg that is not known yet ("???")
+  var EGG_UNKNOWN = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><ellipse cx="50" cy="54" rx="29" ry="38" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="3" stroke-dasharray="6 5"/><text x="50" y="63" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="26" font-weight="900" fill="#fff" fill-opacity=".9">???</text></svg>');
+  function eggArt(name) {
+    name = String(name || "").trim();
+    if (!name) return "";
+    var f = EGG_ART_SPECIAL[name] || EGG_ART_BY_NAME[name];
+    if (f === "???") return EGG_UNKNOWN;
+    if (f) return /^https:\/\//i.test(f) ? f : EGG_ART_BASE + f;
+    for (var i = 0; i < EGG_ART_SHARED.length; i++) {
+      if (name.indexOf(EGG_ART_SHARED[i][0]) === 0) return EGG_ART_BASE + EGG_ART_SHARED[i][1];
+    }
+    // default: spaces -> _, "#" -> "-"   (Experiment #001 -> Experiment_-001_Egg.png)
+    return EGG_ART_BASE + encodeURIComponent(name.replace(/\s+/g, "_").replace(/#/g, "-")) + "_Egg.png";
   }
 
   // ---------- join logic ----------
@@ -2065,7 +2140,7 @@ var guestStart, guestStop, layoutHook; // filled in below
   // [name, rarity, image]. Add a line here when you add an egg to the script.
   // An image set in EGG_IMAGES wins over the link in this list.
   var EGGS = [
-    ["RazorFang", "Secret", "https://asaiya2.github.io/steal-an-egg/Rock_Demon.png"],
+    ["RazorFang", "Secret", "https://stealanegg.tools/images/RazorFang.png"],
     ["Gargoyle", "Secret", "https://asaiya2.github.io/steal-an-egg/Gargoyle_Demon.png"],
     ["Centaur", "Secret", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmpo9iE1MHMQNyB2lCJ6QtI4O_Stz7EvDQXu6HZ2WZTw&s"],
     ["Pure Jellyfish", "Secret", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIXvOauCXxGctW9tMXU6YeSDuNiL8I_RxhFolmuKZy0A&s"],
@@ -2721,6 +2796,7 @@ function calcShowFinal(v) {
   })(t0);
 }
 var calcPicked = {}, calcSel = -1, calcTier = "All", calcQuery = "", calcPass = false, calcLast = null;
+var calcArt = (function () { try { return localStorage.getItem("calcArt") === "pet" ? "pet" : "egg"; } catch (e) { return "egg"; } })();   // which picture the calculator shows: "egg" or "pet"
 var CALC_VARIANTS = ["Silver", "Golden", "Rainbow"];
 var calcHaste = false;   // x2 hatch speed: hatch time is halved
 // ---- hatch time grows with weight ----
@@ -2888,14 +2964,48 @@ function calcUpdate() {
   r.notes.forEach(function (n) { br.appendChild(line("div", n, "warn")); });
 }
 
+// Give an <img> the egg or pet picture (whichever mode is on). Egg mode falls back to the pet picture if the egg picture is missing.
+function calcSetImg(im, name) {
+  var pet = eggImg(name), egg = eggArt(name);
+  var first = calcArt === "egg" ? (egg || pet) : (pet || egg);
+  var second = (calcArt === "egg" && pet && pet !== first) ? pet : "";
+  var retried = false;
+  im.onerror = function () {
+    if (!retried && second) { retried = true; im.src = second; }
+    else im.remove();
+  };
+  if (first) im.src = first; else im.remove();
+}
+function calcPrevImg() {
+  var egg = CALC_EGGS[calcSel], p = $("ccPrev");
+  if (!egg) return;
+  var old = p.querySelector("img"); if (old) old.remove();
+  var im = document.createElement("img"); im.alt = ""; im.referrerPolicy = "no-referrer";
+  calcSetImg(im, egg[0]);
+  p.insertBefore(im, p.firstChild);
+}
+function calcRefreshTileImgs() {
+  $("ccGrid").querySelectorAll(".cc-tile").forEach(function (b) {
+    var e = CALC_EGGS[+b.dataset.i]; if (!e) return;
+    var old = b.querySelector("img"); if (old) old.remove();
+    var im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer";
+    calcSetImg(im, e[0]); b.appendChild(im);
+  });
+}
+function calcSyncArt() {
+  document.querySelectorAll("#ccArt button").forEach(function (b) {
+    var on = b.dataset.m === calcArt;
+    b.classList.toggle("on", on); b.setAttribute("aria-pressed", on);
+  });
+}
+
 function calcShowEgg() {
   var egg = CALC_EGGS[calcSel], p = $("ccPrev");
   p.textContent = "";
   if (!egg) return;
   var col = CALC_COLORS[egg[1]];
   p.style.setProperty("--c", col);
-  var src = eggImg(egg[0]);
-  if (src) { var im = document.createElement("img"); im.alt = ""; im.referrerPolicy = "no-referrer"; im.onerror = function () { im.remove(); }; im.src = src; p.appendChild(im); }
+  calcPrevImg();
   p.appendChild(line("b", egg[0]));
   var r = line("div", egg[1], "r"); r.style.color = col; p.appendChild(r);
   p.appendChild(line("div", calcMoney(egg[2]), "m"));
@@ -2927,8 +3037,8 @@ function calcRenderGrid() {
     b.dataset.i = i;
     b.style.animationDelay = Math.min(n * 16, 420) + "ms";
     b.appendChild(line("span", e[0]));
-    var u = eggImg(e[0]);
-    if (u) { var im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer"; im.onerror = function () { im.remove(); }; im.src = u; b.appendChild(im); }
+    var im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.referrerPolicy = "no-referrer";
+    calcSetImg(im, e[0]); b.appendChild(im);
     box.appendChild(b);
   });
 }
@@ -3002,6 +3112,14 @@ document.addEventListener("DOMContentLoaded", function () {
     calcRenderGrid();
   });
   $("ccSearch").addEventListener("input", function () { calcQuery = this.value; calcRenderGrid(); });
+  // Egg / Pet picture toggle: swaps the pictures only, so typed weight, hatch time and chips stay as they are
+  calcSyncArt();
+  $("ccArt").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b || b.dataset.m === calcArt) return;
+    calcArt = b.dataset.m;
+    try { localStorage.setItem("calcArt", calcArt); } catch (x) {}
+    calcSyncArt(); calcRefreshTileImgs(); calcPrevImg();
+  });
   $("ccGrid").addEventListener("click", function (e) {
     var b = e.target.closest(".cc-tile"); if (!b) return;
     calcSel = +b.dataset.i;
@@ -4036,18 +4154,47 @@ document.addEventListener("DOMContentLoaded", function () {
       w.appendChild(line("div", name, "vname"));
       w.appendChild(line("div", rarity || "No values yet", "vrar"));
 
-      // image: hardcoded in EGG_IMAGES
+      // pictures: the pet (hardcoded in EGG_IMAGES) and, next to it, the egg it hatches from (eggArt)
+      var pics = document.createElement("div");
+      pics.className = "vpics";
+      // Both pictures stay invisible (but keep their space) until BOTH have loaded or failed, then pop in together.
+      pics.style.visibility = "hidden";
+      var pending = 2, revealed = false;
+      function reveal() {
+        if (revealed) return; revealed = true;
+        pics.style.visibility = "";
+        Array.prototype.forEach.call(pics.children, function (c) { c.style.animation = "none"; void c.offsetWidth; c.style.animation = ""; });
+      }
+      function settle() { if (--pending <= 0) reveal(); }
+      setTimeout(reveal, 3000);   // never wait longer than 3s for a slow picture
       var box = document.createElement("div");
       box.className = "vimg";
       var u = eggImg(name);
       if (u) {
         var im = document.createElement("img");
         im.alt = ""; im.referrerPolicy = "no-referrer";
-        im.onerror = function () { im.remove(); box.textContent = "No image yet"; };
+        im.onload = settle;
+        im.onerror = function () { im.remove(); box.insertBefore(document.createTextNode("No image yet"), box.firstChild); settle(); };
         im.src = u;
         box.appendChild(im);
-      } else box.textContent = "No image yet";
-      w.appendChild(box);
+      } else { box.appendChild(document.createTextNode("No image yet")); settle(); }
+      box.appendChild(line("span", "PET", "vtag"));
+      pics.appendChild(box);
+      var eggUrl = eggArt(name);
+      if (eggUrl) {
+        // if there is no egg picture the egg box is removed and the pet shows alone
+        var ebox = document.createElement("div");
+        ebox.className = "vimg egg";
+        var eim = document.createElement("img");
+        eim.alt = ""; eim.referrerPolicy = "no-referrer";
+        eim.onload = settle;
+        eim.onerror = function () { ebox.remove(); settle(); };
+        ebox.appendChild(eim);
+        ebox.appendChild(line("span", "EGG", "vtag"));
+        eim.src = eggUrl;
+        pics.appendChild(ebox);
+      } else settle();
+      w.appendChild(pics);
 
       // Stats
       var biome = /^Rift:/.test(island) ? "The Rift" : island;
@@ -4782,12 +4929,12 @@ document.addEventListener("DOMContentLoaded", function () {
   border:1px solid #303030;
   border-radius:10px;
   box-shadow:none;
-  animation:none;
+  animation:lifePop .4s cubic-bezier(.3,1.4,.5,1) backwards;
   transition:transform .16s,border-color .16s,background .16s,box-shadow .16s;
 }
 #calcPage .cc-tile:hover{transform:translateY(-2px);background:rgba(255,255,255,.07);border-color:#777;box-shadow:0 6px 18px rgba(0,0,0,.25)}
-#calcPage .cc-tile:hover img{animation:none}
-#calcPage .cc-tile.sel{border-color:#fff;box-shadow:0 0 0 1px #fff,0 0 20px rgba(255,255,255,.10);animation:none}
+#calcPage .cc-tile:hover img{animation:lifeWiggle .5s}
+#calcPage .cc-tile.sel{border-color:#fff;box-shadow:0 0 0 1px #fff,0 0 20px rgba(255,255,255,.10);animation:lifeGlow 1.8s ease-in-out infinite}
 #calcPage .cc-tile span{text-shadow:0 1px 3px #000;color:#fff}
 #calcPage .cc-tile img{filter:drop-shadow(0 5px 8px rgba(0,0,0,.45))}
 #calcPage .cc-side{gap:12px}
@@ -4799,8 +4946,8 @@ document.addEventListener("DOMContentLoaded", function () {
   border:1px solid #2c2c2c;
   border-radius:14px;
 }
-#calcPage .cc-prev::before{background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%);opacity:.8;animation:none}
-#calcPage .cc-prev img{width:170px;height:170px;animation:none}
+#calcPage .cc-prev::before{background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%);opacity:.8;animation:lifePulse 2.4s ease-in-out infinite}
+#calcPage .cc-prev img{width:170px;height:170px;animation:lifeHop .6s cubic-bezier(.3,1.6,.5,1),lifeBob 3s .6s ease-in-out infinite}
 #calcPage .cc-prev b{font-size:28px;text-shadow:none}
 #calcPage .cc-prev .r{color:#bbb}
 #calcPage .cc-prev .m{font-size:22px;color:#fff;text-shadow:none}
@@ -4832,7 +4979,7 @@ document.addEventListener("DOMContentLoaded", function () {
 #calcPage .cc-chip:hover{transform:none;border-color:#888}
 #calcPage .cc-chip:active{transform:none}
 #calcPage .cc-chip.on,
-#calcPage .cc-chip.gold.on{color:#0a0a0a;background:#fff;border-color:#fff;box-shadow:none;animation:none}
+#calcPage .cc-chip.gold.on{color:#0a0a0a;background:#fff;border-color:#fff;box-shadow:none;animation:lifePopOn .35s cubic-bezier(.3,1.7,.5,1)}
 #calcPage .cc-chip small{color:inherit;text-shadow:none;opacity:.72}
 #calcPage .cc-final{
   padding:14px;
@@ -4841,9 +4988,8 @@ document.addEventListener("DOMContentLoaded", function () {
   border:1px solid rgba(255,255,255,.14);
   border-radius:12px;
   box-shadow:none;
-  animation:none;
+  animation:lifeAura 2.6s ease-in-out infinite;
 }
-#calcPage .cc-final::after{display:none}
 #calcPage .cc-final small{color:#aaa}
 #calcPage .cc-final b{font-size:34px;color:#fff;text-shadow:none}
 #calcPage .cc-link{color:#ddd;text-decoration:none;border-bottom:1px solid #555}
@@ -4860,8 +5006,8 @@ document.addEventListener("DOMContentLoaded", function () {
 #calcPage .cc-btns .ghost{color:#eee;background:rgba(0,0,0,.25);border-color:#444}
 #calcPage .cc-hist{padding:18px 0 0;margin-top:16px;border-top:1px solid rgba(255,255,255,.12)}
 #calcPage .cc-hist h3{color:#ddd;font-size:14px}
-#calcPage .hitem{background:rgba(0,0,0,.30);border:1px solid #292929;border-radius:10px;animation:none}
-#calcPage .hitem:hover{transform:none;border-color:#666}
+#calcPage .hitem{background:rgba(0,0,0,.30);border:1px solid #292929;border-radius:10px;animation:lifeUp .4s both}
+#calcPage .hitem:hover{transform:translateX(4px);border-color:#666}
 #calcPage .hitem .hval,#calcPage .hitem .hmeta{text-shadow:none}
 @media(max-width:760px){
   #calcPage{padding:16px 12px}
@@ -4873,6 +5019,18 @@ document.addEventListener("DOMContentLoaded", function () {
 @media(prefers-reduced-motion:reduce){
   #calcPage *,#calcPage *::before,#calcPage *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
+/* ---- Egg + Pet pictures side by side (Egg Wiki) ---- */
+.vpics{display:flex;gap:16px;align-items:flex-start}
+.vpics .vimg{position:relative;flex:0 1 320px;min-width:0;width:auto;height:auto;aspect-ratio:1/1}
+.vtag{position:absolute;top:8px;right:8px;z-index:1;padding:3px 9px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#eee;background:rgba(0,0,0,.6);border:1px solid #444;border-radius:999px;pointer-events:none}
+/* ---- Egg / Pet picture toggle (Egg Calculator) ---- */
+.cc-searchrow{display:flex;gap:10px;align-items:stretch}
+.cc-searchrow .cc-search{flex:1 1 auto;min-width:0;width:auto}
+.cc-art{display:flex;flex:none;overflow:hidden;background:rgba(0,0,0,.38);border:1px solid #333;border-radius:10px}
+.cc-art button{border:0;background:transparent;color:#ccc;padding:0 16px;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s,color .15s}
+.cc-art button:hover{color:#fff}
+.cc-art button.on{background:#fff;color:#0a0a0a}
+.cc-art button:focus-visible{outline:2px solid #fff;outline-offset:-2px}
 </style>
 </body>
 </html>
