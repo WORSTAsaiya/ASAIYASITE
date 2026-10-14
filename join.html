@@ -877,7 +877,7 @@ body.wkSearching .vdet *{ animation:none !important; }
 
 <dialog id="donateDlg">
   <h3>Support the site</h3>
-  <p>Don't bother donating, Go buy food and treat yourself to a nice snack :></p>
+  <p>Donation details will go here.</p>
   <div class="dlgbtns"><button id="donateClose" class="no" type="button">Close</button></div>
 </dialog>
 
@@ -2186,13 +2186,13 @@ var guestStart, guestStop, layoutHook; // filled in below
     });
     var wasFirst = firstLoad;
     firstLoad = false;
-    allItems = items;
+    allItems = items.filter(function (it) { return +it.t > clearT; });
     if (wasFirst) setTimeout(function () { if (!$("left").hidden) cascadeFeed(0); }, 0);
     render();
   }
 
   // ---------- public feed (no key): rare egg alerts from /alerts ----------
-  var pubItems = [], pubSig = "";
+  var pubItems = [], pubSig = "", clearT = 0;
   function pollPublic() {
     fetch(API + "/alerts", { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : null; })
@@ -2201,7 +2201,7 @@ var guestStart, guestStop, layoutHook; // filled in below
         cycleStart = null; paintCycle();
         var sig = d.items.map(function (a) { return a.type + a.t + a.egg; }).join(",");
         if (sig === pubSig) return;
-        pubSig = sig; pubItems = d.items;
+        pubSig = sig; pubItems = d.items.filter(function (a) { return +a.t > clearT; });
         renderPublic();
       })
       .catch(function () {});
@@ -2299,6 +2299,9 @@ var guestStart, guestStop, layoutHook; // filled in below
   // Clear the currently displayed batch locally. The same batch stays cleared
   // on subsequent polls; a changed feed signature (new batch) appears normally.
   $("feedClear").addEventListener("click", function () {
+    var top = 0;
+    allItems.concat(pubItems).forEach(function (a) { if (+a.t > top) top = +a.t; });
+    if (top > clearT) clearT = top;
     allItems = []; pubItems = [];
     newKeys = {};
     render();
@@ -3562,7 +3565,408 @@ document.addEventListener("DOMContentLoaded", function () {
       "https://static.wikia.nocookie.net/stealanegg/images/a/a3/Chicken.png/revision/latest?cb=20260901193312",
       "A familiar farmyard bird with a lively cluck and a humble, dependable presence."
     ],
-    "Raccoon": { desc: "A curious masked forager with nimble paws, always ready to investigate anything left unattended.", reward: "+620 Speed, $4500" }
+"Raccoon": [
+      "",
+      "A curious masked forager with nimble paws, always ready to investigate anything left unattended."
+    ],
+    // ===== Rift: Riftborn Egg =====
+    "Rift Eye": [
+      "",
+      "A watchful eye torn loose from a Rift, staring out from the cracks between worlds."
+    ],
+    "Voidmaw": [
+      "",
+      "A hungry Rift creature that seems to be mostly mouth, swallowing the light around it."
+    ],
+    "Ventinal": [
+      "",
+      "A restless Rift sentinel that drifts like a living vent, leaking strange energy wherever it goes."
+    ],
+    "Wendigo": [
+      "",
+      "A gaunt, haunting beast pulled from the Rift, modeled on the starving forest spirit of old legends."
+    ],
+    "Abyss Overlord": [
+      "",
+      "A towering ruler of the Rift's depths, named after the Overlord bosses you fight inside Rifts."
+    ],
+    "World Eater": [
+      "",
+      "A colossal devourer from beyond the Rift, said to swallow whole worlds one bite at a time."
+    ],
+    // ===== Rift: Riftbeasts Egg =====
+    "Void Angler": [
+      "",
+      "A deep-dark hunter that dangles a glowing lure in the void and waits for something to wander close."
+    ],
+    "Riftwing": [
+      "",
+      "A winged creature that glides along the edges of tears in space, leaving shimmering trails behind."
+    ],
+    "Dreadclaw": [
+      "",
+      "A Rift predator with oversized, razor-edged claws built for tearing straight through armor."
+    ],
+    "Mawbreaker": [
+      "",
+      "A brutal Rift beast whose crushing jaws can snap through almost anything in its path."
+    ],
+    "Void Serpent": [
+      "",
+      "A long, coiling serpent of pure void, slipping silently between the folds of the Rift."
+    ],
+    // ===== Rift: Shattered Rift Egg =====
+    "Shardling": [
+      "",
+      "A small creature made of jagged crystal shards, chiming softly as it moves."
+    ],
+    "Shattered Ram": [
+      "",
+      "A stubborn ram with a body of cracked crystal, charging headfirst with horns like broken glass."
+    ],
+    "Shardwing": [
+      "",
+      "A bird-like creature whose wings are sheets of sharp crystal, scattering light as it flies."
+    ],
+    "Shattered Drake": [
+      "",
+      "A drake held together by glowing fractures, as if the Rift itself broke it apart and rebuilt it."
+    ],
+    "Shattered Colossus": [
+      "",
+      "A giant of fractured stone and crystal, the mightiest creature to emerge from the Shattered Rift."
+    ],
+    // ===== Dr. Scramble: Biohazard Egg =====
+    "Toxic Rat": [
+      "",
+      "A scrappy lab rat mutated by chemical spills, glowing faintly and always sniffing for scraps."
+    ],
+    "Radcoon": [
+      "",
+      "A radioactive raccoon whose mask now glows, rummaging through the lab's hazardous waste."
+    ],
+    "Toucax": [
+      "",
+      "A mutated toucan with a beak grown into a heavy, axe-like blade, a failed experiment that came out dangerous."
+    ],
+    "Nuceodile": [
+      "",
+      "A nuclear crocodile with glowing scales and a reactor-hot bite, born from one of Dr. Scramble's worst accidents."
+    ],
+    "Nuclear Mantis": [
+      "",
+      "A mantis charged with radiation, striking with blades that hum with unstable energy."
+    ],
+    // ===== Dr. Scramble: Experimental Egg =====
+    "Wheel Hamster": [
+      "",
+      "A hamster permanently attached to its exercise wheel, forever running and never getting anywhere."
+    ],
+    "Stacked Turtle": [
+      "",
+      "A pile of turtles balanced shell on shell, an experiment in how high a pet can stack before it topples."
+    ],
+    "Three Headed Chicken": [
+      "",
+      "A chicken with three heads that never quite agree, clucking in three directions at once."
+    ],
+    "Eyeball Crab": [
+      "",
+      "A crab covered in eyes, scuttling sideways while watching everything at once."
+    ],
+    "Dreadstinger": [
+      "",
+      "A fearsome lab-made stinger with a venomous tail, built to be as dangerous as an experiment can get."
+    ],
+    // ===== Dr. Scramble: Unstable Egg =====
+    "Frogfly": [
+      "",
+      "A frog fused with a fly, hopping and buzzing in equal measure."
+    ],
+    "Spiderpig": [
+      "",
+      "A pig with spider legs and a wobbly gait, one of Dr. Scramble's more unsettling splices."
+    ],
+    "Sharkodile": [
+      "",
+      "A fused shark and crocodile with a double row of teeth, at home in both water and mud."
+    ],
+    "Rhinobear": [
+      "",
+      "A heavy hybrid of a rhino and a bear, with the horn of one and the claws of the other."
+    ],
+    "Octophant": [
+      "",
+      "An elephant with octopus tentacles in place of a trunk, the most extreme result of an unstable experiment."
+    ],
+    // ===== Dr. Scramble: Other =====
+    "Experiment #001": [
+      "",
+      "Dr. Scramble's very first experiment, an event-limited creature that was only ever sold in tiny numbers."
+    ],
+    "Nibbles #013": [
+      "",
+      "Experiment #013, a small escapee who got loose from Dr. Scramble's drones and hid somewhere on the map."
+    ],
+    // ===== Event Rewards =====
+    "Eye Bat #021": [
+      "",
+      "Experiment #021, a bat with a single huge eye, an event reward that watches from the dark."
+    ],
+    "Citadel Snail #007": [
+      "",
+      "Experiment #007, a snail carrying a fortress on its back, an event reward that is slow but well defended."
+    ],
+    "Uncoiled Armadillo": [
+      "",
+      "An armadillo that has finally unrolled from its armored ball, an event reward caught mid-stretch."
+    ],
+    "67": [
+      "",
+      "A meme-powered event pet that carries nothing but its name, and somehow it is a Secret."
+    ],
+    "Toxic Hedgehog": [
+      "",
+      "A hedgehog whose spines drip with toxic goo, an event reward and the top-earning Secret pet."
+    ],
+    "Mecha Chompa": [
+      "",
+      "A mechanical Chompa built from scrap and steel, with a metal jaw that never stops snapping."
+    ],
+    "Pink Dragon Experiment #010": [
+      "",
+      "Experiment #010, a pink dragon from Dr. Scramble's lab that turned out far stronger than planned."
+    ],
+    "Mecha Scrambler": [
+      "",
+      "A robotic version of Dr. Scramble himself, an event reward built around his mech."
+    ],
+    // ===== Store: Luminous Egg =====
+    "Spike": [
+      "",
+      "A spiky little creature with a shimmering glow, a standout from the Luminous Egg."
+    ],
+    "Spirit Manta": [
+      "",
+      "A manta ray that glides like a drifting spirit, trailing soft light through the air."
+    ],
+    "Abyss Shark": [
+      "",
+      "A shark from the deepest water, with a bioluminescent glow that lights up the dark."
+    ],
+    "Electric Eel": [
+      "",
+      "A long eel crackling with electricity, a charged-up Secret from the Luminous Egg."
+    ],
+    "Terra Snapper": [
+      "",
+      "A heavy, earth-toned snapper with a bite as hard as the ground it lives on."
+    ],
+    "Cthulhu": [
+      "",
+      "A tentacled horror from the deep, drawn from the classic legend of the sleeping sea god."
+    ],
+    // ===== Store: Luminous Reroll Egg =====
+    "Luminous Spike": [
+      "",
+      "A brighter, stronger Spike with a radiant glow, found through the Luminous Reroll Egg."
+    ],
+    "Luminous Spirit Manta": [
+      "",
+      "A Spirit Manta lit from within, gliding like a lantern through a dark sky."
+    ],
+    "Luminous Abyss Shark": [
+      "",
+      "An Abyss Shark whose glow has grown to a blinding shine in the depths."
+    ],
+    "Luminous Electric Eel": [
+      "",
+      "An Electric Eel overflowing with radiant energy, sparking brighter than ever."
+    ],
+    "Luminous Terra Snapper": [
+      "",
+      "A Terra Snapper with glowing, gem-like patterns across its shell and skin."
+    ],
+    "Luminous Cthulhu": [
+      "",
+      "A Cthulhu bathed in eerie light, the most powerful of the Luminous Reroll pets."
+    ],
+    // ===== Store: Extinction Egg =====
+    "Glyptodon": [
+      "",
+      "A giant armored mammal from the ice ages, wearing a domed shell like a living tank."
+    ],
+    "Sabertooth": [
+      "",
+      "A prehistoric cat with huge curved fangs, a Divine-tier predator from the Extinction Egg."
+    ],
+    // ===== Store: Dragon Egg =====
+    "Baby Aurora Dragon": [
+      "",
+      "A young dragon whose scales shimmer like the northern lights, still small but already glowing."
+    ],
+    "Shadow Dragon": [
+      "",
+      "A dragon wrapped in living shadow, hard to spot until its eyes open in the dark."
+    ],
+    "Scorched Dragon": [
+      "",
+      "A dragon with blackened, smoldering scales, as if it just walked out of a fire."
+    ],
+    "Drilla": [
+      "",
+      "A dragon with a drill-like snout, tunneling through rock like it was nothing."
+    ],
+    "Void Dragon": [
+      "",
+      "A dragon of pure void, where its wings fall dark as the empty space between stars."
+    ],
+    "Ember Dragon": [
+      "",
+      "A dragon with a body of glowing embers, leaving a trail of sparks wherever it flies."
+    ],
+    // ===== Racing Eggs =====
+    "Race Seahorse": [
+      "",
+      "A speedy seahorse built for the track, tied to the Nitro Race event."
+    ],
+    "Race Lizard": [
+      "",
+      "A quick lizard that darts along the track, tied to the Nitro Race event."
+    ],
+    "Race Bird": [
+      "",
+      "A fast-flapping bird that skims the finish line, tied to the Nitro Race event."
+    ],
+    "Race Cheetah": [
+      "",
+      "A cheetah built for top speed, sprinting past the pack in the Nitro Race event."
+    ],
+    "Engine Snail": [
+      "",
+      "A snail with an engine strapped to its shell, the unlikely champion of the Nitro Race."
+    ],
+    // ===== Other (not sorted yet) =====
+    "Archdemon Dragon": [
+      "",
+      "A fearsome dragon ruling over the demon realm, an event pet with an overwhelming presence."
+    ],
+    "Gigantus": [
+      "",
+      "An enormous prehistoric giant that shakes the ground with every step, from the Skeletal Egg line."
+    ],
+    "Dunkleosteus": [
+      "",
+      "An armored prehistoric fish with bony jaws that bite like shears, from the Skeletal Egg line."
+    ],
+    "Giant Sloth": [
+      "",
+      "A huge, slow-moving ice age sloth with long claws, from the Skeletal Egg line."
+    ],
+    "Terrorbird": [
+      "",
+      "A towering flightless predator with a hooked beak, from the Skeletal Egg line."
+    ],
+    "Ring Guard": [
+      "",
+      "A loyal guardian standing watch around a mysterious ring, with a source the wiki lists as unconfirmed."
+    ],
+    "Ringlord": [
+      "",
+      "The commanding master of the ring guardians, with a source the wiki lists as unconfirmed."
+    ],
+    "Skeletal Sabertooth": [
+      "",
+      "The bones of a Sabertooth rattling back to life, a Divine-tier pet from the Skeletal Egg line."
+    ],
+    "Skeletal Gigantus": [
+      "",
+      "A towering Gigantus reduced to bone, still enormous and still moving."
+    ],
+    "Skeletal Dunkleosteus": [
+      "",
+      "A Dunkleosteus stripped to its skeleton, its bony jaws still ready to snap."
+    ],
+    "Skeletal Glyptodon": [
+      "",
+      "A Glyptodon whose heavy shell has become a hollow cage of bones."
+    ],
+    "Skeletal Terrorbird": [
+      "",
+      "A Terrorbird that is nothing but bone, its hooked skull still scanning for prey."
+    ],
+    "Skeletal Giant Sloth": [
+      "",
+      "A Giant Sloth reduced to a skeleton, still clinging to its branch."
+    ],
+    "Mecha Dreadscale": [
+      "",
+      "A robotic Dreadscale from the Mecha Egg, built from armored plates and fitted with weaponry."
+    ],
+    "Dreadscale": [
+      "",
+      "A fearsome scaled monster from the Monster Egg, with a tail armored for battle."
+    ],
+    "Mecha Krakenoid": [
+      "",
+      "A mechanical Krakenoid from the Mecha Egg, with tentacles of steel cable."
+    ],
+    "Mecha Crocodon": [
+      "",
+      "A robotic Crocodon from the Mecha Egg, with a jaw of hardened metal."
+    ],
+    "Hazardhog": [
+      "",
+      "A hedgehog marked with hazard stripes, bristling with warning signs and unstable spines."
+    ],
+    "Krakenoid": [
+      "",
+      "A tentacled sea monster from the Monster Egg, a smaller cousin of the legendary Kraken."
+    ],
+    "Balrog": [
+      "",
+      "A towering demon of shadow and flame, drawn from the fantasy legend of the fiery underworld."
+    ],
+    "Strawberry Elephant": [
+      "",
+      "A strawberry-covered elephant from the Brainrot Egg, as sweet and silly as brainrot gets."
+    ],
+    "Toxic Crocodile": [
+      "",
+      "A crocodile with sickly green scales and a venomous bite, steeped in toxic waste."
+    ],
+    "Mecha Crawler": [
+      "",
+      "A mechanical Crawler from the Mecha Egg, with metal legs that skitter across any surface."
+    ],
+    "Jitterbug": [
+      "",
+      "A restless bug that can never sit still, twitching and buzzing nonstop."
+    ],
+    "Mecha Froggo": [
+      "",
+      "A robotic Froggo from the Mecha Egg, springing around on hydraulic legs."
+    ],
+    "Mecha Scorpio": [
+      "",
+      "A mechanical Scorpio from the Mecha Egg, with a steel stinger and claws."
+    ],
+    "Crocodon": [
+      "",
+      "A heavy crocodile-like monster from the Monster Egg, armored from snout to tail."
+    ],
+    "Bombo Croco": [
+      "",
+      "A silly, brainrot-style crocodile character, listed on the wiki as Bomboclat Crocolat."
+    ],
+    "Ostrich": [
+      "",
+      "A long-legged runner that outpaces almost anything on foot, with a head held high above the crowd."
+    ],
+    "Amethyst Runebear": [
+      "",
+      "A bear marked with glowing runes and purple amethyst crystals growing from its fur."
+    ]
   };
 
   
