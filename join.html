@@ -1644,7 +1644,7 @@ var guestStart, guestStop, layoutHook; // filled in below
   // or with the file name of an image you uploaded next to join.html (for example "bg2.png").
   var WALLPAPERS = {
     1: "https://cdn.jsdelivr.net/gh/WORSTAsaiya/ASAIYASITE@main/calc-pc.mp4",
-    2: "https://media1.tenor.com/m/7zgRvAcRNv0AAAAd/mihoyo-genshin.gif",
+    2: "https://cdn.jsdelivr.net/gh/WORSTAsaiya/ASAIYASITE@main/calc-pc.mp4",   // Discord: same as Steal an egg (was the Genshin gif: https://media1.tenor.com/m/7zgRvAcRNv0AAAAd/mihoyo-genshin.gif)
     3: "Channel 3 image"
   };
 
@@ -4535,7 +4535,7 @@ document.addEventListener("DOMContentLoaded", function () {
     $("valuesPage").hidden = !(live && pg === 2);
     $("calcPage").hidden = !(live && pg === 3);
     $("fusionPage").hidden = !(live && pg === 5);
-    calcBgShow(live && (pg >= 2 || unlocked));   // Wiki, Calculator, Join share ONE video that keeps playing when you switch between them; not on Egg Notifiers
+    calcBgShow(ch === 2 || (live && (pg >= 2 || unlocked)));   // Wiki, Calculator, Join and the whole Discord channel share ONE video that keeps playing when you switch between them; not on Egg Notifiers
     $("blank").hidden = live || ch === 2;
     $("verifyPage").hidden = !(ch === 2 && pg === 1);
     $("soonPage").hidden = !(ch === 2 && pg >= 2);
